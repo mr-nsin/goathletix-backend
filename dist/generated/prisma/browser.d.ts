@@ -1,0 +1,13 @@
+import * as Prisma from './internal/prismaNamespaceBrowser.js';
+export { Prisma };
+export * as $Enums from './enums.js';
+export * from './enums.js';
+export type Organizer = Prisma.OrganizerModel;
+export type Event = Prisma.EventModel;
+export type Profile = Prisma.ProfileModel;
+export type Follow = Prisma.FollowModel;
+export type UserCalendar = Prisma.UserCalendarModel;
+export type Reminder = Prisma.ReminderModel;
+export type EventRequest = Prisma.EventRequestModel;
+export type UserFeedback = Prisma.UserFeedbackModel;
+export type ActivityLog = Prisma.ActivityLogModel;

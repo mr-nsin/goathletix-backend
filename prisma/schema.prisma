@@ -1,0 +1,311 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model alembic_version {
+  version_num String @id(map: "alembic_version_pkc") @db.VarChar(32)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model auditlog {
+  user_id      String   @db.Uuid
+  audio_s3_url String?  @db.VarChar
+  transcript   String   @db.VarChar
+  parsed_json  String   @db.VarChar
+  id           String   @id @db.Uuid
+  created_at   DateTime @db.Timestamp(6)
+  user         user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model brokercredential {
+  user_id            String  @db.Uuid
+  fyers_app_id       String? @db.VarChar
+  fyers_access_token String? @db.VarChar
+  id                 String  @id @db.Uuid
+  user               user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model order {
+  user_id         String  @db.Uuid
+  broker_order_id String? @db.VarChar
+  symbol          String  @db.VarChar
+  side            String  @db.VarChar
+  quantity        Int
+  status          String  @db.VarChar
+  is_algo_trade   Boolean
+  id              String  @id @db.Uuid
+  user            user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model user {
+  email             String             @unique(map: "ix_user_email") @db.VarChar
+  subscription_tier String             @db.VarChar
+  id                String             @id @db.Uuid
+  created_at        DateTime           @db.Timestamp(6)
+  auditlog          auditlog[]
+  brokercredential  brokercredential[]
+  order             order[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model virtualportfolio {
+  id               Int   @id @default(autoincrement())
+  total_capital    Float
+  available_margin Float
+  realized_pnl     Float
+  unrealized_pnl   Float
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model virtualtrade {
+  id            String    @id @db.Uuid
+  strategy_name String    @db.VarChar
+  symbol        String    @db.VarChar
+  side          String    @db.VarChar
+  quantity      Int
+  entry_price   Float
+  exit_price    Float?
+  status        String    @db.VarChar
+  pnl           Float
+  created_at    DateTime  @db.Timestamp(6)
+  closed_at     DateTime? @db.Timestamp(6)
+}
+
+// ==========================================
+// GoAthletix Event Discovery Models
+// ==========================================
+
+model Organizer {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  websiteUrl String?  @map("website_url")
+  logoUrl    String?  @map("logo_url")
+  isVerified Boolean  @default(false) @map("is_verified")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  events     Event[]
+  follows    Follow[]
+
+  @@map("organizers")
+}
+
+model Event {
+  id              String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId        String                                 @unique @map("source_id")
+  eventName       String                                 @map("event_name")
+  sportType       SportCategory                          @map("sport_type")
+  startDate       DateTime                               @map("start_date") @db.Date
+  endDate         DateTime?                              @map("end_date") @db.Date
+  city            String
+  state           String
+  venue           String
+  geoLocation     Unsupported("geography(Point, 4326)")? @map("geo_location")
+  distanceOptions String[]                               @map("distance_options")
+  elevationGain   String?                                @map("elevation_gain")
+  difficulty      DifficultyLevel                        @default(Intermediate)
+  priceRange      String?                                @map("price_range")
+  registrationUrl String                                 @map("registration_url")
+  organizerId     String?                                @map("organizer_id") @db.Uuid
+  organizer       Organizer?                             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+  terrain         String?
+  isVirtual       Boolean                                @default(false) @map("is_virtual")
+  status          EventStatus                            @default(upcoming)
+  md5PayloadHash  String                                 @map("md5_payload_hash")
+  createdAt       DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  follows         Follow[]
+  userCalendars   UserCalendar[]
+  reminders       Reminder[]
+
+  @@map("events")
+}
+
+model Profile {
+  id                  String          @id @db.Uuid
+  fullName            String?         @map("full_name")
+  preferredLocation   String?         @map("preferred_location")
+  sportsInterest      SportCategory[] @map("sports_interest")
+  onboardingCompleted Boolean         @default(false) @map("onboarding_completed")
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  follows             Follow[]
+  userCalendars       UserCalendar[]
+  reminders           Reminder[]
+  eventRequests       EventRequest[]
+  feedbacks           UserFeedback[]
+  activityLogs        ActivityLog[]
+
+  @@map("profiles")
+}
+
+model Follow {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  profile     Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType  FollowTarget @map("target_type")
+  organizerId String?      @map("organizer_id") @db.Uuid
+  organizer   Organizer?   @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  eventId     String?      @map("event_id") @db.Uuid
+  event       Event?       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([userId, organizerId], name: "unique_user_follow_organizer")
+  @@unique([userId, eventId], name: "unique_user_follow_event")
+  @@map("follows")
+}
+
+model UserCalendar {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  profile   Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String   @map("event_id") @db.Uuid
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([userId, eventId], name: "unique_user_event_calendar")
+  @@map("user_calendars")
+}
+
+model Reminder {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String       @map("user_id") @db.Uuid
+  profile     Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId     String       @map("event_id") @db.Uuid
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  triggerType ReminderType @map("trigger_type")
+  isTriggered Boolean      @default(false) @map("is_triggered")
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([userId, eventId, triggerType], name: "unique_user_event_reminder")
+  @@map("reminders")
+}
+
+model EventRequest {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String?       @map("user_id") @db.Uuid
+  profile         Profile?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventName       String        @map("event_name")
+  sportType       SportCategory @map("sport_type")
+  startDate       DateTime      @map("start_date") @db.Date
+  endDate         DateTime?     @map("end_date") @db.Date
+  city            String
+  state           String
+  venue           String
+  registrationUrl String        @map("registration_url")
+  description     String?
+  organizerName   String        @map("organizer_name")
+  status          RequestStatus @default(pending)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("event_requests")
+}
+
+model UserFeedback {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String?      @map("user_id") @db.Uuid
+  profile      Profile?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  feedbackType FeedbackType @map("feedback_type")
+  message      String
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("user_feedbacks")
+}
+
+model ActivityLog {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String?        @map("user_id") @db.Uuid
+  profile         Profile?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userDisplayName String?        @map("user_display_name")
+  actionType      ActivityAction @map("action_type")
+  targetId        String         @map("target_id") @db.Uuid
+  targetName      String         @map("target_name")
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("activity_logs")
+}
+
+enum SportCategory {
+  running
+  cycling
+  triathlon
+  trekking
+  fitness
+  racquet
+  water
+  adventure
+
+  @@map("sport_category")
+}
+
+enum EventStatus {
+  upcoming
+  closed
+  completed
+  cancelled
+
+  @@map("event_status")
+}
+
+enum DifficultyLevel {
+  Beginner
+  Intermediate
+  Advanced
+  Expert
+
+  @@map("difficulty_level")
+}
+
+enum FollowTarget {
+  organizer
+  event
+
+  @@map("follow_target")
+}
+
+enum ReminderType {
+  registration_open
+  registration_close
+  event_date
+
+  @@map("reminder_type")
+}
+
+enum RequestStatus {
+  pending
+  approved
+  rejected
+
+  @@map("request_status")
+}
+
+enum FeedbackType {
+  feature_request
+  general_feedback
+  bug_report
+
+  @@map("feedback_type")
+}
+
+enum ActivityAction {
+  save
+  follow
+  calendar_add
+
+  @@map("activity_action")
+}
