@@ -24,6 +24,8 @@
 | 9 | **Manual Event Ingestion** | Admin tool to add/edit events manually | Seed initial database before scrapers are built | Low-Medium | Admin panel |
 | 10 | **Basic SEO** | Meta tags, OpenGraph, structured data for every event page | Google indexing, WhatsApp share previews | Low | Page templates |
 | 11 | **WhatsApp Share Cards** | Tapping "Share" generates a WhatsApp-formatted message with event summary + link | Viral distribution through India's #1 messaging app | Low | OG tags, deep links |
+| 49 | **Buddy Sync** | Share custom links with friends to align calendars | Group race planning, viral invite loops | Medium-High | Personal Event Calendar (#14) |
+| 50 | **Live Activity Feed** | Dynamic feed of user actions like saves, follows, and calendar adds, powered by WebSockets | Real-time social proof, active community feel | High | WebSockets infra, User Accounts (#12) |
 
 ---
 
@@ -44,6 +46,8 @@
 | 22 | **Event Comparison** | Compare 2-3 events side-by-side | "Which half-marathon should I do?" | Medium | Standardized event data |
 | 23 | **Past Events Archive** | Show completed events with results, photos, reviews | Historical record, trust for organizers, SEO content | Low-Medium | Event lifecycle |
 | 24 | **Web Scraping Pipeline** | Automated scraping of BhaagIndia, Townscript, organizer sites | Scale event data collection | High | Scraping infra, data normalization |
+| 51 | **Weather & Altitude Advisories** | Display dynamic climate, terrain, and acclimatization guides for high-altitude/monsoon events | Safe planning for extreme weather and high altitude | Medium | Event Detail Page (#6) |
+| 52 | **Verified Organizer Dashboard** | Claim profile, view traffic/save/follow analytics, and broadcast templates to followers | High-value retention tool for race directors | High | Organizer Profile Pages (#18), Organizer Analytics (#31) |
 
 ---
 
@@ -93,7 +97,8 @@ Event Data Model (#2)
 │   ├── Event Detail Page (#6)
 │   │   ├── External Registration Redirect (#7)
 │   │   ├── WhatsApp Share Cards (#11)
-│   │   └── Event Reviews (#19) → User Accounts (#12)
+│   │   ├── Event Reviews (#19) → User Accounts (#12)
+│   │   └── Weather & Altitude Advisories (#51)
 │   ├── Search & Filter (#3)
 │   └── Event Comparison (#22)
 ├── City Landing Pages (#4)
@@ -105,13 +110,16 @@ Event Data Model (#2)
 User Accounts (#12)
 ├── Save/Bookmark Events (#13)
 │   ├── Personal Event Calendar (#14)
+│   │   └── Buddy Sync (#49)
 │   └── Registration Reminders (#15)
 ├── Event Reviews (#19)
+├── Live Activity Feed (#50)
 └── User Profiles (#36, Future)
 
 Organizer Accounts (#16)
 ├── Event Submission Form (#17)
 ├── Organizer Profile Pages (#18)
+│   └── Verified Organizer Dashboard (#52)
 ├── Organizer Analytics (#31)
 └── Instagram Share Templates (#21)
 ```

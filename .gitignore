@@ -1,6 +1,32 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# Dependencies and build artifacts
+**/node_modules/
+**/.next/
+**/dist/
+**/coverage/
+**/.turbo/
+**/__pycache__/
+*.py[cod]
 
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+
+# Local/editor files
+.DS_Store
+*.tsbuildinfo
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Extra backend stuff
 /generated/prisma
-/dist

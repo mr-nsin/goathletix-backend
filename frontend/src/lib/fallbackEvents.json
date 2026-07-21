@@ -1,0 +1,2000 @@
+[
+  {
+    "event_name": "Tata Mumbai Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-01-17",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "venue": "CST Railway Station",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "40m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://tatamumbaimarathon.procam.in",
+    "organizer_name": "Procam International",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Tata Mumbai Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-01-17",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "venue": "CST Railway Station",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "40m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://tatamumbaimarathon.procam.in",
+    "organizer_name": "Procam International",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Tata Mumbai Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-01-17",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "venue": "CST Railway Station",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "40m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://tatamumbaimarathon.procam.in",
+    "organizer_name": "Procam International",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Wipro Bengaluru Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-09-27",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "venue": "Kanteerava Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "120m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91100 - \u20b93000",
+    "registration_url": "https://www.indiarunning.com/e/wipro-bengaluru-marathon",
+    "organizer_name": "NEB Sports",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Wipro Bengaluru Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-09-27",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "venue": "Kanteerava Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "120m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91100 - \u20b93000",
+    "registration_url": "https://www.indiarunning.com/e/wipro-bengaluru-marathon",
+    "organizer_name": "NEB Sports",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Wipro Bengaluru Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-09-27",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "venue": "Kanteerava Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "120m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91100 - \u20b93000",
+    "registration_url": "https://www.indiarunning.com/e/wipro-bengaluru-marathon",
+    "organizer_name": "NEB Sports",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Adani Ahmedabad Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-11-29",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "venue": "Sabarmati Riverfront",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "10m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.ahmedabadmarathon.com",
+    "organizer_name": "Adani Group",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Adani Ahmedabad Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-11-29",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "venue": "Sabarmati Riverfront",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "10m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.ahmedabadmarathon.com",
+    "organizer_name": "Adani Group",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Adani Ahmedabad Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-11-29",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "venue": "Sabarmati Riverfront",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "10m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.ahmedabadmarathon.com",
+    "organizer_name": "Adani Group",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pune Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-08-02",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune Police Ground",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9800 - \u20b92000",
+    "registration_url": "https://www.indiarunning.com/e/pune-marathon",
+    "organizer_name": "Pune Athletic Association",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pune Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-08-02",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune Police Ground",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9800 - \u20b92000",
+    "registration_url": "https://www.indiarunning.com/e/pune-marathon",
+    "organizer_name": "Pune Athletic Association",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pune Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-08-02",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune Police Ground",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9800 - \u20b92000",
+    "registration_url": "https://www.indiarunning.com/e/pune-marathon",
+    "organizer_name": "Pune Athletic Association",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Indore Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-12-20",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Nehru Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K"
+    ],
+    "elevation_gain": "80m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9700 - \u20b91800",
+    "registration_url": "https://www.indiarunning.com/e/indore-marathon",
+    "organizer_name": "Indore Runners Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Indore Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-12-20",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Nehru Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K"
+    ],
+    "elevation_gain": "80m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9700 - \u20b91800",
+    "registration_url": "https://www.indiarunning.com/e/indore-marathon",
+    "organizer_name": "Indore Runners Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Indore Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-12-20",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Nehru Stadium",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K"
+    ],
+    "elevation_gain": "80m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9700 - \u20b91800",
+    "registration_url": "https://www.indiarunning.com/e/indore-marathon",
+    "organizer_name": "Indore Runners Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Udupi Full Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-12-20",
+    "city": "Udupi",
+    "state": "Karnataka",
+    "venue": "Malpe Beach",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "30m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.indiarunning.com/e/udupi-full-marathon",
+    "organizer_name": "Udupi Sports Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Udupi Full Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-12-20",
+    "city": "Udupi",
+    "state": "Karnataka",
+    "venue": "Malpe Beach",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "30m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.indiarunning.com/e/udupi-full-marathon",
+    "organizer_name": "Udupi Sports Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Udupi Full Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-12-20",
+    "city": "Udupi",
+    "state": "Karnataka",
+    "venue": "Malpe Beach",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "30m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900 - \u20b92500",
+    "registration_url": "https://www.indiarunning.com/e/udupi-full-marathon",
+    "organizer_name": "Udupi Sports Club",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Kovalam Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-09-13",
+    "city": "Thiruvananthapuram",
+    "state": "Kerala",
+    "venue": "Kovalam Beach Road",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "110m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9800 - \u20b92200",
+    "registration_url": "https://www.townscript.com/e/kovalam-marathon-2026",
+    "organizer_name": "Trivandrum Runners",
+    "terrain": "Road/Scenic",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Kovalam Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-09-13",
+    "city": "Thiruvananthapuram",
+    "state": "Kerala",
+    "venue": "Kovalam Beach Road",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "110m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9800 - \u20b92200",
+    "registration_url": "https://www.townscript.com/e/kovalam-marathon-2026",
+    "organizer_name": "Trivandrum Runners",
+    "terrain": "Road/Scenic",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Kovalam Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-09-13",
+    "city": "Thiruvananthapuram",
+    "state": "Kerala",
+    "venue": "Kovalam Beach Road",
+    "distance_options": [
+      "42.2K",
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "110m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9800 - \u20b92200",
+    "registration_url": "https://www.townscript.com/e/kovalam-marathon-2026",
+    "organizer_name": "Trivandrum Runners",
+    "terrain": "Road/Scenic",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Tour of Nilgiris 2026",
+    "sport_type": "cycling",
+    "event_date": "2026-12-06",
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "venue": "Mysuru to Ooty",
+    "distance_options": [
+      "1000K Tour (8 Days)"
+    ],
+    "elevation_gain": "12000m",
+    "difficulty": "Expert",
+    "price_range": "\u20b945000",
+    "registration_url": "https://tourofnilgiris.com",
+    "organizer_name": "RideACycle Foundation",
+    "terrain": "Road/Mountain Passes",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Tour of Nilgiris 2027",
+    "sport_type": "cycling",
+    "event_date": "2027-12-06",
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "venue": "Mysuru to Ooty",
+    "distance_options": [
+      "1000K Tour (8 Days)"
+    ],
+    "elevation_gain": "12000m",
+    "difficulty": "Expert",
+    "price_range": "\u20b945000",
+    "registration_url": "https://tourofnilgiris.com",
+    "organizer_name": "RideACycle Foundation",
+    "terrain": "Road/Mountain Passes",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Tour of Nilgiris 2028",
+    "sport_type": "cycling",
+    "event_date": "2028-12-06",
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "venue": "Mysuru to Ooty",
+    "distance_options": [
+      "1000K Tour (8 Days)"
+    ],
+    "elevation_gain": "12000m",
+    "difficulty": "Expert",
+    "price_range": "\u20b945000",
+    "registration_url": "https://tourofnilgiris.com",
+    "organizer_name": "RideACycle Foundation",
+    "terrain": "Road/Mountain Passes",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Deccan Cliffhanger 2026",
+    "sport_type": "cycling",
+    "event_date": "2026-11-28",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune to Goa",
+    "distance_options": [
+      "643K Ultra Race"
+    ],
+    "elevation_gain": "6500m",
+    "difficulty": "Expert",
+    "price_range": "\u20b98000 - \u20b918000",
+    "registration_url": "https://www.deccancliffhanger.com",
+    "organizer_name": "Inspire India",
+    "terrain": "Highway/Hilly Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Deccan Cliffhanger 2027",
+    "sport_type": "cycling",
+    "event_date": "2027-11-28",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune to Goa",
+    "distance_options": [
+      "643K Ultra Race"
+    ],
+    "elevation_gain": "6500m",
+    "difficulty": "Expert",
+    "price_range": "\u20b98000 - \u20b918000",
+    "registration_url": "https://www.deccancliffhanger.com",
+    "organizer_name": "Inspire India",
+    "terrain": "Highway/Hilly Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Deccan Cliffhanger 2028",
+    "sport_type": "cycling",
+    "event_date": "2028-11-28",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Pune to Goa",
+    "distance_options": [
+      "643K Ultra Race"
+    ],
+    "elevation_gain": "6500m",
+    "difficulty": "Expert",
+    "price_range": "\u20b98000 - \u20b918000",
+    "registration_url": "https://www.deccancliffhanger.com",
+    "organizer_name": "Inspire India",
+    "terrain": "Highway/Hilly Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ironman 70.3 Goa 2026",
+    "sport_type": "triathlon",
+    "event_date": "2026-11-08",
+    "city": "Panaji",
+    "state": "Goa",
+    "venue": "Miramar Beach",
+    "distance_options": [
+      "1.9K Swim + 90K Cycle + 21.1K Run"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Expert",
+    "price_range": "\u20b928000 - \u20b935000",
+    "registration_url": "https://www.ironman.com/im703-goa",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Ocean/Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ironman 70.3 Goa 2027",
+    "sport_type": "triathlon",
+    "event_date": "2027-11-08",
+    "city": "Panaji",
+    "state": "Goa",
+    "venue": "Miramar Beach",
+    "distance_options": [
+      "1.9K Swim + 90K Cycle + 21.1K Run"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Expert",
+    "price_range": "\u20b928000 - \u20b935000",
+    "registration_url": "https://www.ironman.com/im703-goa",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Ocean/Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ironman 70.3 Goa 2028",
+    "sport_type": "triathlon",
+    "event_date": "2028-11-08",
+    "city": "Panaji",
+    "state": "Goa",
+    "venue": "Miramar Beach",
+    "distance_options": [
+      "1.9K Swim + 90K Cycle + 21.1K Run"
+    ],
+    "elevation_gain": "150m",
+    "difficulty": "Expert",
+    "price_range": "\u20b928000 - \u20b935000",
+    "registration_url": "https://www.ironman.com/im703-goa",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Ocean/Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Dadi Prakashmani Abu Half Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-08-09",
+    "city": "Mount Abu",
+    "state": "Rajasthan",
+    "venue": "Brahma Kumaris Shantivan",
+    "distance_options": [
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "350m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9500 - \u20b91000",
+    "registration_url": "https://www.brahmakumaris.com",
+    "organizer_name": "Brahma Kumaris",
+    "terrain": "Hilly Road",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Dadi Prakashmani Abu Half Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-08-09",
+    "city": "Mount Abu",
+    "state": "Rajasthan",
+    "venue": "Brahma Kumaris Shantivan",
+    "distance_options": [
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "350m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9500 - \u20b91000",
+    "registration_url": "https://www.brahmakumaris.com",
+    "organizer_name": "Brahma Kumaris",
+    "terrain": "Hilly Road",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Dadi Prakashmani Abu Half Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-08-09",
+    "city": "Mount Abu",
+    "state": "Rajasthan",
+    "venue": "Brahma Kumaris Shantivan",
+    "distance_options": [
+      "21.1K",
+      "10K",
+      "5K"
+    ],
+    "elevation_gain": "350m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9500 - \u20b91000",
+    "registration_url": "https://www.brahmakumaris.com",
+    "organizer_name": "Brahma Kumaris",
+    "terrain": "Hilly Road",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Ladakh Marathon 2026",
+    "sport_type": "running",
+    "event_date": "2026-09-10",
+    "city": "Leh",
+    "state": "Ladakh",
+    "venue": "Leh Main Market",
+    "distance_options": [
+      "5K Fun Run",
+      "11.2K",
+      "21.1K",
+      "42.2K",
+      "72K Khardung La Challenge",
+      "122K Silk Route Ultra"
+    ],
+    "elevation_gain": "1800m",
+    "difficulty": "Expert",
+    "price_range": "\u20b92000 - \u20b98000",
+    "registration_url": "https://www.ladakhmarathon.com",
+    "organizer_name": "Rimo Expeditions",
+    "terrain": "High-Altitude Road/Trail",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Ladakh Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-09-10",
+    "city": "Leh",
+    "state": "Ladakh",
+    "venue": "Leh Main Market",
+    "distance_options": [
+      "5K Fun Run",
+      "11.2K",
+      "21.1K",
+      "42.2K",
+      "72K Khardung La Challenge",
+      "122K Silk Route Ultra"
+    ],
+    "elevation_gain": "1800m",
+    "difficulty": "Expert",
+    "price_range": "\u20b92000 - \u20b98000",
+    "registration_url": "https://www.ladakhmarathon.com",
+    "organizer_name": "Rimo Expeditions",
+    "terrain": "High-Altitude Road/Trail",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Ladakh Marathon 2028",
+    "sport_type": "running",
+    "event_date": "2028-09-10",
+    "city": "Leh",
+    "state": "Ladakh",
+    "venue": "Leh Main Market",
+    "distance_options": [
+      "5K Fun Run",
+      "11.2K",
+      "21.1K",
+      "42.2K",
+      "72K Khardung La Challenge",
+      "122K Silk Route Ultra"
+    ],
+    "elevation_gain": "1800m",
+    "difficulty": "Expert",
+    "price_range": "\u20b92000 - \u20b98000",
+    "registration_url": "https://www.ladakhmarathon.com",
+    "organizer_name": "Rimo Expeditions",
+    "terrain": "High-Altitude Road/Trail",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "SINHAGAD EPIC TRAIL 2026",
+    "sport_type": "running",
+    "event_date": "2026-07-26",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Sinhagad Fort Foothills",
+    "distance_options": [
+      "42K",
+      "32K",
+      "22K",
+      "11K"
+    ],
+    "elevation_gain": "1600m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://www.townscript.com/e/sinhagad-epic-trail-2026",
+    "organizer_name": "Western Ghats Running",
+    "terrain": "Trail/Mountain",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "SINHAGAD EPIC TRAIL 2027",
+    "sport_type": "running",
+    "event_date": "2027-07-26",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Sinhagad Fort Foothills",
+    "distance_options": [
+      "42K",
+      "32K",
+      "22K",
+      "11K"
+    ],
+    "elevation_gain": "1600m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://www.townscript.com/e/sinhagad-epic-trail-2026",
+    "organizer_name": "Western Ghats Running",
+    "terrain": "Trail/Mountain",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "SINHAGAD EPIC TRAIL 2028",
+    "sport_type": "running",
+    "event_date": "2028-07-26",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Sinhagad Fort Foothills",
+    "distance_options": [
+      "42K",
+      "32K",
+      "22K",
+      "11K"
+    ],
+    "elevation_gain": "1600m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91200 - \u20b93500",
+    "registration_url": "https://www.townscript.com/e/sinhagad-epic-trail-2026",
+    "organizer_name": "Western Ghats Running",
+    "terrain": "Trail/Mountain",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Annual Amritsar Road Cycling Race 2027",
+    "sport_type": "cycling",
+    "event_date": "2027-04-08",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Amritsar",
+    "distance_options": [
+      "50K",
+      "100K"
+    ],
+    "elevation_gain": "4000m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9400",
+    "registration_url": "https://www.townscript.com/e/annual-amritsar-road-cycling-race-2027",
+    "organizer_name": "Decathlon India",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Ludhiana Peak Climbing 2026",
+    "sport_type": "trekking",
+    "event_date": "2026-09-07",
+    "city": "Ludhiana",
+    "state": "Punjab",
+    "venue": "Ludhiana Foothills Base Camp",
+    "distance_options": [
+      "1-Day Hike"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9700",
+    "registration_url": "https://www.townscript.com/e/elite-ludhiana-peak-climbing-2026",
+    "organizer_name": "FitFest Events",
+    "terrain": "Rocky Terrain",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Annual Vijayawada 10K Run 2027",
+    "sport_type": "running",
+    "event_date": "2027-06-09",
+    "city": "Vijayawada",
+    "state": "Andhra Pradesh",
+    "venue": "Central Stadium Complex, Vijayawada",
+    "distance_options": [
+      "10K",
+      "21.1K"
+    ],
+    "elevation_gain": "20m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9500",
+    "registration_url": "https://www.townscript.com/e/annual-vijayawada-10k-run-2027",
+    "organizer_name": "FitIndia League",
+    "terrain": "Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Corporate Indore Squash Tournament 2026",
+    "sport_type": "racquet",
+    "event_date": "2026-12-15",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Indore",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b917000",
+    "registration_url": "https://www.townscript.com/e/corporate-indore-squash-tournament-2026",
+    "organizer_name": "Active Metros Network",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Madurai Wellness Retreat 2028",
+    "sport_type": "fitness",
+    "event_date": "2028-06-19",
+    "city": "Madurai",
+    "state": "Tamil Nadu",
+    "venue": "Central Stadium Complex, Madurai",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91942",
+    "registration_url": "https://www.townscript.com/e/fit-india-madurai-wellness-retreat-2028",
+    "organizer_name": "Gravel Kings",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "National Dehradun Nature Trail 2026",
+    "sport_type": "trekking",
+    "event_date": "2026-04-28",
+    "city": "Dehradun",
+    "state": "Uttarakhand",
+    "venue": "Dehradun Foothills Base Camp",
+    "distance_options": [
+      "5-Day Expedition"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/national-dehradun-nature-trail-2026",
+    "organizer_name": "Runners High",
+    "terrain": "Forest Path",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Ultimate Ahmedabad Tennis Tournament 2028",
+    "sport_type": "racquet",
+    "event_date": "2028-05-23",
+    "city": "Ahmedabad",
+    "state": "Gujarat",
+    "venue": "Central Stadium Complex, Ahmedabad",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b914000",
+    "registration_url": "https://www.townscript.com/e/ultimate-ahmedabad-tennis-tournament-2028",
+    "organizer_name": "Runners High",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Guwahati Desert Rally 2028",
+    "sport_type": "adventure",
+    "event_date": "2028-12-18",
+    "city": "Guwahati",
+    "state": "Assam",
+    "venue": "Central Stadium Complex, Guwahati",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/fit-india-guwahati-desert-rally-2028",
+    "organizer_name": "Sahyadri Explorers",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Monsoon Visakhapatnam Trail Run 2027",
+    "sport_type": "running",
+    "event_date": "2027-02-07",
+    "city": "Visakhapatnam",
+    "state": "Andhra Pradesh",
+    "venue": "Central Stadium Complex, Visakhapatnam",
+    "distance_options": [
+      "21.1K",
+      "42.2K"
+    ],
+    "elevation_gain": "1200m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91000",
+    "registration_url": "https://www.townscript.com/e/monsoon-visakhapatnam-trail-run-2027",
+    "organizer_name": "Himalayan Trails",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Amritsar Duathlon 2028",
+    "sport_type": "triathlon",
+    "event_date": "2028-09-09",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Amritsar",
+    "distance_options": [
+      "1.9K S + 90K C + 21.1K R"
+    ],
+    "elevation_gain": "800m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91000",
+    "registration_url": "https://www.townscript.com/e/elite-amritsar-duathlon-2028",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Lake/Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ultimate Jalandhar Skiing 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-02-05",
+    "city": "Jalandhar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Jalandhar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Expert",
+    "price_range": "\u20b9600",
+    "registration_url": "https://www.townscript.com/e/ultimate-jalandhar-skiing-2026",
+    "organizer_name": "Velocity Sports",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Challenge Rishikesh Bike Tour 2028",
+    "sport_type": "cycling",
+    "event_date": "2028-08-17",
+    "city": "Rishikesh",
+    "state": "Uttarakhand",
+    "venue": "Central Stadium Complex, Rishikesh",
+    "distance_options": [
+      "160K Gran Fondo"
+    ],
+    "elevation_gain": "100m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b944000",
+    "registration_url": "https://www.townscript.com/e/challenge-rishikesh-bike-tour-2028",
+    "organizer_name": "Inspire India",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Chandigarh Functional Fitness Event 2027",
+    "sport_type": "fitness",
+    "event_date": "2027-01-24",
+    "city": "Chandigarh",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Chandigarh",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91039",
+    "registration_url": "https://www.townscript.com/e/elite-chandigarh-functional-fitness-event-2027",
+    "organizer_name": "Red Bull India",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Annual Madurai Wellness Retreat 2028",
+    "sport_type": "fitness",
+    "event_date": "2028-10-07",
+    "city": "Madurai",
+    "state": "Tamil Nadu",
+    "venue": "Central Stadium Complex, Madurai",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91265",
+    "registration_url": "https://www.townscript.com/e/annual-madurai-wellness-retreat-2028",
+    "organizer_name": "Velocity Sports",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Mumbai Table Tennis Event 2026",
+    "sport_type": "racquet",
+    "event_date": "2026-06-27",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "venue": "Central Stadium Complex, Mumbai",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91129",
+    "registration_url": "https://www.townscript.com/e/pro-mumbai-table-tennis-event-2026",
+    "organizer_name": "Procam International",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "National Noida Peak Climbing 2026",
+    "sport_type": "trekking",
+    "event_date": "2026-12-16",
+    "city": "Noida",
+    "state": "Uttar Pradesh",
+    "venue": "Noida Foothills Base Camp",
+    "distance_options": [
+      "1-Day Hike"
+    ],
+    "elevation_gain": "1800m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/national-noida-peak-climbing-2026",
+    "organizer_name": "Himalayan Trails",
+    "terrain": "Mountain Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Srinagar Open Water Swimming 2028",
+    "sport_type": "water",
+    "event_date": "2028-12-07",
+    "city": "Srinagar",
+    "state": "Jammu & Kashmir",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91138",
+    "registration_url": "https://www.townscript.com/e/elite-srinagar-open-water-swimming-2028",
+    "organizer_name": "Goa Surf School",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Great Lucknow Skiing 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-02-11",
+    "city": "Lucknow",
+    "state": "Uttar Pradesh",
+    "venue": "Central Stadium Complex, Lucknow",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91300",
+    "registration_url": "https://www.townscript.com/e/great-lucknow-skiing-2026",
+    "organizer_name": "Adventure Quest India",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Fit India Gurugram Trek 2028",
+    "sport_type": "trekking",
+    "event_date": "2028-11-02",
+    "city": "Gurugram",
+    "state": "Haryana",
+    "venue": "Gurugram Foothills Base Camp",
+    "distance_options": [
+      "3-Day Trek"
+    ],
+    "elevation_gain": "3200m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9500",
+    "registration_url": "https://www.townscript.com/e/fit-india-gurugram-trek-2028",
+    "organizer_name": "Gravel Kings",
+    "terrain": "Mountain Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Monsoon Srinagar Snowboarding 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-12-19",
+    "city": "Srinagar",
+    "state": "Jammu & Kashmir",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91100",
+    "registration_url": "https://www.townscript.com/e/monsoon-srinagar-snowboarding-2026",
+    "organizer_name": "FitFest Events",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Apex Hyderabad Open Water Swimming 2026",
+    "sport_type": "water",
+    "event_date": "2026-11-14",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "venue": "Central Stadium Complex, Hyderabad",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91367",
+    "registration_url": "https://www.townscript.com/e/apex-hyderabad-open-water-swimming-2026",
+    "organizer_name": "Tri2Champ Chennai",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro New Delhi Half Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-12-11",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "venue": "Central Stadium Complex, New Delhi",
+    "distance_options": [
+      "5K",
+      "10K"
+    ],
+    "elevation_gain": "80m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9700",
+    "registration_url": "https://www.townscript.com/e/pro-new-delhi-half-marathon-2027",
+    "organizer_name": "Pickleball India Federation",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Mysuru Aquathlon 2026",
+    "sport_type": "triathlon",
+    "event_date": "2026-02-15",
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "venue": "Central Stadium Complex, Mysuru",
+    "distance_options": [
+      "1.9K S + 90K C + 21.1K R"
+    ],
+    "elevation_gain": "50m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/pro-mysuru-aquathlon-2026",
+    "organizer_name": "Thrill Zone",
+    "terrain": "Ocean/Road",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Star Bhopal Expedition 2027",
+    "sport_type": "trekking",
+    "event_date": "2027-08-07",
+    "city": "Bhopal",
+    "state": "Madhya Pradesh",
+    "venue": "Bhopal Foothills Base Camp",
+    "distance_options": [
+      "3-Day Trek"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b910000",
+    "registration_url": "https://www.townscript.com/e/star-bhopal-expedition-2027",
+    "organizer_name": "FitFest Events",
+    "terrain": "Mountain Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Corporate Nagpur Ice Marathon 2028",
+    "sport_type": "adventure",
+    "event_date": "2028-12-26",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "venue": "Central Stadium Complex, Nagpur",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/corporate-nagpur-ice-marathon-2028",
+    "organizer_name": "Decathlon India",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Great New Delhi Fitness Expo 2028",
+    "sport_type": "fitness",
+    "event_date": "2028-12-18",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "venue": "Central Stadium Complex, New Delhi",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b92031",
+    "registration_url": "https://www.townscript.com/e/great-new-delhi-fitness-expo-2028",
+    "organizer_name": "Procam International",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "National Ranchi Adventure Race 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-01-17",
+    "city": "Ranchi",
+    "state": "Jharkhand",
+    "venue": "Central Stadium Complex, Ranchi",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9600",
+    "registration_url": "https://www.townscript.com/e/national-ranchi-adventure-race-2026",
+    "organizer_name": "Velocity Sports",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Monsoon Visakhapatnam Gravel Race 2026",
+    "sport_type": "cycling",
+    "event_date": "2026-10-08",
+    "city": "Visakhapatnam",
+    "state": "Andhra Pradesh",
+    "venue": "Central Stadium Complex, Visakhapatnam",
+    "distance_options": [
+      "160K Gran Fondo"
+    ],
+    "elevation_gain": "100m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91000",
+    "registration_url": "https://www.townscript.com/e/monsoon-visakhapatnam-gravel-race-2026",
+    "organizer_name": "Decathlon India",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ultimate Indore Badminton Tournament 2027",
+    "sport_type": "racquet",
+    "event_date": "2027-03-22",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Indore",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b929000",
+    "registration_url": "https://www.townscript.com/e/ultimate-indore-badminton-tournament-2027",
+    "organizer_name": "Outdoor Nomad Club",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "National Mysuru Road Cycling Race 2028",
+    "sport_type": "cycling",
+    "event_date": "2028-10-04",
+    "city": "Mysuru",
+    "state": "Karnataka",
+    "venue": "Central Stadium Complex, Mysuru",
+    "distance_options": [
+      "160K Gran Fondo"
+    ],
+    "elevation_gain": "1500m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9600",
+    "registration_url": "https://www.townscript.com/e/national-mysuru-road-cycling-race-2028",
+    "organizer_name": "Sahyadri Explorers",
+    "terrain": "Highway",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Challenge Chandigarh Tennis Tournament 2027",
+    "sport_type": "racquet",
+    "event_date": "2027-09-23",
+    "city": "Chandigarh",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Chandigarh",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b943000",
+    "registration_url": "https://www.townscript.com/e/challenge-chandigarh-tennis-tournament-2027",
+    "organizer_name": "Gravel Kings",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Corporate Indore MTB Race 2026",
+    "sport_type": "cycling",
+    "event_date": "2026-02-24",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Indore",
+    "distance_options": [
+      "200K Brevet"
+    ],
+    "elevation_gain": "1500m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91300",
+    "registration_url": "https://www.townscript.com/e/corporate-indore-mtb-race-2026",
+    "organizer_name": "Swim Life India",
+    "terrain": "Gravel",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Neon Night Srinagar Badminton Tournament 2028",
+    "sport_type": "racquet",
+    "event_date": "2028-05-17",
+    "city": "Srinagar",
+    "state": "Uttarakhand",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b926000",
+    "registration_url": "https://www.townscript.com/e/neon-night-srinagar-badminton-tournament-2028",
+    "organizer_name": "Red Bull India",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Annual Pune Kayaking 2026",
+    "sport_type": "water",
+    "event_date": "2026-06-25",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "venue": "Central Stadium Complex, Pune",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91804",
+    "registration_url": "https://www.townscript.com/e/annual-pune-kayaking-2026",
+    "organizer_name": "Runners High",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "National Jodhpur Adventure Race 2027",
+    "sport_type": "adventure",
+    "event_date": "2027-09-01",
+    "city": "Jodhpur",
+    "state": "Rajasthan",
+    "venue": "Central Stadium Complex, Jodhpur",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9500",
+    "registration_url": "https://www.townscript.com/e/national-jodhpur-adventure-race-2027",
+    "organizer_name": "FitIndia League",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Kolkata Ironman Event 2026",
+    "sport_type": "triathlon",
+    "event_date": "2026-05-12",
+    "city": "Kolkata",
+    "state": "West Bengal",
+    "venue": "Central Stadium Complex, Kolkata",
+    "distance_options": [
+      "Sprint: 750m S + 20K C + 5K R"
+    ],
+    "elevation_gain": "50m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b922000",
+    "registration_url": "https://www.townscript.com/e/pro-kolkata-ironman-event-2026",
+    "organizer_name": "FitIndia League",
+    "terrain": "Lake/Trail",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Annual Amritsar Surfing 2026",
+    "sport_type": "water",
+    "event_date": "2026-04-28",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Amritsar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b92499",
+    "registration_url": "https://www.townscript.com/e/annual-amritsar-surfing-2026",
+    "organizer_name": "Pickleball India Federation",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Ultimate Amritsar 10K Run 2027",
+    "sport_type": "running",
+    "event_date": "2027-07-26",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Amritsar",
+    "distance_options": [
+      "10K",
+      "21.1K"
+    ],
+    "elevation_gain": "80m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91500",
+    "registration_url": "https://www.townscript.com/e/ultimate-amritsar-10k-run-2027",
+    "organizer_name": "Procam International",
+    "terrain": "Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Coimbatore Snowboarding 2027",
+    "sport_type": "adventure",
+    "event_date": "2027-06-10",
+    "city": "Coimbatore",
+    "state": "Tamil Nadu",
+    "venue": "Central Stadium Complex, Coimbatore",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b9700",
+    "registration_url": "https://www.townscript.com/e/pro-coimbatore-snowboarding-2027",
+    "organizer_name": "Gravel Kings",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Challenge Manali Mountain Challenge 2027",
+    "sport_type": "trekking",
+    "event_date": "2027-02-25",
+    "city": "Manali",
+    "state": "Himachal Pradesh",
+    "venue": "Manali Foothills Base Camp",
+    "distance_options": [
+      "5-Day Expedition"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/challenge-manali-mountain-challenge-2027",
+    "organizer_name": "Inspire India",
+    "terrain": "Rocky Terrain",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Monsoon Vadodara Fitness Expo 2027",
+    "sport_type": "fitness",
+    "event_date": "2027-01-04",
+    "city": "Vadodara",
+    "state": "Gujarat",
+    "venue": "Central Stadium Complex, Vadodara",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91389",
+    "registration_url": "https://www.townscript.com/e/monsoon-vadodara-fitness-expo-2027",
+    "organizer_name": "Pickleball India Federation",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Kanpur Bike Tour 2026",
+    "sport_type": "cycling",
+    "event_date": "2026-05-02",
+    "city": "Kanpur",
+    "state": "Uttar Pradesh",
+    "venue": "Central Stadium Complex, Kanpur",
+    "distance_options": [
+      "60K MTB",
+      "30K MTB"
+    ],
+    "elevation_gain": "600m",
+    "difficulty": "Expert",
+    "price_range": "\u20b933000",
+    "registration_url": "https://www.townscript.com/e/elite-kanpur-bike-tour-2026",
+    "organizer_name": "Thrill Zone",
+    "terrain": "Road",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Challenge Leh Squash Tournament 2028",
+    "sport_type": "racquet",
+    "event_date": "2028-02-24",
+    "city": "Leh",
+    "state": "Ladakh",
+    "venue": "Central Stadium Complex, Leh",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Expert",
+    "price_range": "\u20b942000",
+    "registration_url": "https://www.townscript.com/e/challenge-leh-squash-tournament-2028",
+    "organizer_name": "Audax India Randonneurs",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Star Dehradun Sailing 2028",
+    "sport_type": "water",
+    "event_date": "2028-03-07",
+    "city": "Dehradun",
+    "state": "Uttarakhand",
+    "venue": "Central Stadium Complex, Dehradun",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91861",
+    "registration_url": "https://www.townscript.com/e/star-dehradun-sailing-2028",
+    "organizer_name": "Velocity Sports",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Surat Functional Fitness Event 2026",
+    "sport_type": "fitness",
+    "event_date": "2026-05-10",
+    "city": "Surat",
+    "state": "Gujarat",
+    "venue": "Central Stadium Complex, Surat",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b91380",
+    "registration_url": "https://www.townscript.com/e/fit-india-surat-functional-fitness-event-2026",
+    "organizer_name": "Goa Surf School",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "completed"
+  },
+  {
+    "event_name": "Pro Srinagar Desert Rally 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-09-16",
+    "city": "Srinagar",
+    "state": "Uttarakhand",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91500",
+    "registration_url": "https://www.townscript.com/e/pro-srinagar-desert-rally-2026",
+    "organizer_name": "IndiaHikes",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Jalandhar Pickleball Tournament 2026",
+    "sport_type": "racquet",
+    "event_date": "2026-11-10",
+    "city": "Jalandhar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Jalandhar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b922000",
+    "registration_url": "https://www.townscript.com/e/fit-india-jalandhar-pickleball-tournament-2026",
+    "organizer_name": "Procam International",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ultimate Nashik Mountain Challenge 2026",
+    "sport_type": "trekking",
+    "event_date": "2026-08-14",
+    "city": "Nashik",
+    "state": "Maharashtra",
+    "venue": "Nashik Foothills Base Camp",
+    "distance_options": [
+      "1-Day Hike"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91100",
+    "registration_url": "https://www.townscript.com/e/ultimate-nashik-mountain-challenge-2026",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Mountain Trail",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Pro Gwalior Half Marathon 2027",
+    "sport_type": "running",
+    "event_date": "2027-04-06",
+    "city": "Gwalior",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Gwalior",
+    "distance_options": [
+      "100K",
+      "50K"
+    ],
+    "elevation_gain": "20m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91200",
+    "registration_url": "https://www.townscript.com/e/pro-gwalior-half-marathon-2027",
+    "organizer_name": "Goa Surf School",
+    "terrain": "Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Apex Varanasi Ironman Event 2028",
+    "sport_type": "triathlon",
+    "event_date": "2028-09-20",
+    "city": "Varanasi",
+    "state": "Uttar Pradesh",
+    "venue": "Central Stadium Complex, Varanasi",
+    "distance_options": [
+      "Olympic: 1.5K S + 40K C + 10K R"
+    ],
+    "elevation_gain": "800m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b928000",
+    "registration_url": "https://www.townscript.com/e/apex-varanasi-ironman-event-2028",
+    "organizer_name": "Tri2Champ Chennai",
+    "terrain": "Road/Pool",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Indore Desert Rally 2026",
+    "sport_type": "adventure",
+    "event_date": "2026-11-09",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Indore",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91200",
+    "registration_url": "https://www.townscript.com/e/pro-indore-desert-rally-2026",
+    "organizer_name": "Himalayan Trails",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Apex Jodhpur Skiing 2027",
+    "sport_type": "adventure",
+    "event_date": "2027-04-09",
+    "city": "Jodhpur",
+    "state": "Rajasthan",
+    "venue": "Central Stadium Complex, Jodhpur",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b9900",
+    "registration_url": "https://www.townscript.com/e/apex-jodhpur-skiing-2027",
+    "organizer_name": "Yoska Sports",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "National Vijayawada Mountain Challenge 2026",
+    "sport_type": "trekking",
+    "event_date": "2026-12-07",
+    "city": "Vijayawada",
+    "state": "Andhra Pradesh",
+    "venue": "Vijayawada Foothills Base Camp",
+    "distance_options": [
+      "5-Day Expedition"
+    ],
+    "elevation_gain": "3200m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91200",
+    "registration_url": "https://www.townscript.com/e/national-vijayawada-mountain-challenge-2026",
+    "organizer_name": "Procam International",
+    "terrain": "Forest Path",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Great Bhopal Nature Trail 2027",
+    "sport_type": "trekking",
+    "event_date": "2027-10-23",
+    "city": "Bhopal",
+    "state": "Madhya Pradesh",
+    "venue": "Bhopal Foothills Base Camp",
+    "distance_options": [
+      "1-Day Hike"
+    ],
+    "elevation_gain": "4500m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9400",
+    "registration_url": "https://www.townscript.com/e/great-bhopal-nature-trail-2027",
+    "organizer_name": "Outdoor Nomad Club",
+    "terrain": "Forest Path",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Pro Srinagar Rowing 2028",
+    "sport_type": "water",
+    "event_date": "2028-12-18",
+    "city": "Srinagar",
+    "state": "Jammu & Kashmir",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91735",
+    "registration_url": "https://www.townscript.com/e/pro-srinagar-rowing-2028",
+    "organizer_name": "Sahyadri Explorers",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Ultimate Patna Functional Fitness Event 2026",
+    "sport_type": "fitness",
+    "event_date": "2026-07-11",
+    "city": "Patna",
+    "state": "Bihar",
+    "venue": "Central Stadium Complex, Patna",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91890",
+    "registration_url": "https://www.townscript.com/e/ultimate-patna-functional-fitness-event-2026",
+    "organizer_name": "Goa Surf School",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Monsoon Srinagar Obstacle Race 2026",
+    "sport_type": "triathlon",
+    "event_date": "2026-07-19",
+    "city": "Srinagar",
+    "state": "Jammu & Kashmir",
+    "venue": "Central Stadium Complex, Srinagar",
+    "distance_options": [
+      "1.9K S + 90K C + 21.1K R"
+    ],
+    "elevation_gain": "50m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/monsoon-srinagar-obstacle-race-2026",
+    "organizer_name": "Goa Surf School",
+    "terrain": "Ocean/Road",
+    "is_virtual": false,
+    "status": "closed"
+  },
+  {
+    "event_name": "Neon Night Indore Triathlon 2027",
+    "sport_type": "triathlon",
+    "event_date": "2027-06-07",
+    "city": "Indore",
+    "state": "Madhya Pradesh",
+    "venue": "Central Stadium Complex, Indore",
+    "distance_options": [
+      "Olympic: 1.5K S + 40K C + 10K R"
+    ],
+    "elevation_gain": "200m",
+    "difficulty": "Advanced",
+    "price_range": "\u20b9800",
+    "registration_url": "https://www.townscript.com/e/neon-night-indore-triathlon-2027",
+    "organizer_name": "Thrill Zone",
+    "terrain": "Lake/Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Amritsar Skiing 2028",
+    "sport_type": "adventure",
+    "event_date": "2028-01-12",
+    "city": "Amritsar",
+    "state": "Punjab",
+    "venue": "Central Stadium Complex, Amritsar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Beginner",
+    "price_range": "\u20b91400",
+    "registration_url": "https://www.townscript.com/e/fit-india-amritsar-skiing-2028",
+    "organizer_name": "Outdoor Nomad Club",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Fit India Coimbatore 5K Run 2026",
+    "sport_type": "running",
+    "event_date": "2026-10-05",
+    "city": "Coimbatore",
+    "state": "Tamil Nadu",
+    "venue": "Central Stadium Complex, Coimbatore",
+    "distance_options": [
+      "10K",
+      "21.1K"
+    ],
+    "elevation_gain": "20m",
+    "difficulty": "Expert",
+    "price_range": "\u20b91300",
+    "registration_url": "https://www.townscript.com/e/fit-india-coimbatore-5k-run-2026",
+    "organizer_name": "Swim Life India",
+    "terrain": "Trail",
+    "is_virtual": false,
+    "status": "upcoming"
+  },
+  {
+    "event_name": "Elite Munnar Wellness Retreat 2026",
+    "sport_type": "fitness",
+    "event_date": "2026-10-20",
+    "city": "Munnar",
+    "state": "Kerala",
+    "venue": "Central Stadium Complex, Munnar",
+    "distance_options": [
+      "Standard Category"
+    ],
+    "elevation_gain": "0m",
+    "difficulty": "Intermediate",
+    "price_range": "\u20b91971",
+    "registration_url": "https://www.townscript.com/e/elite-munnar-wellness-retreat-2026",
+    "organizer_name": "IndiaHikes",
+    "terrain": "Mixed",
+    "is_virtual": false,
+    "status": "upcoming"
+  }
+]

@@ -22,13 +22,16 @@ The MVP is a **responsive web application** that lets athletes discover, filter,
 | SEO optimization | Sprint 2 | Meta tags, OG tags, structured schema |
 | WhatsApp share cards | Sprint 2 | Share button generates formatted WhatsApp message |
 | Basic search (text) | Sprint 2 | Search by event name, city, organizer |
+| **Live Activity Feed (P0)** | Sprint 2 | Real-time tickers showing public user interactions (e.g., bookmarks, calendar additions) |
 | **OAuth Login (Google, FB, LinkedIn)** | Sprint 3 | Supabase Auth integration |
 | **Onboarding Questionnaire** | Sprint 3 | Profile setup asking: sports of interest, preferred cities, distance preferences |
 | **Personalized Dashboard** | Sprint 3 | Filtered events feed based on onboarding data |
 | **Follow Organizers & Events** | Sprint 3 | Get updates from favorite organizers |
 | **Personal Event Calendar** | Sprint 3 | Save events to personal calendar sheet |
 | **Registration Reminders** | Sprint 3 | Set notifications for registration dates |
-| **Feature / Event Request Forms** | Sprint 4 | Forms to request new features, submit feedback, or submit a local event |
+| **Buddy Sync (P0)** | Sprint 3 | Share bookmarks and sync training/race calendars with friends |
+| **Request to Add Event Form** | Sprint 4 | Dedicated form for organizers and users to submit details of local events |
+| **Request a Feature & Feedback Form** | Sprint 4 | Dedicated form for user feedback and feature requests |
 
 ### Non-Goals for MVP ❌
 
@@ -38,8 +41,8 @@ The MVP is a **responsive web application** that lets athletes discover, filter,
 | Recommendations/personalization (AI) | Basic filter matches onboarding data; ML engines are Phase 3 |
 | Payment/ticketing | Explicitly out of scope for all versions |
 | Mobile app | Responsive web + PWA first |
-| Social activity feed / posts | Post-PMF |
-| Activity tracking (GPS/Sync) | Stay in discovery lane; sync integrations are Year 2 |
+| Full social networking / chat | Tickers and public activity feeds are in; direct messaging & posting are Phase 2 |
+| Device GPS Integration (Strava/Garmin) | Stay in discovery lane; device track sync integrations are Year 2 (Friend calendar sync is in) |
 
 
 ---
@@ -100,13 +103,15 @@ The MVP is a **responsive web application** that lets athletes discover, filter,
 
 | Page | URL Pattern | Purpose |
 |------|-------------|---------|
-| **Homepage** | / | Hero, search bar, featured events, browse by sport, browse by city |
+| **Homepage** | / | Hero, search bar, featured events, browse by sport, browse by city, Live Activity Feed ticker |
 | **Event Listing (filtered)** | /events?sport=running&city=mumbai&date=2026-01 | Filterable grid of events |
 | **Event Detail** | /events/tata-mumbai-marathon-2026 | Full event information + registration link |
 | **City Landing** | /city/mumbai | All events in Mumbai, city-specific SEO |
 | **Sport Landing** | /sport/running | All running events, sport-specific SEO |
 | **About** | /about | What is GoAthletix, mission, team |
-| **Submit Event** | /submit (link to Google Form in MVP) | Organizers submit events via form |
+| **Request to Add Event** | /add-event | Dedicated form page for organizers/users to submit event details |
+| **Request a Feature & Feedback** | /feedback | Dedicated form page for user feedback and feature requests |
+| **Buddy Sync Dashboard** | /dashboard/buddies | User interface to connect with buddies and view synced calendars/bookmarks |
 | **Search Results** | /search?q=marathon | Text search results |
 | **404 / Not Found** | /404 | Helpful error page |
 
@@ -149,20 +154,39 @@ Google Search: "half marathon bangalore 2026" → Clicks SEO-optimized City+Spor
 → Views filtered event listing → Clicks event → Views detail → Registers
 ```
 
----
-
-## Basic Organizer Flow (MVP — Minimal)
-
-### Flow: Organizer Submits an Event
+### Flow 5: Buddy Sync (Share bookmarks & calendar sync)
 
 ```
-Homepage → Click "List Your Event" → Opens Google Form / Embedded Form
-→ Fills in event details (name, date, city, sport, distances, price, registration URL)
-→ Submits → Admin reviews and approves within 24-48 hours
-→ Event goes live on platform
+Logged-in User → Navigates to /dashboard/buddies → Clicks "Generate Share Link"
+→ Sends unique URL to a friend via WhatsApp → Friend opens link and accepts sync request
+→ Both users can now view a merged calendar highlighting each other's bookmarked races and planned events
 ```
 
-> **Note**: In MVP, there is no organizer dashboard. All event management is done by the platform admin. Self-serve organizer tools come in Sprint 4.
+### Flow 6: Live Activity Feed Interaction
+
+```
+User lands on Homepage/Dashboard → Views real-time ticker displaying public interactions (e.g., "Arjun bookmarked Sattal Trail Run")
+→ Clicks on the event name in the feed → Navigates directly to the Event Detail Page to discover event details
+```
+
+### Flow 7: Request to Add Event (For organizers/users)
+
+```
+User/Organizer clicks "Add Event Request" in footer/nav → Redirected to /add-event form
+→ Inputs event name, sport, date, venue, registration URL, price range, and organizer contact info
+→ Clicks "Submit Request" → Submission logged to PostgreSQL with status "pending_review"
+→ Admin notified via dashboard for validation and publishing
+```
+
+### Flow 8: Request a Feature & Give Feedback
+
+```
+User clicks "Send Feedback" or "Request a Feature" → Redirected to /feedback form
+→ Selects type ("Feature Request" or "General Feedback") → Fills out feedback description
+→ Clicks "Submit Feedback" → Feedback logged to database for product management review
+```
+
+> **Note**: In MVP, there is no organizer dashboard. All event management is done by the platform admin using the database log from the submission forms. Self-serve organizer tools come in Sprint 5.
 
 ---
 
@@ -178,6 +202,8 @@ Homepage → Click "List Your Event" → Opens Google Form / Embedded Form
 | All event pages load in < 3 seconds | 100% |
 | Mobile responsiveness tested | ✅ |
 | WhatsApp share working | ✅ |
+| Live Activity Feed ticker working | ✅ |
+| Buddy Sync invite generation working | ✅ |
 | SEO meta tags on all pages | ✅ |
 | Google Search Console submitted | ✅ |
 
@@ -187,13 +213,16 @@ Homepage → Click "List Your Event" → Opens Google Form / Embedded Form
 |--------|--------|-------------|
 | **Unique visitors** | 5,000 | Google Analytics |
 | **Event detail page views** | 10,000 | Analytics |
-| **Registration link clicks** | 500 | Click tracking |
-| **WhatsApp shares** | 200 | Share button clicks |
+| **Registration Intent Clicks (RIC)** | **800** | Click tracking (increased via social & sync discovery) |
+| **WhatsApp shares** | 350 | Share button clicks (including Buddy Sync invites) |
 | **Organic search impressions** | 50,000 | Google Search Console |
-| **Avg. session duration** | > 2 minutes | Analytics |
-| **Bounce rate** | < 60% | Analytics |
-| **Events submitted by organizers** | 50 | Form submissions |
-| **Return visitors (within 30 days)** | 20% | Analytics |
+| **Avg. session duration (session length)** | **> 3.5 minutes** | Analytics (increased via Live Activity Feed & Buddy profiles) |
+| **Bounce rate** | < 50% | Analytics |
+| **Event additions via Request form** | 75 | Database submissions |
+| **Feedback/Feature requests submitted** | 100 | Database submissions |
+| **Return visitors (return rate within 30 days)** | **35%** | Analytics (driven by Buddy Sync calendar retention) |
+| **Active Buddy Sync Connections** | 400 | Database records of synchronized user pairs |
+| **Live Activity Feed clicks** | 1,200 | Ticker interaction tracking |
 
 ### Post-Launch KPIs (First 90 Days)
 
@@ -202,7 +231,8 @@ Homepage → Click "List Your Event" → Opens Google Form / Embedded Form
 | Unique visitors | 25,000 |
 | Events in database | 1,500+ |
 | Cities covered | 40+ |
-| Registration link clicks | 3,000 |
-| Organizer submissions | 200 |
+| **Registration Intent Clicks (RIC)** | **4,500** (accelerated by viral Buddy loops) |
+| Event Request / Organizer submissions | 300 |
 | Google organic clicks | 5,000+ |
 | Ranking for 50+ event keywords | Top 10 positions |
+| **Active Buddy Sync Connections** | 2,500+ |

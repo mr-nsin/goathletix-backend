@@ -1,14 +1,15 @@
 # Active Context: GoAthletix
 
-## Current Focus
-Developing the implementation plan and structuring the architecture for:
-1. **Web App Layout**: Landing page explaining the value proposition, top-nav header with "Discover" options, advanced filters, and popular events categorized by sport/location.
-2. **Crawler Pipeline**: Multi-site Python/Go web crawler to aggregate events, normalise details using LLMs (via OpenRouter), and ingest them into a **Neon Database** (serverless PostgreSQL). *Note: Zero sample/dummy seed data will be used; the ingestion must immediately extract live data from actual sites like Townscript.*
-3. **UI Engine (Google Stitch)**: Crafting high-fidelity, experience-heavy, 3D/immersive visual components using web technologies (Three.js/WebGL hooks, glassmorphic cards, custom shader animations, fluid micro-interactions) built via Google Stitch.
-4. **Multi-Agent Operations**: Designing a Paperclip organization chart with specialized agents (Scraper Agent, Editorial Agent, Compliance Auditor Agent) executing in parallel.
+1. **Unified REST API Integration**: Integrated the Next.js frontend search interface directly with the NestJS backend to query the live Supabase database.
+2. **Schema & Seeding Finalization**: Enabled PostGIS, corrected multi-day schemas (`startDate`/`endDate`), and batch-uploaded **10,100 events** to the new Singapore Supabase project (`bxytidxjdufzsgfhkuty`).
+3. **CORS & Validation Pipes**: Finalized NestJS backend configuration for client connections.
+4. **Mobile Responsive & High-Fidelity UI**: Redesigned the search and calendar components to be 100% mobile-friendly with stacked controls, compact grid dimensions, and dot indicators. Added an animated flowing gradient border.
+5. **Framer Motion Animations**: Added spring scale-ups, exit fades, and staggered layout entries for dropdown selectors and calendar event detail popover drawers.
+6. **Remote Repository Pushes**: Added separate remotes for the git worktrees and pushed frontend code to `goathletix-frontend` and backend code to `goathletix-backend`.
 
 ## Next Steps
-- Establish Neon DB connection configuration.
-- Develop python/go live crawlers for Townscript and sports event websites.
-- Provide the ultimate Google Stitch prompt for building a highly aesthetic, experience-heavy 3D landing page.
+- Implement backend WebSocket Gateway for real-time `activity_logs` streaming.
+- Integrate client-side WebSocket hooks to update the scrolling live feed ticker.
+- Set up Supabase OAuth authentication (Google, Facebook, LinkedIn).
+- Design and code the onboarding questionnaire overlay and preference filtering.
 
