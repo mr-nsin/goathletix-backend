@@ -1,88 +1,69 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { SupabaseService } from '../supabase.service';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
-import { Prisma } from '@prisma/client';
+
+const EVENT_SELECT =
+  'id, source_id, event_name, sport_type, event_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, organizer_id, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
+
+function toDateOnly(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
 
 @Injectable()
 export class EventsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly supabase: SupabaseService) {}
 
   async findAll(query: GetEventsQueryDto) {
-    console.log('QUERY PARAMS RECEIVED:', query);
     const { search, sport, city, difficulty, month, year } = query;
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
-    const skip = (page - 1) * limit;
-    const take = limit;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-    const where: Prisma.EventWhereInput = {};
+    let builder = this.supabase.client
+      .from('events')
+      .select(EVENT_SELECT, { count: 'exact' });
 
     if (search) {
-      where.eventName = {
-        contains: search,
-        mode: 'insensitive',
-      };
+      builder = builder.ilike('event_name', `%${search}%`);
     }
 
     if (sport) {
-      where.sportType = sport;
+      builder = builder.eq('sport_type', sport);
     }
 
     if (city) {
-      where.city = {
-        equals: city,
-        mode: 'insensitive',
-      };
+      builder = builder.ilike('city', city);
     }
 
     if (difficulty) {
-      where.difficulty = difficulty;
+      builder = builder.eq('difficulty', difficulty);
     }
 
     if (year && month) {
-      const startDateVal = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
-      const endDateVal = new Date(Date.UTC(year, month, 0, 23, 59, 59));
-      where.startDate = {
-        gte: startDateVal,
-        lte: endDateVal,
-      };
+      const startDateVal = toDateOnly(new Date(Date.UTC(year, month - 1, 1)));
+      const endDateVal = toDateOnly(new Date(Date.UTC(year, month, 0)));
+      builder = builder.gte('event_date', startDateVal).lte('event_date', endDateVal);
     } else if (year) {
-      const startDateVal = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
-      const endDateVal = new Date(Date.UTC(year, 11, 31, 23, 59, 59));
-      where.startDate = {
-        gte: startDateVal,
-        lte: endDateVal,
-      };
+      const startDateVal = toDateOnly(new Date(Date.UTC(year, 0, 1)));
+      const endDateVal = toDateOnly(new Date(Date.UTC(year, 11, 31)));
+      builder = builder.gte('event_date', startDateVal).lte('event_date', endDateVal);
     }
 
-    const [total, data] = await Promise.all([
-      this.prisma.event.count({ where }),
-      this.prisma.event.findMany({
-        where,
-        skip,
-        take,
-        orderBy: {
-          startDate: 'asc',
-        },
-        include: {
-          organizer: {
-            select: {
-              id: true,
-              name: true,
-              logoUrl: true,
-              websiteUrl: true,
-              isVerified: true,
-            },
-          },
-        },
-      }),
-    ]);
+    const { data, count, error } = await builder
+      .order('event_date', { ascending: true })
+      .range(from, to);
 
+    if (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    const total = count ?? 0;
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data,
+      data: data ?? [],
       meta: {
         total,
         page,
@@ -93,23 +74,25 @@ export class EventsService {
   }
 
   async findOne(id: string) {
-    // Validate UUID format before querying to avoid DB errors
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
-    const event = await this.prisma.event.findUnique({
-      where: { id },
-      include: {
-        organizer: true,
-      },
-    });
+    const { data, error } = await this.supabase.client
+      .from('events')
+      .select(EVENT_SELECT)
+      .eq('id', id)
+      .maybeSingle();
 
-    if (!event) {
+    if (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    if (!data) {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
-    return event;
+    return data;
   }
 }
