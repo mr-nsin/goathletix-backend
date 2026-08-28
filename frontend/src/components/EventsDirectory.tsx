@@ -32,6 +32,8 @@ export function EventsDirectory({
   const [locationFilter, setLocationFilter] = useState(initialLocationFilter);
   const [loading, setLoading] = useState(false);
   const [seasonPlan, setSeasonPlan] = useState<NormalizedEvent[]>([]);
+  const [competitionFilter, setCompetitionFilter] = useState("All");
+  const [whenFilter, setWhenFilter] = useState("Any Time");
 
   // Calendar states
   const [currentMonth, setCurrentMonth] = useState(9); // October 2026
@@ -137,10 +139,10 @@ export function EventsDirectory({
         setSportFilter={setSportFilter}
         locationFilter={locationFilter}
         setLocationFilter={setLocationFilter}
-        currentMonth={currentMonth}
-        setCurrentMonth={setCurrentMonth}
-        currentYear={currentYear}
-        setCurrentYear={setCurrentYear}
+        competitionFilter={competitionFilter}
+        setCompetitionFilter={setCompetitionFilter}
+        whenFilter={whenFilter}
+        setWhenFilter={setWhenFilter}
       />
 
       <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-12 py-8 mt-4">

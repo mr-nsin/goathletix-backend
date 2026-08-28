@@ -10,7 +10,9 @@ export default function Home() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [sportFilter, setSportFilter] = useState("All");
-  const [locationFilter, setLocationFilter] = useState("All");
+  const [competitionFilter, setCompetitionFilter] = useState("All");
+  const [locationFilter, setLocationFilter] = useState("Anywhere");
+  const [whenFilter, setWhenFilter] = useState("Any Time");
   const [currentMonth, setCurrentMonth] = useState(9); // October 2026
   const [currentYear, setCurrentYear] = useState(2026);
 
@@ -21,36 +23,39 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen">
       {/* Massive Hero Section */}
-      <div className="relative h-[400px] md:h-[500px] bg-slate-900 w-full flex items-center justify-center overflow-hidden">
-        {/* Placeholder background representing athletic events */}
+      <div className="relative h-[600px] md:h-[700px] w-full flex items-center justify-center overflow-hidden">
+        {/* Stadium background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?q=80&w=2070&auto=format&fit=crop')" }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1459865264687-595d652de67e?q=80&w=2070&auto=format&fit=crop')" }}
         />
-        <div className="relative z-10 text-center px-4 w-full flex flex-col items-center">
-          <h1 className="font-heading font-black text-5xl md:text-7xl text-white uppercase tracking-tighter mb-4 drop-shadow-lg max-w-4xl leading-none">
-            The World's Athletic Events
+        {/* Subtle dark gradient overlay to make text readable */}
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <div className="relative z-10 px-4 sm:px-6 lg:px-12 w-full max-w-[1600px] mx-auto pt-24 pb-12 flex flex-col items-center text-center">
+          <h1 className="font-heading font-black text-5xl md:text-7xl lg:text-8xl text-white uppercase tracking-tighter mb-4 leading-[0.9] max-w-5xl">
+            FIND YOUR FINISH LINE
           </h1>
-          <p className="text-white font-sans font-bold text-lg md:text-xl uppercase tracking-widest drop-shadow opacity-90 max-w-2xl">
-            Plan your sporting year with GoAthletix
+          <p className="text-white font-sans text-lg md:text-xl max-w-2xl font-medium tracking-wide mb-12">
+            Discover and track every race, marathon, and trek. All the events. All in one place.
           </p>
+          
+          <MegaSearchBar
+            search={search}
+            setSearch={setSearch}
+            sportFilter={sportFilter}
+            setSportFilter={setSportFilter}
+            competitionFilter={competitionFilter}
+            setCompetitionFilter={setCompetitionFilter}
+            locationFilter={locationFilter}
+            setLocationFilter={setLocationFilter}
+            whenFilter={whenFilter}
+            setWhenFilter={setWhenFilter}
+          />
         </div>
       </div>
 
-      <MegaSearchBar
-        search={search}
-        setSearch={setSearch}
-        sportFilter={sportFilter}
-        setSportFilter={setSportFilter}
-        locationFilter={locationFilter}
-        setLocationFilter={setLocationFilter}
-        currentMonth={currentMonth}
-        setCurrentMonth={setCurrentMonth}
-        currentYear={currentYear}
-        setCurrentYear={setCurrentYear}
-      />
-
-      <div className="pt-8 pb-16 space-y-4">
+      <div className="pt-12 pb-16 space-y-4">
         
         {/* Sports Section */}
         <SectionSlider 

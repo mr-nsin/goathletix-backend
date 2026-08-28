@@ -1,17 +1,11 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { SupabaseService } from '../supabase.service';
+import { PrismaService } from '../prisma.service';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
-
-const EVENT_SELECT =
-  'id, source_id, event_name, sport_type, event_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, organizer_id, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
-
-function toDateOnly(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
-  constructor(private readonly supabase: SupabaseService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: GetEventsQueryDto) {
     const { search, sport, city, difficulty, month, year } = query;
@@ -19,58 +13,67 @@ export class EventsService {
     const limit = query.limit ?? 10;
 
     const from = (page - 1) * limit;
-    const to = from + limit - 1;
 
-    let builder = this.supabase.client
-      .from('events')
-      .select(EVENT_SELECT, { count: 'exact' });
+    const where: Prisma.EventWhereInput = {};
 
     if (search) {
-      builder = builder.ilike('event_name', `%${search}%`);
+      where.eventName = { contains: search, mode: 'insensitive' };
     }
-
     if (sport) {
-      builder = builder.eq('sport_type', sport);
+      where.sportType = sport as any;
     }
-
     if (city) {
-      builder = builder.ilike('city', city);
+      where.city = { contains: city, mode: 'insensitive' };
     }
-
     if (difficulty) {
-      builder = builder.eq('difficulty', difficulty);
+      where.difficulty = difficulty as any;
     }
-
     if (year && month) {
-      const startDateVal = toDateOnly(new Date(Date.UTC(year, month - 1, 1)));
-      const endDateVal = toDateOnly(new Date(Date.UTC(year, month, 0)));
-      builder = builder.gte('event_date', startDateVal).lte('event_date', endDateVal);
+      const startDateVal = new Date(Date.UTC(year, month - 1, 1));
+      const endDateVal = new Date(Date.UTC(year, month, 0));
+      where.startDate = { gte: startDateVal, lte: endDateVal };
     } else if (year) {
-      const startDateVal = toDateOnly(new Date(Date.UTC(year, 0, 1)));
-      const endDateVal = toDateOnly(new Date(Date.UTC(year, 11, 31)));
-      builder = builder.gte('event_date', startDateVal).lte('event_date', endDateVal);
+      const startDateVal = new Date(Date.UTC(year, 0, 1));
+      const endDateVal = new Date(Date.UTC(year, 11, 31));
+      where.startDate = { gte: startDateVal, lte: endDateVal };
     }
 
-    const { data, count, error } = await builder
-      .order('event_date', { ascending: true })
-      .range(from, to);
+    try {
+      const total = await this.prisma.event.count({ where });
+      const data = await this.prisma.event.findMany({
+        where,
+        include: {
+          organizer: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+              websiteUrl: true,
+              isVerified: true,
+            },
+          },
+        },
+        orderBy: {
+          startDate: 'asc',
+        },
+        skip: from,
+        take: limit,
+      });
 
-    if (error) {
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+      };
+    } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
-
-    const total = count ?? 0;
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      data: data ?? [],
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages,
-      },
-    };
   }
 
   async findOne(id: string) {
@@ -79,20 +82,30 @@ export class EventsService {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
-    const { data, error } = await this.supabase.client
-      .from('events')
-      .select(EVENT_SELECT)
-      .eq('id', id)
-      .maybeSingle();
+    try {
+      const data = await this.prisma.event.findUnique({
+        where: { id },
+        include: {
+          organizer: {
+            select: {
+              id: true,
+              name: true,
+              logoUrl: true,
+              websiteUrl: true,
+              isVerified: true,
+            },
+          },
+        },
+      });
 
-    if (error) {
+      if (!data) {
+        throw new NotFoundException(`Event with ID "${id}" not found`);
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(error.message);
     }
-
-    if (!data) {
-      throw new NotFoundException(`Event with ID "${id}" not found`);
-    }
-
-    return data;
   }
 }

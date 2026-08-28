@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   description: "Find your next race",
 };
 
-import { Activity, Menu } from "lucide-react";
+import { MapPin, User, Menu } from "lucide-react";
 import Link from "next/link";
 
 export default function RootLayout({
@@ -36,25 +36,46 @@ export default function RootLayout({
       className={`${robotoCondensed.variable} ${outfit.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#F6F6F9]">
-        {/* Top Header (Dark) */}
-        <header className="bg-[#141A3E] text-white">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 h-14 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-               <Activity className="w-5 h-5 text-[#37DAC3]" />
-               <span className="font-heading font-bold text-xl uppercase tracking-wider">
-                 GoAthletix
-               </span>
-            </Link>
+        {/* Top Header (Transparent Overlay) */}
+        <header className="absolute top-0 left-0 w-full z-50 text-white bg-gradient-to-b from-black/60 to-transparent">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             
-            <div className="flex items-center gap-6">
-              <nav className="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-[#DBDBE7]">
-                <Link href="/" className="hover:text-white transition-colors text-white py-4">Events</Link>
-                <Link href="/sports" className="hover:text-white transition-colors py-4">Sports</Link>
-                <Link href="/locations" className="hover:text-white transition-colors py-4">Locations</Link>
+            <div className="flex items-center gap-8">
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-2">
+                 <div className="bg-[#37DAC3] text-white font-black text-2xl leading-none flex items-center justify-center w-10 h-10 rounded-sm italic">G</div>
+                 <span className="font-heading font-black text-xl md:text-2xl uppercase tracking-tighter leading-none flex flex-col">
+                   <span>GO</span>
+                   <span>ATHLETIX</span>
+                 </span>
+              </Link>
+              
+              {/* Location */}
+              <div className="hidden md:flex items-center text-sm font-bold gap-1">
+                <MapPin className="w-4 h-4 text-white" />
+                <span>You are in: <span className="border-b border-dashed border-white cursor-pointer hover:text-[#37DAC3] transition-colors">Choose location</span></span>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-8">
+              {/* Navigation */}
+              <nav className="hidden lg:flex items-center gap-6 text-[13px] font-bold uppercase tracking-wider">
+                <Link href="/" className="hover:text-[#37DAC3] transition-colors pb-1 border-b-2 border-white">HOME</Link>
+                <Link href="/explore" className="hover:text-[#37DAC3] transition-colors pb-1 border-b-2 border-transparent">EXPLORE</Link>
+                <div className="flex items-center gap-1 cursor-pointer hover:text-[#37DAC3] transition-colors pb-1 border-b-2 border-transparent">
+                  READ <span className="text-[10px]">▼</span>
+                </div>
+                <Link href="/forum" className="hover:text-[#37DAC3] transition-colors pb-1 border-b-2 border-transparent">FORUM</Link>
+                <Link href="/about" className="hover:text-[#37DAC3] transition-colors pb-1 border-b-2 border-transparent">ABOUT</Link>
               </nav>
-              <div className="flex gap-4 items-center">
-                 <button className="text-[#37DAC3] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">Log In</button>
-                 <button className="md:hidden"><Menu className="w-6 h-6" /></button>
+              
+              {/* Log In Button */}
+              <div className="flex items-center gap-4">
+                 <button className="bg-white text-black text-sm font-bold uppercase tracking-wider px-4 py-2 rounded flex items-center gap-2 hover:bg-gray-200 transition-colors">
+                   <User className="w-4 h-4" />
+                   LOG IN
+                 </button>
+                 <button className="lg:hidden"><Menu className="w-6 h-6" /></button>
               </div>
             </div>
           </div>
