@@ -19,7 +19,7 @@ async function main() {
   console.log('Starting seed process...');
   const seedFilePath = path.join(__dirname, '../../scripts/events_seed.json');
   console.log(`Reading seed file from ${seedFilePath}`);
-  
+
   if (!fs.existsSync(seedFilePath)) {
     throw new Error(`Seed file not found at path: ${seedFilePath}`);
   }
@@ -29,11 +29,19 @@ async function main() {
   console.log(`Loaded ${events.length} events from seed file.`);
 
   // 1. Extract and insert unique organizers
-  const organizerNames = Array.from(new Set(events.map((e: any) => e.organizer_name).filter(Boolean))) as string[];
+  // Typed as string[] explicitly: `new Set(...)` over an `any[]` yields `Set<unknown>`, so
+  // `name` arrived as `unknown` and failed Prisma's `OrganizerCreateManyInput` (TS2322).
+  const organizerNames: string[] = Array.from(
+    new Set(
+      events
+        .map((e: any): unknown => e.organizer_name)
+        .filter((n: unknown): n is string => typeof n === 'string' && n !== ''),
+    ),
+  );
   console.log(`Found ${organizerNames.length} unique organizers.`);
 
   console.log('Inserting organizers...');
-  const organizerData = organizerNames.map(name => ({
+  const organizerData = organizerNames.map((name: string) => ({
     name,
     isVerified: true,
   }));
@@ -45,7 +53,7 @@ async function main() {
 
   // Query all organizers to build name -> id map
   const dbOrganizers = await prisma.organizer.findMany({
-    select: { id: true, name: true }
+    select: { id: true, name: true },
   });
   const organizerMap = new Map<string, string>();
   for (const org of dbOrganizers) {
@@ -56,18 +64,25 @@ async function main() {
   // 2. Prepare events data
   console.log('Preparing events data...');
   const eventData = events.map((event: any, index: number) => {
-    const orgId = event.organizer_name ? organizerMap.get(event.organizer_name) : null;
-    
+    const orgId = event.organizer_name
+      ? organizerMap.get(event.organizer_name)
+      : null;
+
     // Hash source_id and md5 payload
-    const hashPayload = crypto.createHash('md5').update(JSON.stringify(event)).digest('hex');
+    const hashPayload = crypto
+      .createHash('md5')
+      .update(JSON.stringify(event))
+      .digest('hex');
     const sourceId = `seed_${hashPayload.substring(0, 16)}_${index}`;
 
     return {
       sourceId,
       eventName: event.event_name,
       sportType: event.sport_type,
-      startDate: new Date(event.event_date),
-      endDate: event.end_date ? new Date(event.end_date) : new Date(event.event_date),
+      // Accept both shapes: `start_date` is the post-ADR-001 key, `event_date` is
+      // tolerated for seed files generated before the cutover.
+      startDate: new Date(event.start_date ?? event.event_date),
+      endDate: new Date(event.end_date ?? event.start_date ?? event.event_date),
       city: event.city,
       state: event.state,
       venue: event.venue,
@@ -92,7 +107,9 @@ async function main() {
       data: batch,
       skipDuplicates: true,
     });
-    console.log(`Inserted batch ${Math.floor(i / batchSize) + 1} (${i + batch.length}/${eventData.length})`);
+    console.log(
+      `Inserted batch ${Math.floor(i / batchSize) + 1} (${i + batch.length}/${eventData.length})`,
+    );
   }
 
   console.log('Seed process completed successfully!');

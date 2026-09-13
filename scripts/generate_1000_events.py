@@ -87,7 +87,9 @@ def generate_1000_events():
             events.append({
                 "event_name": f"{be['name']} {year}",
                 "sport_type": be["sport"],
-                "event_date": f"{year}-{be['month']:02d}-{be['day']:02d}",
+                # ADR-001: emit start_date/end_date. Single-day events repeat the date.
+                "start_date": f"{year}-{be['month']:02d}-{be['day']:02d}",
+                "end_date": f"{year}-{be['month']:02d}-{be['day']:02d}",
                 "city": be["city"],
                 "state": be["state"],
                 "venue": be["venue"],
@@ -187,7 +189,8 @@ def generate_1000_events():
         events.append({
             "event_name": event_name,
             "sport_type": sport,
-            "event_date": date_str,
+            "start_date": date_str,
+            "end_date": date_str,
             "city": city,
             "state": state,
             "venue": f"Central Stadium Complex, {city}" if sport != "trekking" else f"{city} Foothills Base Camp",
