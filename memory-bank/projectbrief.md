@@ -1,5 +1,11 @@
 # Project Brief: GoAthletix
 
+> **⚠ PARTLY ASPIRATIONAL — verify before planning against this file.**
+> The product vision is still valid, but the technical and delivery claims are not. Cross-check any
+> capability statement against `memory-bank/activeContext.md` and
+> `01 Product/Feature status and gaps.md` — of the 13 P0 features declared in
+> `docs/05-feature-inventory.md`, 0 are built, 6 partial, 7 not built. Verified 2026-09-09.
+
 ## Ultimate Goal
 Build the definitive discovery-first, multi-sport event and community platform, starting with India first and expanding to Southeast Asia and globally.
 

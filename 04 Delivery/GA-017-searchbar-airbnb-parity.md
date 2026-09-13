@@ -6,7 +6,7 @@ priority: P1
 owner: main session
 branch: unassigned
 worktree: unassigned
-scope: ["goathletix-frontend/src/components/SearchBar.tsx", "goathletix-frontend/src/app/page.tsx"]
+scope: ["goathletix-frontend/src/components/SearchBar.tsx", "goathletix-frontend/src/components/MegaSearchBar.tsx", "goathletix-frontend/src/app/page.tsx"]
 acceptance: []
 depends_on: []
 related: [GA-002, GA-008, GA-016]
@@ -44,7 +44,10 @@ fix the defects found in a deep audit of the previous implementation.
 - [x] Mobile: collapsed pill opening a full-screen sheet, background scroll locked
 - [x] Day cells meet the 44px minimum tap target
 - [x] `prefers-reduced-motion` respected
-- [x] Brand uses the project's orange token, not Airbnb's red
+- [ ] Brand colour resolved — **still open, see GA-018**. The orange re-skin applies to
+      `SearchBar.tsx` on `codex/ga-017-...`/`main`. The later Airbnb-parity rewrite of
+      `MegaSearchBar.tsx` on `chore/sync-from-monorepo` uses Airbnb red `#FF385C`, and that branch's
+      theme is indigo `#2C3D8F` / cyan `#37DAC3` — not orange. Needs an ADR.
 - [ ] Date **range** (check-in/check-out equivalent) — **blocked on GA-002**
 
 ## Implementation notes

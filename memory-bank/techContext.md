@@ -1,5 +1,13 @@
 # Technical Context: GoAthletix
 
+> **⚠ NOT AUTHORITATIVE — ASPIRATIONAL. Do not plan against this file.**
+> It describes FastAPI services, an OpenRouter LLM extraction pipeline, Algolia, Mem0, Supermemory and
+> a Paperclip agent fleet. **None of that exists in the repo.** What exists: a NestJS 11 backend, a
+> Next.js 16 frontend, and Python used only for standalone `scripts/`. There is no ML code, no model,
+> no FastAPI service, and no Python dependency manifest.
+> For the real stack see `CLAUDE.md` §2; for real current state see `memory-bank/activeContext.md`.
+> Kept only as a record of original intent. Verified 2026-09-09.
+
 ## Tech Stack
 - **Frontend / Core Web**: Next.js (App Router, React, Tailwind CSS v4 / Vanilla CSS), hosted on Vercel.
 - **Backend Services**: Node.js/Python FastAPI.
