@@ -71,11 +71,11 @@ Still open:
 
 ## Branch state
 
-- `goathletix-backend` → `main` (docs committed and pushed).
-- `goathletix-frontend` → `chore/sync-from-monorepo` — **not `main`**. This is the built-out 27-file
-  frontend with real `/sports` and `/locations` routes. `main` is 4 weeks stale. The branch
-  `chore/sync-from-monorepo` has **no merge base** with `main` and cannot be merged conventionally.
-- Uncommitted: `goathletix-frontend/src/app/page.tsx`, `src/components/MegaSearchBar.tsx`.
+- **Both repos are on `codex/ga-019-multiday-date-cutover`, pushed, working trees clean**
+  (backend `7f0e34e`, frontend `69c31e1`, 2026-09-15). Nothing is uncommitted.
+- `goathletix-frontend/main` is 4 weeks stale and `chore/sync-from-monorepo` has **no merge base**
+  with it, so it cannot be merged conventionally. GA-019 branched from the sync branch, so it
+  inherits that problem — decide the reconciliation before opening a PR.
 
 ## Decisions — see `03 Decisions/Decision log.md`
 
@@ -108,9 +108,26 @@ avoid the word "best" until there is a signal behind it.
 
 ## Next steps
 
-Phase 0 of GA-018, in order: fix `seed.ts:44` so the backend builds → get `HTTPS_PROXY` into the
-server process → add `GET /health` → point `seed.ts` at `event_date` → add a "showing cached data"
-banner → `await params` on the two 500ing routes. Then log the five ADRs above.
+**Phase 0 of GA-018 is done** — `seed.ts:44` typed so the backend builds; the proxy reaches the
+server *and* its TLS is fixed via `tls.getCACertificates` into `ProxyAgent({requestTls:{ca}})`;
+`seed.ts` cut over to `start_date`/`end_date`; `await params` applied to `/sports/[sport]` and
+`/locations/[city]`. Still open from that phase: `GET /health`, and the "showing cached data" banner.
+
+Shipped in GA-019 beyond the date cutover: multi-select cities **and** states (24 states / 53 cities
+generated into `goathletix-frontend/src/lib/locations.ts`), the 17 Townscript disciplines mapped onto
+the 8 backend primaries (`src/lib/sportTaxonomy.ts`, with 9 unmappable entries recorded), widened +
+sanitised `search`, and the search-bar clipping/alignment fixes.
+
+Next, in order:
+1. Decide how GA-019 lands — the no-merge-base problem above blocks the PR.
+2. Organiser search. PostgREST **cannot** reference an embedded column inside `or()` (PGRST100), so
+   this needs a denormalized `organizer_name` column or an RPC. "Competition" has no backing column
+   at all, and the PRD's `tags` column was never built — all three are schema work.
+3. Log the five ADRs; ADR-002 (palette) and ADR-005 (imagery) gate the homepage rails.
+
+Unverified, not broken: multi-day rendering (every row currently has `end_date == start_date`, so
+the → end affordance has never been exercised) and the search-bar animations (the Browser pane does
+not composite frames).
 
 ## Update obligation
 
