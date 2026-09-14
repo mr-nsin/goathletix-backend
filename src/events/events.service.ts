@@ -22,6 +22,20 @@ function toDateOnly(date: Date): string {
  * `start_date <= rangeEnd AND end_date >= rangeStart`. `end_date` is backfilled to equal
  * `start_date` for single-day events and a CHECK keeps it >= start_date, so no null guard is needed.
  */
+/**
+ * Split a comma-separated filter value into clean terms.
+ *
+ * Commas, parentheses, `%`, `*` and backslashes are stripped from each term because PostgREST
+ * parses `or=(...)` as a logic tree — unescaped, they would corrupt the filter rather than be
+ * matched literally.
+ */
+function splitTerms(value: string): string[] {
+  return value
+    .split(',')
+    .map((v) => v.replace(/[(),%*\\]/g, ' ').trim())
+    .filter(Boolean);
+}
+
 function resolveDateWindow(
   query: GetEventsQueryDto,
 ): { start: string; end: string } | null {
@@ -86,7 +100,7 @@ export class EventsService {
   }
 
   async findAll(query: GetEventsQueryDto) {
-    const { search, sport, city, difficulty } = query;
+    const { search, sport, city, state, difficulty } = query;
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
@@ -98,15 +112,35 @@ export class EventsService {
       .select(EVENT_SELECT, { count: 'exact' });
 
     if (search) {
-      builder = builder.ilike('event_name', `%${search}%`);
+      // PostgREST parses `or=(...)` as a logic tree, so commas, parentheses and `%` in user
+      // input would corrupt the filter rather than be matched literally. Strip them before
+      // interpolating.
+      const term = search.replace(/[(),%*\\]/g, ' ').trim();
+      if (term) {
+        builder = builder.or(
+          `event_name.ilike.%${term}%,venue.ilike.%${term}%,city.ilike.%${term}%`,
+        );
+      }
     }
 
     if (sport) {
       builder = builder.eq('sport_type', sport);
     }
 
-    if (city) {
-      builder = builder.ilike('city', city);
+    // Multi-value: `city=Mumbai,Pune` OR's the terms. Separate .or() groups are AND'd by
+    // PostgREST, so city and state narrow each other as expected.
+    const cities = city ? splitTerms(city) : [];
+    if (cities.length === 1) {
+      builder = builder.ilike('city', cities[0]);
+    } else if (cities.length > 1) {
+      builder = builder.or(cities.map((c) => `city.ilike.${c}`).join(','));
+    }
+
+    const states = state ? splitTerms(state) : [];
+    if (states.length === 1) {
+      builder = builder.ilike('state', states[0]);
+    } else if (states.length > 1) {
+      builder = builder.or(states.map((s) => `state.ilike.${s}`).join(','));
     }
 
     if (difficulty) {

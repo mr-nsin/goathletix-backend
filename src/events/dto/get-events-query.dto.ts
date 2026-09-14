@@ -18,9 +18,19 @@ export class GetEventsQueryDto {
   @IsEnum(SportCategory)
   sport?: SportCategory;
 
+  /**
+   * One or more cities, comma-separated (`city=Mumbai,Pune`). Matched case-insensitively and
+   * OR'd together. A single value keeps the previous behaviour, so existing callers such as
+   * `/locations/[city]` are unaffected.
+   */
   @IsOptional()
   @IsString()
   city?: string;
+
+  /** One or more states, comma-separated (`state=Maharashtra,Goa`). Same semantics as `city`. */
+  @IsOptional()
+  @IsString()
+  state?: string;
 
   @IsOptional()
   @IsEnum(DifficultyLevel)
