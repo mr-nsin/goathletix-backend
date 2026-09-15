@@ -121,6 +121,8 @@ model Event {
   difficulty      DifficultyLevel                        @default(Intermediate)
   priceRange      String?                                @map("price_range")
   registrationUrl String                                 @map("registration_url")
+  posterUrl       String?                                @map("poster_url")
+  isPopular       Boolean                                @default(false) @map("is_popular")
   organizerId     String?                                @map("organizer_id") @db.Uuid
   organizer       Organizer?                             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
   terrain         String?

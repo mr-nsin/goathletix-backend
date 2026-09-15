@@ -8,7 +8,7 @@ import { SupabaseService } from '../supabase.service';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
 
 const EVENT_SELECT =
-  'id, source_id, event_name, sport_type, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, organizer_id, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
+  'id, source_id, event_name, sport_type, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, poster_url, is_popular, organizer_id, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
 
 function toDateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -100,7 +100,7 @@ export class EventsService {
   }
 
   async findAll(query: GetEventsQueryDto) {
-    const { search, sport, city, state, difficulty } = query;
+    const { search, sport, city, state, difficulty, popular } = query;
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
@@ -125,6 +125,11 @@ export class EventsService {
 
     if (sport) {
       builder = builder.eq('sport_type', sport);
+    }
+
+    // Popular Events (main-page carousel): only events flagged is_popular.
+    if (popular === 'true' || popular === '1') {
+      builder = builder.eq('is_popular', true);
     }
 
     // Multi-value: `city=Mumbai,Pune` OR's the terms. Separate .or() groups are AND'd by

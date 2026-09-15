@@ -27,6 +27,11 @@ export class GetEventsQueryDto {
   @IsString()
   city?: string;
 
+  /** "true"/"1" → only events flagged is_popular (main-page Popular Events). */
+  @IsOptional()
+  @IsString()
+  popular?: string;
+
   /** One or more states, comma-separated (`state=Maharashtra,Goa`). Same semantics as `city`. */
   @IsOptional()
   @IsString()
