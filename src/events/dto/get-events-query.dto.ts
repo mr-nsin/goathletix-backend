@@ -7,7 +7,14 @@ import {
   Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { SportCategory, DifficultyLevel } from '@prisma/client';
+import {
+  SportCategory,
+  DifficultyLevel,
+  AgeCategory,
+  SportFamily,
+} from '@prisma/client';
+
+const AGE_CATEGORY_VALUES = Object.values(AgeCategory).join('|');
 
 export class GetEventsQueryDto {
   @IsOptional()
@@ -82,4 +89,36 @@ export class GetEventsQueryDto {
     message: 'dateTo must be a date string in YYYY-MM-DD format',
   })
   dateTo?: string;
+
+  /**
+   * One or more discipline slugs, comma-separated (`disciplines=marathon,badminton`).
+   * Matched against `events.discipline_slugs` (an array column) — an event is returned if
+   * it carries at least one of the requested slugs.
+   */
+  @IsOptional()
+  @IsString()
+  disciplines?: string;
+
+  /**
+   * One or more age categories, comma-separated (`ageCategories=kids,junior`). Matched
+   * against `events.age_categories` (an array column). Values are restricted to the
+   * `AgeCategory` enum so an unknown value fails validation rather than silently matching
+   * nothing.
+   */
+  @IsOptional()
+  @Matches(
+    new RegExp(`^(${AGE_CATEGORY_VALUES})(,(${AGE_CATEGORY_VALUES}))*$`),
+    {
+      message: `ageCategories must be a comma-separated list of: ${Object.values(AgeCategory).join(', ')}`,
+    },
+  )
+  ageCategories?: string;
+
+  /**
+   * A single sport family (`family=athletics`). Resolved to the sports that belong to that
+   * family via the `sports` table, then filtered on `events.sport_type`.
+   */
+  @IsOptional()
+  @IsEnum(SportFamily)
+  family?: SportFamily;
 }

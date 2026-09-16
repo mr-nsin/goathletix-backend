@@ -4,11 +4,49 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase.service';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
 
 const EVENT_SELECT =
-  'id, source_id, event_name, sport_type, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, poster_url, is_popular, organizer_id, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
+  'id, source_id, event_name, sport_type, description, slug, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, registration_opens_at, registration_closes_at, poster_url, is_popular, age_categories, discipline_slugs, organizer_id, organizer_name, club_id, is_club_activity, interest_count, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
+
+/**
+ * Sport-family -> sport-slug lookup, backing the `family` filter. The `sports` table changes
+ * rarely, so it is cached in memory for the process lifetime after the first request rather
+ * than queried per-request. Keyed per SupabaseClient instance to keep this test-friendly.
+ */
+const sportsByFamilyCache = new WeakMap<
+  SupabaseClient,
+  Promise<Map<string, string[]>>
+>();
+
+async function loadSportsByFamily(
+  client: SupabaseClient,
+): Promise<Map<string, string[]>> {
+  let cached = sportsByFamilyCache.get(client);
+  if (!cached) {
+    cached = (async () => {
+      const { data, error } = await client
+        .from('sports')
+        .select('slug, family');
+      if (error) {
+        throw error;
+      }
+      const map = new Map<string, string[]>();
+      for (const row of (data ?? []) as { slug: string; family: string }[]) {
+        const slugs = map.get(row.family) ?? [];
+        slugs.push(row.slug);
+        map.set(row.family, slugs);
+      }
+      return map;
+    })();
+    // A failed lookup must not poison the cache forever — let the next call retry.
+    cached.catch(() => sportsByFamilyCache.delete(client));
+    sportsByFamilyCache.set(client, cached);
+  }
+  return cached;
+}
 
 function toDateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -100,7 +138,7 @@ export class EventsService {
   }
 
   async findAll(query: GetEventsQueryDto) {
-    const { search, sport, city, state, difficulty, popular } = query;
+    const { search, sport, city, state, difficulty, popular, family } = query;
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
 
@@ -112,19 +150,49 @@ export class EventsService {
       .select(EVENT_SELECT, { count: 'exact' });
 
     if (search) {
-      // PostgREST parses `or=(...)` as a logic tree, so commas, parentheses and `%` in user
-      // input would corrupt the filter rather than be matched literally. Strip them before
-      // interpolating.
-      const term = search.replace(/[(),%*\\]/g, ' ').trim();
+      // Strip anything tsquery would read as an operator, so user input is matched literally.
+      const term = search.replace(/[(),%*\\:&|!'"<>]/g, ' ').trim();
       if (term) {
-        builder = builder.or(
-          `event_name.ilike.%${term}%,venue.ilike.%${term}%,city.ilike.%${term}%`,
-        );
+        // `search_vector` is a GENERATED STORED tsvector over event_name, venue, city, state and
+        // organizer_name — that last one is what finally makes organiser search work, since
+        // PostgREST cannot reach an embedded column from .or().
+        //
+        // Every token gets the `:*` prefix operator and they are AND'd. This matters because the
+        // directory debounces and queries WHILE THE USER TYPES: `websearch_to_tsquery` matches
+        // whole words only, so "Mumb" found nothing and the box read as broken until a complete
+        // word was entered. `to_tsquery('simple','mumb:*')` matches from the first keystroke.
+        // Passing no `type` selects the plain `fts` operator, which is the one that accepts `:*`.
+        const tsquery = term
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((token) => `${token}:*`)
+          .join(' & ');
+        builder = builder.textSearch('search_vector', tsquery, {
+          config: 'simple',
+        });
       }
     }
 
     if (sport) {
       builder = builder.eq('sport_type', sport);
+    }
+
+    if (family) {
+      const sportsByFamily = await loadSportsByFamily(this.supabase.client);
+      const slugs = sportsByFamily.get(family) ?? [];
+      builder = builder.in('sport_type', slugs.length > 0 ? slugs : ['']);
+    }
+
+    const disciplines = query.disciplines ? splitTerms(query.disciplines) : [];
+    if (disciplines.length > 0) {
+      builder = builder.overlaps('discipline_slugs', disciplines);
+    }
+
+    const ageCategories = query.ageCategories
+      ? splitTerms(query.ageCategories)
+      : [];
+    if (ageCategories.length > 0) {
+      builder = builder.overlaps('age_categories', ageCategories);
     }
 
     // Popular Events (main-page carousel): only events flagged is_popular.

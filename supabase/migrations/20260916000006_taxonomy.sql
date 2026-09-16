@@ -309,4 +309,4 @@ COMMIT;
 -- Verify:
 --   SELECT count(*) FROM sports;                        -- 14
 --   SELECT count(*) FROM disciplines;                   -- 105
---   SELECT count(*) FROM disciplines WHERE is_active;   -- 92
+--   SELECT count(*) FROM disciplines WHERE is_active;   -- 93 (105 minus 10 team + 2 mind)
