@@ -142,16 +142,26 @@ generated into `goathletix-frontend/src/lib/locations.ts`), the 17 Townscript di
 the 8 backend primaries (`src/lib/sportTaxonomy.ts`, with 9 unmappable entries recorded), widened +
 sanitised `search`, and the search-bar clipping/alignment fixes.
 
-Migrations 0005/0006/0007 are written and **awaiting manual application** in the Supabase SQL
-editor (5432 is firewalled; PostgREST has no DDL surface, and there is no exec-SQL RPC — checked).
-**Run 0005 on its own first**: Postgres rejects using a new enum value in the transaction that adds
-it, which is why it is a separate file.
+**Migrations 0005-0011 are APPLIED and verified over REST (2026-09-16).** 11 tables exposed, every
+expected column present, 14 sports, 105 disciplines (93 active), 0 events missing a slug.
+`schema.prisma` is mirrored and `prisma generate` has been run, so the API accepts `sport=athletics`.
+Shipped alongside: `GET /taxonomy/sports`, the `disciplines`/`ageCategories`/`family` filters,
+prefix full-text search over `search_vector` (which is what finally makes organiser search work),
+and the frontend's athletics-first 12-sport list with the age-group axis.
 
-`schema.prisma` has deliberately **not** been mirrored yet, departing from CLAUDE.md section 5. The
-rule exists to keep schema and database in step; mirroring before application would make Prisma
-declare tables that do not exist — the exact phantom-model drift ADR-003 and ADR-001 documented.
-Mirror it in the same change that confirms the SQL ran, then `prisma generate` so
-`@IsEnum(SportCategory)` accepts the new values (until then the API 400s on `sport=athletics`).
+**Blocking fact, now the main constraint: the new categories have no data.** `sport=athletics`
+returns 0. All 10,100 rows are from the original 8 endurance categories and every one has
+`discipline_slugs = []`. The schema, API and UI all support athletics-first, all-ages discovery;
+the catalogue behind it does not exist yet. This is an ingestion problem, not a code one.
+
+The main page design is specced in `01 Product/Main page design spec.md` (brand purpose, section
+order, card anatomy, open blockers). Competitor research is being done externally and lands in
+`01 Product/Competitor homepage research.md`.
+
+Applying them taught two things worth keeping: PostgREST has **no DDL surface** and 5432 is
+firewalled, so migrations only ever run from the Supabase dashboard; and `update_modified_column()`
+from migration 0000 was **missing from the live database** even though 0001 and 0002 had clearly
+run. The repo's migration files do not describe what is deployed — verify, never assume.
 
 Next, in order:
 1. Decide how GA-019 lands — the no-merge-base problem above blocks the PR.
