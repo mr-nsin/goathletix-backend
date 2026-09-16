@@ -123,6 +123,20 @@ model Event {
   registrationUrl String                                 @map("registration_url")
   posterUrl       String?                                @map("poster_url")
   isPopular       Boolean                                @default(false) @map("is_popular")
+  description     String?
+  slug            String?                                @unique
+  ageCategories   AgeCategory[]                          @map("age_categories")
+  disciplineSlugs String[]                               @map("discipline_slugs")
+  seriesId        String?                                @map("series_id") @db.Uuid
+  series          EventSeries?                           @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  clubId          String?                                @map("club_id") @db.Uuid
+  club            Club?                                  @relation(fields: [clubId], references: [id], onDelete: SetNull)
+  isClubActivity  Boolean                                @default(false) @map("is_club_activity")
+  organizerName   String?                                @map("organizer_name")
+  registrationOpensAt  DateTime?                         @map("registration_opens_at") @db.Timestamptz(6)
+  registrationClosesAt DateTime?                         @map("registration_closes_at") @db.Timestamptz(6)
+  interestCount   Int                                    @default(0) @map("interest_count")
+  viewCount       Int                                    @default(0) @map("view_count")
   organizerId     String?                                @map("organizer_id") @db.Uuid
   organizer       Organizer?                             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
   terrain         String?
@@ -134,6 +148,8 @@ model Event {
   follows         Follow[]
   userCalendars   UserCalendar[]
   reminders       Reminder[]
+  interests       EventInterest[]
+  results         EventResult[]
 
   @@map("events")
 }
@@ -152,6 +168,13 @@ model Profile {
   eventRequests       EventRequest[]
   feedbacks           UserFeedback[]
   activityLogs        ActivityLog[]
+  eventInterests      EventInterest[]
+  eventResults        EventResult[]
+  entityFollows       EntityFollow[]
+  clubMemberships     ClubMember[]
+  ownedClubs          Club[]           @relation("ClubOwner")
+  ownedCenters        TrainingCenter[] @relation("CenterOwner")
+  sharedCalendars     SharedCalendar[]
 
   @@map("profiles")
 }
@@ -251,6 +274,14 @@ enum SportCategory {
   racquet
   water
   adventure
+  // Added 2026-09-16 by migration 0005 (ADR-006). Order matches pg_enum sort order; Postgres
+  // cannot reorder or remove enum values, so append only.
+  athletics
+  skating
+  gymnastics
+  martial_arts
+  team_sports
+  mind_sports
 
   @@map("sport_category")
 }
@@ -310,4 +341,289 @@ enum ActivityAction {
   calendar_add
 
   @@map("activity_action")
+}
+
+// ---------------------------------------------------------------------------
+// Taxonomy, clubs and engagement — migrations 0006-0011 (ADR-006).
+// ---------------------------------------------------------------------------
+
+enum SportFamily {
+  athletics
+  endurance
+  skill_artistic
+  combat
+  racquet
+  outdoor
+  fitness
+  team
+  mind
+
+  @@map("sport_family")
+}
+
+enum EventModel {
+  mass_participation
+  meet
+  bracket
+  batch_departure
+  non_competitive
+  league_fixture
+
+  @@map("event_model")
+}
+
+enum DisciplineKind {
+  sport
+  format
+
+  @@map("discipline_kind")
+}
+
+enum AgeCategory {
+  kids
+  sub_junior
+  junior
+  youth
+  open
+  masters
+
+  @@map("age_category")
+}
+
+enum RecurrenceKind {
+  none
+  weekly
+  monthly
+  seasonal
+  annual
+
+  @@map("recurrence_kind")
+}
+
+enum ClubRole {
+  owner
+  admin
+  member
+
+  @@map("club_role")
+}
+
+enum MembershipStatus {
+  pending
+  active
+  left
+  removed
+
+  @@map("membership_status")
+}
+
+enum InterestStatus {
+  saved
+  interested
+  going
+  attended
+  skipped
+
+  @@map("interest_status")
+}
+
+enum FollowEntity {
+  event
+  organizer
+  club
+  training_center
+  user
+
+  @@map("follow_entity")
+}
+
+model Sport {
+  slug        SportCategory @id
+  displayName String        @map("display_name")
+  family      SportFamily
+  eventModel  EventModel    @map("event_model")
+  phase       Int           @default(9) @db.SmallInt
+  isActive    Boolean       @default(false) @map("is_active")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  disciplines Discipline[]
+  series      EventSeries[]
+
+  @@map("sports")
+}
+
+model Discipline {
+  slug        String         @id
+  displayName String         @map("display_name")
+  sportType   SportCategory  @map("sport_type")
+  sport       Sport          @relation(fields: [sportType], references: [slug])
+  kind        DisciplineKind @default(sport)
+  aliases     String[]
+  isActive    Boolean        @default(true) @map("is_active")
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("disciplines")
+}
+
+model EventSeries {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  slug           String?        @unique
+  description    String?
+  sportType      SportCategory  @map("sport_type")
+  sport          Sport          @relation(fields: [sportType], references: [slug])
+  recurrence     RecurrenceKind @default(none)
+  recurrenceNote String?        @map("recurrence_note")
+  clubId         String?        @map("club_id") @db.Uuid
+  club           Club?          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  isActive       Boolean        @default(true) @map("is_active")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+  events         Event[]
+
+  @@map("event_series")
+}
+
+model Club {
+  id                String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  slug              String                                 @unique
+  description       String?
+  sportTypes        SportCategory[]                        @map("sport_types")
+  disciplineSlugs   String[]                               @map("discipline_slugs")
+  ageCategories     AgeCategory[]                          @map("age_categories")
+  city              String
+  state             String
+  meetingPoint      String?                                @map("meeting_point")
+  geoLocation       Unsupported("geography(Point, 4326)")? @map("geo_location")
+  logoUrl           String?                                @map("logo_url")
+  coverUrl          String?                                @map("cover_url")
+  websiteUrl        String?                                @map("website_url")
+  instagramUrl      String?                                @map("instagram_url")
+  whatsappInviteUrl String?                                @map("whatsapp_invite_url")
+  contactEmail      String?                                @map("contact_email")
+  ownerId           String?                                @map("owner_id") @db.Uuid
+  owner             Profile?                               @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  isVerified        Boolean                                @default(false) @map("is_verified")
+  isActive          Boolean                                @default(true) @map("is_active")
+  memberCount       Int                                    @default(0) @map("member_count")
+  createdAt         DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  members           ClubMember[]
+  events            Event[]
+  series            EventSeries[]
+
+  @@map("clubs")
+}
+
+model ClubMember {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clubId    String           @map("club_id") @db.Uuid
+  club      Club             @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  userId    String           @map("user_id") @db.Uuid
+  user      Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ClubRole         @default(member)
+  status    MembershipStatus @default(active)
+  joinedAt  DateTime         @default(now()) @map("joined_at") @db.Timestamptz(6)
+  updatedAt DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([clubId, userId], map: "unique_club_member")
+  @@map("club_members")
+}
+
+model EventInterest {
+  id        String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String         @map("user_id") @db.Uuid
+  user      Profile        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String         @map("event_id") @db.Uuid
+  event     Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status    InterestStatus @default(saved)
+  note      String?
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([userId, eventId], map: "unique_user_event_interest")
+  @@map("event_interests")
+}
+
+model EventResult {
+  id               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String                   @map("user_id") @db.Uuid
+  user             Profile                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId          String                   @map("event_id") @db.Uuid
+  event            Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryEntered  String?                  @map("category_entered")
+  bibNumber        String?                  @map("bib_number")
+  // Postgres `interval` has no native Prisma mapping, so it stays Unsupported: reachable by raw
+  // query only. EventsService uses Supabase REST, so nothing in the app path needs it typed.
+  finishTime       Unsupported("interval")? @map("finish_time")
+  positionOverall  Int?                     @map("position_overall")
+  positionCategory Int?                     @map("position_category")
+  isPersonalBest   Boolean                  @default(false) @map("is_personal_best")
+  isVerified       Boolean                  @default(false) @map("is_verified")
+  notes            String?
+  createdAt        DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime                 @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("event_results")
+}
+
+model EntityFollow {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String       @map("user_id") @db.Uuid
+  user       Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType FollowEntity @map("target_type")
+  // No relation: the target spans five tables. Integrity is held by the delete triggers in
+  // migrations 0009 and 0010, which is the accepted trade for a table that never changes shape.
+  targetId   String       @map("target_id") @db.Uuid
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([userId, targetType, targetId], map: "unique_entity_follow")
+  @@map("entity_follows")
+}
+
+model SharedCalendar {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String           @map("user_id") @db.Uuid
+  user             Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shareToken       String           @unique @map("share_token")
+  title            String           @default("My season")
+  includedStatuses InterestStatus[] @map("included_statuses")
+  seasonYear       Int?             @map("season_year")
+  isPublic         Boolean          @default(true) @map("is_public")
+  viewCount        Int              @default(0) @map("view_count")
+  expiresAt        DateTime?        @map("expires_at") @db.Timestamptz(6)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("shared_calendars")
+}
+
+model TrainingCenter {
+  id              String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String
+  slug            String                                 @unique
+  description     String?
+  sportTypes      SportCategory[]                        @map("sport_types")
+  disciplineSlugs String[]                               @map("discipline_slugs")
+  ageCategories   AgeCategory[]                          @map("age_categories")
+  city            String
+  state           String
+  address         String?
+  geoLocation     Unsupported("geography(Point, 4326)")? @map("geo_location")
+  contactPhone    String?                                @map("contact_phone")
+  contactEmail    String?                                @map("contact_email")
+  websiteUrl      String?                                @map("website_url")
+  logoUrl         String?                                @map("logo_url")
+  coverUrl        String?                                @map("cover_url")
+  isCertified     Boolean                                @default(false) @map("is_certified")
+  isVerified      Boolean                                @default(false) @map("is_verified")
+  isActive        Boolean                                @default(true) @map("is_active")
+  ownerId         String?                                @map("owner_id") @db.Uuid
+  owner           Profile?                               @relation("CenterOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt       DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("training_centers")
 }
