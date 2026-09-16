@@ -19,6 +19,10 @@
 
 Build the definitive sports event discovery platform for India — the place where every runner, cyclist, trekker, triathlete, and adventure athlete goes to find, compare, save, and plan their next event. Solve the fragmentation problem where events are scattered across Instagram stories, WhatsApp forwards, obscure websites, and club newsletters. Give organizers a zero-cost distribution channel that reaches the right athletes. Over time, evolve into the operating system for India's sports community: profiles, challenges, social feed, activity tracking, and AI coaching.
 
+> **Vision expansion (2026-09):** the target end-state is a **sports-only super-app** on a discovery wedge — five sequenced pillars: **Discover → Host (sports-only event hosting) → Community + WhatsApp CRM (clubs, AroundU-style) → Marketplace (gear/nutrition/apparel) → Services (event travel + training centers)**. Market-validated and phased in **[`21-platform-expansion-vision.md`](21-platform-expansion-vision.md)**. Discovery remains the wedge; the other pillars are progressive surfaces, not simultaneous builds.
+
+> **Scope broadening (2026-09):** beyond endurance/adventure, GoAthletix also covers **competitive & youth sports** — **skating, athletics (track & field), gymnastics, martial arts, team sports** — and their **training/academies**. It becomes a **family sports platform**: a parent can find a kids' skating competition *and* the academy that coaches for it in one place. New **age-category** (Kids / Sub-Junior / Junior / Youth / Open / Masters) and **training-center** dimensions are defined in **[`17-sports-taxonomy.md`](17-sports-taxonomy.md)**. Endurance still ships first as the launch wedge.
+
 ---
 
 ## Product Thesis (One Paragraph)

@@ -70,3 +70,69 @@ CREATE TYPE primary_sport_category AS ENUM (
 -- Sub-category details are stored as text tags in a PostgreSQL array (e.g., tags = ['MTB', 'Endurance'])
 -- to allow flexible filtering without complex join tables.
 ```
+
+---
+
+## Scope Expansion (2026-09): Multi-Sport, Youth Competitions & Training
+
+**Product decision:** GoAthletix broadens from an endurance/adventure aggregator to a **multi-sport discovery + youth-competition + training platform** — while keeping endurance as the launch wedge (Phases 1–8 above ship first). This adds two things the original 8 categories don't cover: **competitive sports with strong kids/junior participation** (e.g. **skating**), and a **training/coaching layer** (academies, coaches, camps).
+
+### New primary categories (Phase 9+)
+
+| Primary Category | Sub-Categories (Tags) | Kids/Youth relevance | Typical organisers |
+|------------------|----------------------|----------------------|--------------------|
+| **Skating** | Inline/roller speed skating, Quad, Artistic skating, Roller hockey, Skateboarding | 🔴 Very high — school & district/state meets | Roller Skating Federation of India, school/district associations, rinks |
+| **Athletics** (track & field) | Sprints, Middle/Long distance, Relays, Jumps, Throws, Race walking, Cross-country | 🔴 Very high — school & age-group meets | AFI, school games federations, district athletics assns |
+| **Gymnastics** | Artistic, Rhythmic, Aerobic, Trampoline | 🔴 Very high | Gymnastics Federation of India, academies |
+| **Martial Arts** | Karate, Taekwondo, Judo, Boxing, Wrestling, Kalaripayattu, Fencing | 🔴 Very high | Style federations, dojos/academies |
+| **Team Sports** | Football, Basketball, Cricket, Volleyball, Hockey, Kabaddi, Kho-Kho | 🟠 High — school leagues & academies | Schools, academies, district bodies |
+| **Mind Sports** *(optional)* | Chess, and other board/mind competitions | 🟠 High — scholastic circuits | Chess assns, schools |
+
+> Existing categories already carry youth relevance too — **Racquet** (badminton/TT), **Water** (swimming), **Cycling**, and **Running** all run age-group events. The new categories mainly add the *competitive, coached, school-linked* disciplines that are the heart of the kids market.
+
+### New dimension: Age / Audience categories
+
+Kids and competitive sports are organised by **age group**, not distance. Add an audience axis, filterable and shown on cards:
+
+```sql
+CREATE TYPE age_category AS ENUM (
+  'kids',        -- e.g. U8 / U10 / U12
+  'sub_junior',
+  'junior',
+  'youth',
+  'open',        -- adult / all-ages
+  'masters'
+);
+-- Events can span several groups → store as an array column:
+-- ALTER TABLE events ADD COLUMN age_categories age_category[] DEFAULT '{open}';
+```
+
+### New entity: Training & Academies (feeds the Services pillar in doc 21)
+
+Kids competitions imply **training demand**. Introduce a first-class `training_centers` entity (academies, coaches, camps):
+
+```sql
+-- training_centers: id, name, sport_type[], age_categories age_category[],
+--   city, state, geo_location, is_certified, contact, website, description
+```
+This powers "Training centers near you" and "Academies for <sport>" surfaces, and links coaches ↔ events ↔ clubs.
+
+### Required schema changes (planned migration)
+
+1. **Extend the sport enum** (Postgres allows additive `ADD VALUE`):
+   ```sql
+   ALTER TYPE sport_category ADD VALUE IF NOT EXISTS 'skating';
+   ALTER TYPE sport_category ADD VALUE IF NOT EXISTS 'athletics';
+   ALTER TYPE sport_category ADD VALUE IF NOT EXISTS 'gymnastics';
+   ALTER TYPE sport_category ADD VALUE IF NOT EXISTS 'martial_arts';
+   ALTER TYPE sport_category ADD VALUE IF NOT EXISTS 'team_sports';
+   -- 'mind_sports' optional
+   ```
+   The backend DTO (`@IsEnum(SportCategory)`) and the frontend `sportTaxonomy.ts` + `sportIcons.json` must be regenerated/extended to match, or new-category filters return 400.
+2. **Add `age_categories`** (enum array) to `events`, plus a filter param.
+3. **Create `training_centers`** table + read API.
+
+### Positioning note
+
+This makes GoAthletix a **family sports platform**, not just an endurance-athlete tool: a parent can find a *skating competition* for a 10-year-old **and** the *academy that trains for it*, in the same place. That is a genuinely under-served combination in India and strengthens the Community (clubs/schools) and Services (training) pillars in `21-platform-expansion-vision.md`.
+

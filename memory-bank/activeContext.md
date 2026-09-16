@@ -77,6 +77,30 @@ Still open:
   with it, so it cannot be merged conventionally. GA-019 branched from the sync branch, so it
   inherits that problem — decide the reconciliation before opening a PR.
 
+## Product scope — broadened 2026-09-16
+
+GoAthletix is now an **athletics-first, multi-sport, multi-age** platform, not an endurance
+aggregator. Target: any place, any age group, kids through masters. Team sports (cricket, hockey)
+come **last** and are a different record type, not a later phase of the same one.
+
+- `docs/21-platform-expansion-vision.md` (new): five sequenced pillars —
+  Discover -> Host -> Community+WhatsApp CRM -> Marketplace -> Services. Discovery stays the wedge.
+- `docs/17-sports-taxonomy.md`: +6 categories (athletics, skating, gymnastics, martial arts,
+  team sports, mind sports), an age-group axis, and a training-centers entity.
+- `docs/03-target-users.md`: new segments — Parents/Guardians (10-20M households), Academies,
+  Schools/Federations.
+- **These four docs were edited in `goathletix-frontend/docs/` first and have now been synced here.**
+  The vault copy under `goathletix-backend/docs/` is the authoritative one (CLAUDE.md section 0).
+  If they diverge again, the frontend copy is the fork, not the source.
+
+**Blocking fact: athletics is not in the database.** `sport_category` has 8 values and
+`athletics` is not among them — `running` is road running. The product's stated primary focus
+cannot be stored, filtered or displayed until migration 0005 is applied.
+
+**Homepage model (settled):** the main page is an *eligibility feed*, not a catalogue and not a
+fixture list — "events I can enter, near me, soon, for my age group." Three axes: WHERE / WHEN /
+WHO. Sport is a secondary filter, never the entry point. WHO does not exist yet (0006).
+
 ## Decisions — see `03 Decisions/Decision log.md`
 
 - **ADR-001 DONE.** Migration applied to the live database 2026-09-12 and verified: `events` has 22
@@ -117,6 +141,17 @@ Shipped in GA-019 beyond the date cutover: multi-select cities **and** states (2
 generated into `goathletix-frontend/src/lib/locations.ts`), the 17 Townscript disciplines mapped onto
 the 8 backend primaries (`src/lib/sportTaxonomy.ts`, with 9 unmappable entries recorded), widened +
 sanitised `search`, and the search-bar clipping/alignment fixes.
+
+Migrations 0005/0006/0007 are written and **awaiting manual application** in the Supabase SQL
+editor (5432 is firewalled; PostgREST has no DDL surface, and there is no exec-SQL RPC — checked).
+**Run 0005 on its own first**: Postgres rejects using a new enum value in the transaction that adds
+it, which is why it is a separate file.
+
+`schema.prisma` has deliberately **not** been mirrored yet, departing from CLAUDE.md section 5. The
+rule exists to keep schema and database in step; mirroring before application would make Prisma
+declare tables that do not exist — the exact phantom-model drift ADR-003 and ADR-001 documented.
+Mirror it in the same change that confirms the SQL ran, then `prisma generate` so
+`@IsEnum(SportCategory)` accepts the new values (until then the API 400s on `sport=athletics`).
 
 Next, in order:
 1. Decide how GA-019 lands — the no-merge-base problem above blocks the PR.

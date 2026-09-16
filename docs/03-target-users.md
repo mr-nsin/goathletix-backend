@@ -18,6 +18,9 @@
 | **Large Event Companies** | Professional organizers (Procam, NEB, Godrej events) running 10+ events/year | 50-100 | 🟡 Medium |
 | **Sports Brands** | Nike, Adidas, Decathlon, local brands wanting athlete reach | 50-200 | 🟡 Medium (monetization) |
 | **Coaches/Trainers** | Running/cycling coaches who recommend events to clients | 2,000-5,000 | 🟡 Medium |
+| **Parents / Guardians** | Parents of young athletes seeking kids' competitions (skating, athletics, gymnastics, martial arts) + training academies | 10-20 million households | 🟠 High (scope broadening 2026-09) |
+| **Academies / Training Centers** | Coaching institutes, skating rinks, martial-arts dojos, athletics/gymnastics academies wanting athlete reach & enrolments | 20,000-50,000 | 🟠 High (supply for the Services pillar) |
+| **Schools / Sports Federations** | Schools & district/state bodies running age-group championships | 10,000+ | 🟡 Medium (structured youth-event supply) |
 
 ---
 
