@@ -24,6 +24,20 @@
 
 BEGIN;
 
+-- Guard: update_modified_column() is declared in migration 0000, but the live database was not
+-- provisioned from that file -- it is missing there (2026-09-16). Recreated here, identical to
+-- 0000, so each migration stands on its own. CREATE OR REPLACE is idempotent.
+CREATE OR REPLACE FUNCTION public.update_modified_column()
+RETURNS TRIGGER AS $upd$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$upd$ LANGUAGE plpgsql;
+
+-- gen_random_bytes() (share_token default) comes from pgcrypto; declared in 0000, guarded here.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- ---------------------------------------------------------------------------
 -- 1. event_interests
 -- ---------------------------------------------------------------------------

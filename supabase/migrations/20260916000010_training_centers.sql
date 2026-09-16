@@ -11,6 +11,20 @@
 
 BEGIN;
 
+-- Guard: update_modified_column() is declared in migration 0000, but the live database was not
+-- provisioned from that file -- it is missing there (2026-09-16). Recreated here, identical to
+-- 0000, so each migration stands on its own. CREATE OR REPLACE is idempotent.
+CREATE OR REPLACE FUNCTION public.update_modified_column()
+RETURNS TRIGGER AS $upd$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$upd$ LANGUAGE plpgsql;
+
+-- geography(Point,4326) below needs PostGIS; declared in 0000, guarded here for the same reason.
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 CREATE TABLE IF NOT EXISTS training_centers (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name             text NOT NULL,
