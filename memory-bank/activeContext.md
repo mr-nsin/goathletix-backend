@@ -154,9 +154,15 @@ returns 0. All 10,100 rows are from the original 8 endurance categories and ever
 `discipline_slugs = []`. The schema, API and UI all support athletics-first, all-ages discovery;
 the catalogue behind it does not exist yet. This is an ingestion problem, not a code one.
 
-The main page design is specced in `01 Product/Main page design spec.md` (brand purpose, section
-order, card anatomy, open blockers). Competitor research is being done externally and lands in
-`01 Product/Competitor homepage research.md`.
+The main page design is specced in `01 Product/Main page design spec.md`, now revised against
+`01 Product/Competitor homepage research.md` (11 sites checked). **One correction the research
+forced:** WHO (age) does not belong in the search bar — no competitor surfaces age above a
+per-sport drill-down, not even Airbnb. WHERE + WHEN stay in the bar; WHO ships as the "For kids &
+juniors near you" rail plus composed chips ("U12 Skating"), which is validated precisely because
+it is unclaimed everywhere else. Price was also added back to the card (a single "From ₹X",
+never the raw range) — indiarunning shows it on every card and the user base is cost-sensitive.
+Category grid stays banned as an *entry point*, but a slim sticky sport row survives — Airbnb, the
+spec's own analogue, keeps exactly that above its pill.
 
 Applying them taught two things worth keeping: PostgREST has **no DDL surface** and 5432 is
 firewalled, so migrations only ever run from the Supabase dashboard; and `update_modified_column()`
