@@ -48,6 +48,10 @@
 | 24 | **Web Scraping Pipeline** | Automated scraping of BhaagIndia, Townscript, organizer sites | Scale event data collection | High | Scraping infra, data normalization |
 | 51 | **Weather & Altitude Advisories** | Display dynamic climate, terrain, and acclimatization guides for high-altitude/monsoon events | Safe planning for extreme weather and high altitude | Medium | Event Detail Page (#6) |
 | 52 | **Verified Organizer Dashboard** | Claim profile, view traffic/save/follow analytics, and broadcast templates to followers | High-value retention tool for race directors | High | Organizer Profile Pages (#18), Organizer Analytics (#31) |
+| 53 | **Official Event Results** | Per-event results page: full finisher list with bib, name, category, gun/chip time, overall and category position, searchable by name or bib. Phased — Phase 1 is an outbound `results_url` to the timing partner; Phase 3 is ingested structured entries | The reason an athlete returns to a site after the event. Every competitor loses the user to the timing partner's domain the moment the race ends; holding results holds the relationship. Also the single largest SEO surface — one page per event per year, each with hundreds of searched names | High | Event Detail Page (#6), Past Events Archive (#23), scraping/feed integration with timing partners |
+| 54 | **Claim Your Result** | Match an ingested official result row to a logged-in profile; auto-populates PB history, the season poster (#21) and the past-events archive (#23) | Turns a read-only results page into an account reason. Converts anonymous results traffic — the highest-volume traffic a race site gets — into registered users | Medium | Official Event Results (#53), User Profiles (#36) |
+| 56 | **Gear Marketplace** | Equipment, apparel and nutrition storefront, surfaced as a header menu, a homepage rail matched to the user's saved events, and footer SEO links. GoAthletix holds no stock — the seller fulfils and owns returns | The only site that knows someone just entered a 21.1K three weeks out. That context, not catalogue breadth, is the advantage; a generic sports store has no reason to exist. Also the first revenue line that does not touch an entry fee, which protects the Neutrality pillar | High | Catalogue/affiliate source, saved-events signal (#13), seller terms |
+| 55 | **Editorial Featured Events** | Admin-curated `is_featured` / `featured_rank` / `featured_until` on events, driving the homepage hero carousel and seasonal collections | The Trust pillar forbids calling anything "Popular" without a signal behind it, and `interest_count` / `view_count` are at zero on all 10,100 rows. Curation is the honest bridge until engagement data exists | Low | Schema column, a minimal admin surface |
 
 ---
 
@@ -106,6 +110,11 @@ Event Data Model (#2)
 ├── Manual Event Ingestion (#9)
 │   └── Web Scraping Pipeline (#24)
 └── Basic SEO (#10)
+
+Official Event Results (#53)
+├── Claim Your Result (#54)
+│   └── Instagram Share Templates (#21)
+└── Past Events Archive (#23)
 
 User Accounts (#12)
 ├── Save/Bookmark Events (#13)

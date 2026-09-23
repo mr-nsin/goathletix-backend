@@ -3,69 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-</head>
-<body>
 <title>GoAthletix Homepage</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Roboto+Condensed:wght@500;700&display=swap">
+<!--
+  GoAthletix main page mockup — rev 3, 2026-09-23.
+  Implements "01 Product/Main page design spec.md" plus the rev-3 review:
+    · headline is now "Find Your Next Challenge"
+    · featured events are a full banner with info + thumbnail navigation BELOW it (§7a)
+    · event cards rebuilt to the IndiaRunning-class density: trust badge, rating, distance
+      chips, two-column meta, registration status band, price + Register CTA, social proof,
+      and an Interested / Save / Share / Comment action bar (§4a)
+    · the filter bar pins "near me" and scrolls everything else (§3a)
+    · Shop (marketplace) and For organisers added to the header (§7)
+  Sample data only. Anything marked "data pending" has no backing column yet — spec §6.
+-->
 <style>
   :root{
     --bg:#F5F6F9; --surface:#FFFFFF; --surface-2:#FBFCFE;
     --ink:#141A3E; --muted:#6B7180; --line:#E6E8EF;
     --accent:#12B4A0; --accent-ink:#0B2027;
+    --cta:#FF385C; --cta-ink:#FFFFFF;
     --grad:linear-gradient(120deg,#37DAC3 0%,#4FD9A3 45%,#86E01E 100%);
-    --warn:#B4720F; --star:#E4B23C;
+    --warn:#B4720F; --star:#E4B23C; --ok:#15803D; --info:#2563EB; --danger:#D53A57;
+    --tint-ok:#EAF7EF; --tint-danger:#FDEEF1; --tint-info:#EAF1FD; --tint-mute:#F1F2F6;
     --shadow:0 6px 20px rgba(20,26,62,.08);
     --shadow-lg:0 14px 40px rgba(20,26,62,.14);
     --radius:18px;
     --sans:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     --cond:"Roboto Condensed",system-ui,sans-serif;
   }
-  :root:not([data-theme="light"]){ }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#0E1120; --surface:#161A2C; --surface-2:#1B2038;
       --ink:#EAECF6; --muted:#9AA1B6; --line:#272C44;
-      --accent:#37DAC3; --accent-ink:#0B2027;
-      --warn:#E8A33D; --star:#E4B23C;
+      --accent:#37DAC3; --cta:#FF5C7A;
+      --warn:#E8A33D; --ok:#4ADE80; --info:#60A5FA; --danger:#FF7D93;
+      --tint-ok:#12271B; --tint-danger:#2C1620; --tint-info:#141F36; --tint-mute:#1E2338;
       --shadow:0 8px 26px rgba(0,0,0,.45); --shadow-lg:0 16px 44px rgba(0,0,0,.55);
     }
   }
   :root[data-theme="dark"]{
     --bg:#0E1120; --surface:#161A2C; --surface-2:#1B2038;
     --ink:#EAECF6; --muted:#9AA1B6; --line:#272C44;
-    --accent:#37DAC3; --accent-ink:#0B2027;
-    --warn:#E8A33D; --star:#E4B23C;
+    --accent:#37DAC3; --cta:#FF5C7A;
+    --warn:#E8A33D; --ok:#4ADE80; --info:#60A5FA; --danger:#FF7D93;
+    --tint-ok:#12271B; --tint-danger:#2C1620; --tint-info:#141F36; --tint-mute:#1E2338;
     --shadow:0 8px 26px rgba(0,0,0,.45); --shadow-lg:0 16px 44px rgba(0,0,0,.55);
   }
 
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
     -webkit-font-smoothing:antialiased;line-height:1.45}
-  h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.01em}
+  h1,h2,h3,h4{margin:0;text-wrap:balance;letter-spacing:-.01em}
   a{color:inherit;text-decoration:none}
   button{font-family:inherit}
+  ul{margin:0;padding:0;list-style:none}
   .eyebrow{font-family:var(--cond);text-transform:uppercase;letter-spacing:.14em;
     font-weight:700;font-size:12px;color:var(--muted)}
   .tnum{font-variant-numeric:tabular-nums}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-
-  /* ---------- header ---------- */
   .wrap{width:100%;max-width:1240px;margin:0 auto;padding-inline:20px}
-  header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;
-    background:color-mix(in srgb,var(--surface) 88%, transparent);
-    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;gap:18px;height:64px}
-  .logo{display:flex;align-items:center;gap:9px;font-weight:800}
-  .logo .mark{width:30px;height:30px;border-radius:8px;background:var(--grad);
-    display:grid;place-items:center;color:#08251f;font-weight:800;font-size:18px;
-    font-style:italic;box-shadow:var(--shadow)}
-  .logo .name{font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;
-    font-weight:700;line-height:.92;font-size:15px}
-  .loc{display:none;align-items:center;gap:6px;color:var(--muted);font-size:14px;font-weight:600}
-  .loc b{color:var(--ink)}
-  nav.main{display:none;gap:20px;margin-left:8px;font-family:var(--cond);
-    text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-size:13.5px}
-  nav.main a{color:var(--muted)} nav.main a.active,nav.main a:hover{color:var(--ink)}
   .spacer{flex:1}
   .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
     background:var(--surface);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-size:16px}
@@ -74,27 +71,93 @@
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
   .btn.solid{background:var(--ink);color:var(--surface);border:1px solid var(--ink)}
   .btn.grad{background:var(--grad);color:var(--accent-ink);border:none}
+  .btn.cta{background:var(--cta);color:var(--cta-ink);border:1px solid var(--cta)}
   .hide-sm{display:none}
-  @media(min-width:720px){ .loc{display:flex} .hide-sm{display:inline-flex} }
-  @media(min-width:940px){ nav.main{display:flex} }
+  .pending{font-family:var(--cond);text-transform:uppercase;letter-spacing:.09em;font-weight:700;
+    font-size:10px;color:var(--muted);border:1px dashed var(--line);border-radius:999px;
+    padding:3px 8px;white-space:nowrap}
 
-  /* ---------- hero ---------- */
+  /* ================= header — two rows (spec §7) ================= */
+  header.site{position:sticky;top:0;z-index:60;
+    background:color-mix(in srgb,var(--surface) 93%, transparent);
+    backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;gap:14px;height:62px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800}
+  .logo .mark{width:30px;height:30px;border-radius:8px;background:var(--grad);
+    display:grid;place-items:center;color:#08251f;font-weight:800;font-size:18px;
+    font-style:italic;box-shadow:var(--shadow)}
+  .logo .name{font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;
+    font-weight:700;line-height:.92;font-size:15px}
+
+  .locwrap{position:relative;display:none}
+  .loc{display:flex;align-items:center;gap:6px;color:var(--ink);font-size:14px;font-weight:600;
+    background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+  .loc .r{color:var(--muted);font-weight:500}
+  .pop{position:absolute;top:calc(100% + 10px);left:0;z-index:70;width:330px;background:var(--surface);
+    border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);padding:16px;display:none}
+  .pop[data-open="true"]{display:block}
+  .pop h4{font-size:12px;font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;
+    color:var(--muted);margin-bottom:9px}
+  .geobtn{width:100%;display:flex;align-items:center;gap:9px;background:var(--bg);
+    border:1px solid var(--line);border-radius:11px;padding:11px 13px;cursor:pointer;
+    font-weight:600;font-size:14px;color:var(--ink);text-align:left}
+  .geobtn:hover{border-color:var(--accent)}
+  .geonote{font-size:11.5px;color:var(--muted);margin-top:7px;line-height:1.4}
+  .seg-radius{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:11px;
+    padding:3px;gap:2px;margin-top:6px}
+  .seg-radius button{flex:1;border:none;background:transparent;border-radius:8px;padding:8px 4px;
+    cursor:pointer;font-family:var(--cond);font-weight:700;font-size:12.5px;letter-spacing:.04em;color:var(--muted)}
+  .seg-radius button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+  .citylist{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+  .citylist button{border:1px solid var(--line);background:var(--surface);border-radius:999px;
+    padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+  .citylist button:hover{border-color:var(--accent)}
+
+  .browse{border-top:1px solid var(--line);display:none}
+  .browse .wrap{display:flex;align-items:center;gap:2px;height:46px}
+  .nav-item{position:relative}
+  .nav-item > a,.nav-item > button{font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.08em;font-weight:700;font-size:13px;color:var(--muted);background:none;border:none;
+    cursor:pointer;padding:12px 11px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .nav-item > a:hover,.nav-item > button:hover,.nav-item.open > button{color:var(--ink)}
+  .nav-item .new{font-size:9px;background:var(--grad);color:var(--accent-ink);border-radius:999px;
+    padding:2px 6px;letter-spacing:.06em}
+  .nav-item .hot{font-size:9px;background:var(--cta);color:#fff;border-radius:999px;padding:2px 6px;letter-spacing:.06em}
+  @media(min-width:900px){ .browse{display:block} .locwrap{display:block} .hide-sm{display:inline-flex} }
+
+  .mega{position:absolute;top:100%;left:0;z-index:70;background:var(--surface);
+    border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:22px;display:none}
+  .nav-item.open .mega{display:grid}
+  .mega.sports{width:min(980px,92vw);grid-template-columns:repeat(4,1fr) 1.15fr;gap:22px}
+  .mega.small{width:min(560px,92vw);grid-template-columns:repeat(2,1fr);gap:18px}
+  .mega.small.right{left:auto;right:0}
+  .mega .col h4{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;
+    color:var(--muted);margin-bottom:8px}
+  .mega .col li{margin-bottom:5px}
+  .mega .col a{font-size:13.5px;font-weight:600;display:flex;justify-content:space-between;gap:10px;
+    padding:3px 0;color:var(--ink)}
+  .mega .col a:hover{color:var(--accent)}
+  .mega .col a .n{color:var(--muted);font-weight:600;font-size:12px}
+  .mega .feat{background:var(--bg);border-radius:14px;padding:16px;border:1px solid var(--line)}
+  .mega .feat a{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600;padding:5px 0}
+  .mega .note{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;font-size:12.5px;color:var(--muted)}
+
+  /* ================= hero — compact, brand + search only ================= */
   .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
     background:
-      radial-gradient(120% 140% at 88% -20%, color-mix(in srgb,#37DAC3 22%, transparent), transparent 60%),
-      radial-gradient(120% 150% at -10% 120%, color-mix(in srgb,#86E01E 18%, transparent), transparent 55%),
+      radial-gradient(120% 150% at 88% -30%, color-mix(in srgb,#37DAC3 24%, transparent), transparent 60%),
+      radial-gradient(120% 160% at -10% 130%, color-mix(in srgb,#86E01E 18%, transparent), transparent 55%),
       var(--surface)}
-  .hero .wrap{padding-block:34px 26px}
-  .hero h1{font-size:clamp(30px,6vw,52px);font-weight:800;line-height:1.02;max-width:14ch}
-  .hero p.sub{color:var(--muted);font-size:clamp(15px,2.4vw,18px);margin:10px 0 0;max-width:52ch}
-  .klabel{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
+  .hero .wrap{padding-block:30px 26px}
+  .klabel{display:inline-flex;align-items:center;gap:8px;margin-bottom:12px}
   .kdot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .hero h1{font-size:clamp(30px,5.6vw,52px);font-weight:800;line-height:1.02;max-width:15ch}
+  .hero p.sub{color:var(--muted);font-size:clamp(14.5px,2.2vw,17.5px);margin:10px 0 0;max-width:54ch}
 
-  /* search pill */
-  .pill{margin-top:22px;background:var(--surface);border:1px solid var(--line);
+  .pill{margin-top:20px;background:var(--surface);border:1px solid var(--line);
     border-radius:999px;box-shadow:var(--shadow-lg);display:flex;align-items:stretch;
-    padding:6px;gap:2px;max-width:900px;flex-wrap:wrap}
-  .seg{flex:1 1 150px;min-width:120px;border:none;background:transparent;text-align:left;
+    padding:6px;gap:2px;max-width:840px;flex-wrap:wrap}
+  .seg{flex:1 1 150px;min-width:130px;border:none;background:transparent;text-align:left;
     padding:10px 18px;border-radius:999px;cursor:pointer;color:var(--ink)}
   .seg:hover{background:var(--bg)}
   .seg .lab{display:block;font-family:var(--cond);text-transform:uppercase;
@@ -102,29 +165,103 @@
   .seg .val{display:block;font-size:14.5px;color:var(--muted);font-weight:500;margin-top:2px}
   .seg.divider{position:relative}
   .seg.divider::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:1px;background:var(--line)}
-  .seg-search{flex:2 1 220px;display:flex;align-items:center;gap:8px}
+  .seg-search{flex:2 1 230px;display:flex;align-items:center;gap:8px}
   .seg-search .col{flex:1;min-width:0}
   .go{margin-left:auto;flex:0 0 auto;width:50px;height:50px;border-radius:999px;border:none;
     background:var(--grad);color:var(--accent-ink);cursor:pointer;display:grid;place-items:center;
     box-shadow:var(--shadow);font-size:20px;align-self:center}
-  .go:hover{filter:brightness(1.04)}
 
-  /* chip row */
-  .chips{margin-top:16px;display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;
-    scrollbar-width:none}
+  /* ================= filter bar — pinned location + scrollable chips (§3a) ================= */
+  .filterbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:62px;z-index:35}
+  .filterbar .wrap{display:flex;align-items:center;gap:10px;padding-block:10px}
+  /* the location chip never scrolls away — it is the one filter that frames every other one */
+  .pinned{flex:0 0 auto;position:relative}
+  .pinchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent);
+    background:color-mix(in srgb,var(--accent) 10%, transparent);color:var(--ink);border-radius:999px;
+    padding:9px 14px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .scroller{position:relative;flex:1;min-width:0;display:flex;align-items:center;gap:6px}
+  .chips{display:flex;gap:9px;overflow-x:auto;padding:2px 0;scrollbar-width:none;scroll-behavior:smooth;flex:1}
   .chips::-webkit-scrollbar{display:none}
   .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);
     border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:600;cursor:pointer;
     display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
   .chip:hover{border-color:var(--accent)}
   .chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
-  .chip .em{font-size:15px}
+  .fade{position:absolute;top:0;bottom:0;width:38px;pointer-events:none;z-index:2}
+  .fade.l{left:0;background:linear-gradient(90deg,var(--surface),transparent)}
+  .fade.r{right:0;background:linear-gradient(270deg,var(--surface),transparent)}
+  .sarr{flex:0 0 auto;display:none;width:32px;height:32px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);cursor:pointer;place-items:center;z-index:3}
+  @media(min-width:760px){ .sarr{display:grid} }
+  .allfilters{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
+    background:var(--surface);border-radius:999px;padding:9px 14px;font-size:13.5px;font-weight:700;
+    color:var(--ink);cursor:pointer;white-space:nowrap}
 
-  /* ---------- rails ---------- */
-  section.rail{padding-block:30px}
+  /* ================= featured — full banner, info + nav below (§7a) ================= */
+  .featured{padding-block:26px 6px}
+  .fhead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .fhead h2{font-size:clamp(20px,3vw,26px);font-weight:800;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .fhead .sub{color:var(--muted);font-size:13.5px;margin-top:4px}
+  .fcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    box-shadow:var(--shadow-lg)}
+  .fbanner{position:relative;aspect-ratio:4/3;overflow:hidden}
+  @media(min-width:720px){ .fbanner{aspect-ratio:1000/360} }
+  .fslide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;display:grid;place-items:center}
+  .fslide[data-active="true"]{opacity:1}
+  .fslide .wm{font-size:min(40vw,300px);opacity:.16;transform:translateX(30%)}
+  .fslide::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(95deg,rgba(6,10,26,.90) 0%,rgba(6,10,26,.66) 52%,rgba(6,10,26,.18) 100%)}
+  .fcontent{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;
+    gap:8px;padding:22px;color:#fff}
+  @media(min-width:720px){ .fcontent{padding:30px 34px;max-width:70%} }
+  .fbadges{display:flex;gap:8px;flex-wrap:wrap}
+  .fcontent h3{font-size:clamp(22px,4.4vw,40px);font-weight:800;line-height:1.03;color:#fff}
+  .ftag{font-family:var(--cond);text-transform:uppercase;letter-spacing:.09em;font-weight:700;
+    font-size:13px;color:rgba(255,255,255,.86)}
+  .fdists{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+  .fdists span{font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.06em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);border-radius:999px;padding:4px 10px}
+  /* date block on the banner, mirroring the card */
+  .fdate{position:absolute;top:20px;right:20px;z-index:3;background:var(--surface);border-radius:14px;
+    overflow:hidden;text-align:center;min-width:86px;box-shadow:var(--shadow-lg)}
+  .fdate .d{font-size:30px;font-weight:800;line-height:1;padding:10px 12px 2px;color:var(--ink)}
+  .fdate .m{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-size:11px;
+    color:var(--muted);font-weight:700;padding-bottom:8px}
+  .fdate .w{background:var(--ink);color:var(--surface);font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.1em;font-size:10.5px;font-weight:700;padding:4px 0}
+
+  /* info strip under the banner */
+  .finfo{display:flex;align-items:center;gap:16px 22px;flex-wrap:wrap;padding:16px 18px;
+    border-top:1px solid var(--line);background:var(--surface)}
+  .finfo .blk{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .finfo .k{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;color:var(--muted);font-weight:700}
+  .finfo .v{font-size:14px;font-weight:700}
+  .finfo .v small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+  .finfo .actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .finfo .interested{font-size:12.5px;color:var(--muted);font-weight:600}
+  .bigprice{font-size:20px;font-weight:800}
+  .bigprice small{font-size:11.5px;color:var(--muted);font-weight:600}
+
+  /* navigation below the banner: arrows + thumbnails + counter */
+  .fnav{display:flex;align-items:center;gap:10px;padding:12px 14px;border-top:1px solid var(--line);
+    background:var(--surface-2)}
+  .fthumbs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;flex:1;scroll-behavior:smooth}
+  .fthumbs::-webkit-scrollbar{display:none}
+  .thumb{flex:0 0 auto;width:150px;border-radius:12px;overflow:hidden;border:2px solid transparent;
+    cursor:pointer;background:var(--surface);text-align:left;padding:0;display:block}
+  .thumb[aria-current="true"]{border-color:var(--accent)}
+  .thumb .tp{height:46px;display:grid;place-items:center;font-size:22px;color:#fff}
+  .thumb .tt{font-size:11.5px;font-weight:700;padding:6px 8px;line-height:1.25;color:var(--ink);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em}
+  .fcount{flex:0 0 auto;font-family:var(--cond);font-weight:700;letter-spacing:.08em;font-size:12px;
+    color:var(--muted);display:none}
+  @media(min-width:720px){ .fcount{display:block} }
+
+  /* ================= rails ================= */
+  section.rail{padding-block:28px}
   .rail-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
-  .rail-head h2{font-size:clamp(20px,3vw,26px);font-weight:800;display:flex;align-items:center;gap:9px}
-  .rail-head .sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+  .rail-head h2{font-size:clamp(20px,3vw,26px);font-weight:800;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .rail-head .sub{color:var(--muted);font-size:13.5px;margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .rail-head .right{display:flex;align-items:center;gap:8px}
   .viewall{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;
     font-weight:700;font-size:13px;color:var(--accent);white-space:nowrap}
@@ -133,87 +270,178 @@
   .track{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
     scroll-snap-type:x mandatory;padding:4px 2px 10px;scrollbar-width:none}
   .track::-webkit-scrollbar{display:none}
+  .radbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;
+    font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+  .radbtn:hover{border-color:var(--accent)}
+  .railpop{position:relative}
+  .railpop .pop{width:300px;top:calc(100% + 8px)}
 
-  /* event card */
-  .card{flex:0 0 82%;max-width:300px;scroll-snap-align:start;background:var(--surface);
+  /* ================= event card v3 — full-detail (spec §4a) ================= */
+  .card{flex:0 0 88%;max-width:340px;scroll-snap-align:start;background:var(--surface);
     border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
-    box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease, box-shadow .18s ease}
-  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-  @media(min-width:560px){ .card{flex-basis:44%} }
-  @media(min-width:900px){ .card{flex-basis:262px} }
-  .poster{position:relative;aspect-ratio:16/10;display:grid;place-items:center;color:#fff;overflow:hidden}
-  .poster .glyph{font-size:58px;opacity:.9;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+    box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease;
+    display:flex;flex-direction:column}
+  .card:hover,.card:focus-within{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  @media(min-width:640px){ .card{flex-basis:48%} }
+  @media(min-width:980px){ .card{flex-basis:330px} }
+  .poster{position:relative;aspect-ratio:16/11;display:grid;place-items:center;color:#fff;overflow:hidden}
+  .poster .glyph{font-size:62px;opacity:.28;transform:translate(22%,-8%)}
   .poster::after{content:"";position:absolute;inset:0;
-    background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.42))}
-  .datebadge{position:absolute;top:10px;left:10px;z-index:2;background:var(--surface);
-    color:var(--ink);border-radius:11px;padding:5px 9px;text-align:center;line-height:1;
-    box-shadow:var(--shadow);min-width:44px}
-  .datebadge .d{font-size:18px;font-weight:800}
-  .datebadge .m{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;
-    font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
-  .save{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;
-    border:none;background:color-mix(in srgb,#fff 88%, transparent);color:#e0435f;cursor:pointer;
-    display:grid;place-items:center;font-size:15px;box-shadow:var(--shadow)}
-  .sport-tag{position:absolute;left:10px;bottom:10px;z-index:2;font-family:var(--cond);
-    text-transform:uppercase;letter-spacing:.09em;font-weight:700;font-size:11px;color:#fff;
-    background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 10px;
-    backdrop-filter:blur(3px)}
-  .body{padding:13px 14px 15px}
-  .body h3{font-size:16px;font-weight:700;line-height:1.2;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
-  .place{color:var(--muted);font-size:13px;margin-top:5px;display:flex;align-items:center;gap:5px}
-  .metarow{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
-  .tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 9px;line-height:1;
-    font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em}
-  .tag.disc{background:color-mix(in srgb,var(--accent) 15%, transparent);color:var(--accent)}
-  .tag.age{background:color-mix(in srgb,var(--ink) 8%, transparent);color:var(--ink);border:1px solid var(--line)}
-  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:13px;gap:8px}
-  .price{font-size:14px;font-weight:700}
-  .price small{font-family:var(--cond);text-transform:uppercase;letter-spacing:.07em;
-    font-weight:700;color:var(--muted);font-size:10.5px;display:block}
-  .closing{font-family:var(--cond);text-transform:uppercase;letter-spacing:.05em;font-weight:700;
-    font-size:11.5px;color:var(--warn);display:inline-flex;align-items:center;gap:5px}
+    background:linear-gradient(120deg,rgba(0,0,0,.52),rgba(0,0,0,.10) 62%,rgba(0,0,0,.34))}
+  .ptext{position:absolute;left:14px;bottom:14px;z-index:2;max-width:64%}
+  .ptext .pl{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;
+    font-weight:700;color:rgba(255,255,255,.82)}
+  .ptext .ph{font-family:var(--cond);text-transform:uppercase;font-weight:700;font-size:19px;
+    line-height:1.02;color:#fff;letter-spacing:.01em;margin-top:3px}
+  /* trust badge, top-left — "Official", "Popular", "Sustainable", "Certified" */
+  .tbadge{position:absolute;top:12px;left:12px;z-index:3;display:inline-flex;align-items:center;gap:5px;
+    background:var(--surface);border-radius:999px;padding:5px 11px;font-size:11.5px;font-weight:700;
+    box-shadow:var(--shadow);color:var(--ink)}
+  .tbadge.official{color:var(--info)} .tbadge.popular{color:#D9730D}
+  .tbadge.green{color:var(--ok)} .tbadge.certified{color:var(--accent)}
+  /* date block, bottom-right, with the weekday bar */
+  .dblock{position:absolute;right:12px;bottom:12px;z-index:3;background:var(--surface);border-radius:12px;
+    overflow:hidden;text-align:center;min-width:72px;box-shadow:var(--shadow-lg)}
+  .dblock .d{font-size:22px;font-weight:800;line-height:1;padding:8px 10px 1px;color:var(--ink)}
+  .dblock .m{font-family:var(--cond);text-transform:uppercase;letter-spacing:.07em;font-size:10px;
+    color:var(--muted);font-weight:700;padding-bottom:6px}
+  .dblock .w{background:var(--ink);color:var(--surface);font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.1em;font-size:9.5px;font-weight:700;padding:3px 0}
 
-  /* kids rail accent */
-  .kids{background:
-      linear-gradient(180deg,color-mix(in srgb,#86E01E 8%, transparent),transparent 220px)}
+  .body{padding:14px 15px 0;display:flex;flex-direction:column;flex:1}
+  .titlerow{display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+  .body h3{font-size:15.5px;font-weight:700;line-height:1.24;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+  .rating{flex:0 0 auto;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+  .rating .s{color:var(--star)}
+  .rating small{color:var(--muted);font-weight:600;font-size:11.5px}
+  /* sport + every distance offered — the strip an entrant actually scans */
+  .chipsline{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tag{font-size:11px;font-weight:700;border-radius:999px;padding:5px 10px;line-height:1;
+    font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em}
+  .tag.sport{background:color-mix(in srgb,var(--accent) 16%, transparent);color:var(--accent)}
+  .tag.dist{background:var(--tint-mute);color:var(--ink);border:1px solid var(--line)}
+  .tag.age{background:color-mix(in srgb,var(--info) 14%, transparent);color:var(--info)}
+  /* two-column meta: when + where, each with a secondary line */
+  .metagrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .mcell{display:flex;gap:8px;min-width:0}
+  .mcell .ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--tint-mute);
+    display:grid;place-items:center;font-size:13px}
+  .mcell .t{font-size:12.5px;font-weight:700;line-height:1.25}
+  .mcell .s{font-size:11.5px;color:var(--muted);line-height:1.3;
+    display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  /* registration status band — the biggest trust fix on the card */
+  .band-st{display:flex;align-items:center;gap:10px;margin-top:12px;border-radius:12px;padding:10px 12px;
+    cursor:pointer;border:1px solid transparent}
+  .band-st .bi{flex:0 0 auto;font-size:16px}
+  .band-st .bt{font-size:12.5px;font-weight:700;line-height:1.25}
+  .band-st .bs{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .band-st .ch{margin-left:auto;color:var(--muted);font-size:16px}
+  .band-st.open{background:var(--tint-ok);border-color:color-mix(in srgb,var(--ok) 22%, transparent)}
+  .band-st.open .bt{color:var(--ok)}
+  .band-st.soon{background:var(--tint-danger);border-color:color-mix(in srgb,var(--danger) 24%, transparent)}
+  .band-st.soon .bt{color:var(--danger)}
+  .band-st.results{background:var(--tint-info);border-color:color-mix(in srgb,var(--info) 22%, transparent)}
+  .band-st.results .bt{color:var(--info)}
+  .band-st.closed{background:var(--tint-mute)} .band-st.closed .bt{color:var(--muted)}
+  .prog{height:5px;border-radius:999px;background:color-mix(in srgb,var(--danger) 22%, transparent);
+    margin-top:6px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--danger);border-radius:999px}
+  /* calibre line — the axis the competing athlete decides on */
+  .calibre{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+  .bdg{font-size:11.5px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+  .bdg.cert{color:var(--ok);font-weight:700}
+  .pricerow{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .price{font-size:19px;font-weight:800;white-space:nowrap}
+  .price small{font-size:11.5px;color:var(--muted);font-weight:600;margin-left:3px}
+  .reg{margin-left:auto;border:none;border-radius:11px;background:var(--cta);color:var(--cta-ink);
+    font-weight:700;font-size:13.5px;padding:10px 16px;cursor:pointer;white-space:nowrap}
+  .reg:hover{filter:brightness(1.06)}
+  .reg.outlineb{background:transparent;color:var(--info);border:1px solid var(--info)}
+  /* social proof */
+  .socialrow{display:flex;align-items:center;gap:10px;margin-top:12px;background:var(--tint-mute);
+    border-radius:12px;padding:8px 11px}
+  .avstack{display:flex}
+  .avstack span{width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);margin-left:-8px;
+    display:grid;place-items:center;font-size:11px;color:#fff;font-weight:700}
+  .avstack span:first-child{margin-left:0}
+  .socialrow .txt{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .socialrow .txt b{font-weight:800}
+  /* action bar */
+  .actionbar{display:flex;align-items:center;margin-top:12px;border-top:1px solid var(--line);
+    margin-inline:-15px;padding:4px 6px}
+  .actionbar button{flex:1;border:none;background:none;cursor:pointer;color:var(--muted);font-size:11.5px;
+    font-weight:700;padding:11px 2px;display:inline-flex;align-items:center;justify-content:center;gap:5px;
+    border-radius:9px}
+  .actionbar button:hover{background:var(--bg);color:var(--ink)}
+  .actionbar button[aria-pressed="true"]{color:var(--cta)}
+  .actionbar .sep{width:1px;align-self:stretch;background:var(--line);margin-block:8px}
+
+  .kids{background:linear-gradient(180deg,color-mix(in srgb,#86E01E 8%, transparent),transparent 240px)}
   .starpill{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-weight:700;
     font-size:11px;color:var(--accent-ink);background:var(--grad);border-radius:999px;padding:4px 10px}
 
-  /* ---------- sport grid ---------- */
+  /* ================= marketplace ================= */
+  .prow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;scroll-behavior:smooth}
+  .prow::-webkit-scrollbar{display:none}
+  .prod{flex:0 0 62%;max-width:210px;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+  @media(min-width:640px){ .prod{flex-basis:210px} }
+  .prod .pimg{aspect-ratio:1/1;display:grid;place-items:center;font-size:48px;background:var(--tint-mute)}
+  .prod .pb{padding:11px 12px 13px}
+  .prod .pn{font-size:13.5px;font-weight:700;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+  .prod .pm{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .prod .pp{display:flex;align-items:center;gap:7px;margin-top:8px}
+  .prod .pp b{font-size:15px;font-weight:800}
+  .prod .pp s{font-size:12px;color:var(--muted)}
+  .prod .pp .off{font-size:11px;font-weight:700;color:var(--ok)}
+
+  /* ================= sports / clubs / organiser / cities ================= */
   .sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   @media(min-width:620px){ .sgrid{grid-template-columns:repeat(3,1fr)} }
-  @media(min-width:920px){ .sgrid{grid-template-columns:repeat(6,1fr)} }
+  @media(min-width:920px){ .sgrid{grid-template-columns:repeat(7,1fr)} }
   .stile{position:relative;border-radius:14px;overflow:hidden;color:#fff;aspect-ratio:5/4;
-    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;cursor:pointer;
-    border:none}
-  .stile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.4))}
+    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;cursor:pointer;border:none}
+  .stile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.42))}
   .stile .g{position:absolute;top:8px;right:9px;font-size:26px;opacity:.9;z-index:1}
   .stile .nm{position:relative;z-index:2;font-family:var(--cond);text-transform:uppercase;
-    letter-spacing:.04em;font-weight:700;font-size:15px;line-height:1}
-  .stile .ct{position:relative;z-index:2;font-size:12px;font-weight:600;opacity:.92;margin-top:3px}
+    letter-spacing:.04em;font-weight:700;font-size:14px;line-height:1}
+  .stile .ct{position:relative;z-index:2;font-size:11.5px;font-weight:600;opacity:.92;margin-top:3px}
 
-  /* ---------- clubs ---------- */
   .clubrow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px}
   .clubrow::-webkit-scrollbar{display:none}
-  .club{flex:0 0 78%;max-width:300px;background:var(--surface);border:1px solid var(--line);
+  .club{flex:0 0 78%;max-width:320px;background:var(--surface);border:1px solid var(--line);
     border-radius:16px;padding:15px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow)}
-  @media(min-width:620px){ .club{flex-basis:300px} }
+  @media(min-width:620px){ .club{flex-basis:320px} }
   .club .av{width:48px;height:48px;border-radius:12px;background:var(--grad);display:grid;
     place-items:center;font-size:22px;flex:0 0 auto;color:#08251f}
   .club h3{font-size:15px;font-weight:700}
   .club .meta{color:var(--muted);font-size:12.5px;margin-top:2px}
   .club .join{margin-left:auto}
 
-  /* ---------- organiser band ---------- */
-  .band{border-radius:20px;overflow:hidden;position:relative;color:#08251f;background:var(--grad);
-    padding:26px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
-  .band h2{font-size:clamp(20px,3.4vw,28px);font-weight:800;color:#08251f}
-  .band p{margin:6px 0 0;color:#0b3b32;font-weight:500;max-width:46ch}
-  .band .cta{margin-left:auto}
-  .band .btn.solid{background:#08251f;color:#eafff8;border-color:#08251f}
+  /* organiser band — the platform's other audience */
+  .obandwrap{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+    box-shadow:var(--shadow)}
+  .oband{background:var(--grad);color:#08251f;padding:26px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
+  .oband h2{font-size:clamp(20px,3.4vw,28px);font-weight:800;color:#08251f}
+  .oband p{margin:6px 0 0;color:#0b3b32;font-weight:500;max-width:52ch}
+  .oband .cta{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+  .oband .btn.solid{background:#08251f;color:#eafff8;border-color:#08251f}
+  .oband .btn.ghost{border-color:#08251f;color:#08251f}
+  .ostats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line)}
+  @media(min-width:760px){ .ostats{grid-template-columns:repeat(4,1fr)} }
+  .ostat{background:var(--surface);padding:18px}
+  .ostat .n{font-size:22px;font-weight:800}
+  .ostat .l{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .osteps{display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border-top:1px solid var(--line)}
+  @media(min-width:760px){ .osteps{grid-template-columns:repeat(3,1fr)} }
+  .ostep{background:var(--surface-2);padding:18px}
+  .ostep .k{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:10.5px;
+    color:var(--accent);font-weight:700}
+  .ostep h4{font-size:14.5px;font-weight:700;margin-top:5px}
+  .ostep p{font-size:12.5px;color:var(--muted);margin:4px 0 0;line-height:1.45}
 
-  /* ---------- cities ---------- */
   .citygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
   @media(min-width:620px){ .citygrid{grid-template-columns:repeat(3,1fr)} }
   @media(min-width:920px){ .citygrid{grid-template-columns:repeat(5,1fr)} }
@@ -223,148 +451,458 @@
   .city .n{font-weight:600;font-size:14px}
   .city .c{color:var(--muted);font-size:12.5px;font-weight:600}
 
+  /* ================= footer ================= */
   footer.site{border-top:1px solid var(--line);margin-top:26px;background:var(--surface-2)}
-  footer .wrap{padding-block:26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;
-    color:var(--muted);font-size:13px}
+  .fgrid{display:grid;grid-template-columns:1fr;gap:26px;padding-block:34px}
+  @media(min-width:560px){ .fgrid{grid-template-columns:repeat(2,1fr)} }
+  @media(min-width:900px){ .fgrid{grid-template-columns:repeat(4,1fr)} }
+  @media(min-width:1140px){ .fgrid{grid-template-columns:repeat(8,1fr)} }
+  .fcol h4{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-size:11.5px;
+    color:var(--ink);margin-bottom:10px}
+  .fcol li{margin-bottom:6px}
+  .fcol a{font-size:13px;color:var(--muted)}
+  .fcol a:hover{color:var(--accent)}
+  .fnote{border-top:1px solid var(--line);padding-block:18px;font-size:12.5px;color:var(--muted);
+    display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;line-height:1.5}
+  .fnote .neutral{max-width:66ch}
+  .fbar{border-top:1px solid var(--line);padding-block:18px;display:flex;flex-wrap:wrap;gap:12px;
+    align-items:center;color:var(--muted);font-size:12.5px}
+  .social{display:flex;gap:8px}
+  .social a{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);display:grid;
+    place-items:center;background:var(--surface)}
   .preview-tag{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-weight:700;
     font-size:10.5px;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:4px 10px}
 
   @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;transition:none!important} }
 </style>
+</head>
+<body>
 
+<!-- ============================= HEADER ============================= -->
 <header class="site">
   <div class="wrap bar">
     <a class="logo" href="#" aria-label="GoAthletix home">
-      <span class="mark">G</span>
-      <span class="name">Go<br>Athletix</span>
+      <span class="mark">G</span><span class="name">Go<br>Athletix</span>
     </a>
-    <span class="loc">📍 You are in: <b>Bengaluru</b> ▾</span>
-    <nav class="main" aria-label="Primary">
-      <a href="#" class="active">Home</a><a href="#">Explore</a><a href="#">Clubs</a>
-      <a href="#">Academies</a><a href="#">Read</a>
-    </nav>
-    <span class="spacer"></span>
-    <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle theme">◐</button>
-    <button class="btn ghost hide-sm">Log In</button>
-    <button class="btn grad">Sign Up</button>
-  </div>
-</header>
 
-<section class="hero">
-  <div class="wrap">
-    <span class="klabel eyebrow"><span class="kdot"></span> Every event · every age · one place</span>
-    <h1>Where India competes.</h1>
-    <p class="sub">Find races, meets, matches and tournaments you can actually enter — near you, this season, for your age group.</p>
-
-    <div class="pill" role="search" aria-label="Find events">
-      <button class="seg" type="button"><span class="lab">Where</span><span class="val">Bengaluru</span></button>
-      <button class="seg divider" type="button"><span class="lab">When</span><span class="val">Any dates</span></button>
-      <button class="seg divider" type="button"><span class="lab">Sport</span><span class="val">All sports</span></button>
-      <div class="seg divider seg-search">
-        <div class="col"><span class="lab">Age group</span><span class="val">Add age · Kids → Masters</span></div>
-        <button class="go" aria-label="Search">⌕</button>
+    <div class="locwrap">
+      <button class="loc" id="locbtn" aria-expanded="false">📍 <b>Bengaluru</b> <span class="r">· 100 km</span> ▾</button>
+      <div class="pop" id="locpop">
+        <h4>Your location</h4>
+        <button class="geobtn">🎯 Use my current location</button>
+        <p class="geonote">Asked only when you tap this — never on page load. Decline and we fall back to your last city.</p>
+        <h4 style="margin-top:16px">Show events within</h4>
+        <div class="seg-radius">
+          <button type="button">25 km</button><button type="button">50 km</button>
+          <button type="button" aria-pressed="true">100 km</button><button type="button">200 km</button>
+        </div>
+        <h4 style="margin-top:16px">Or pick a city</h4>
+        <div class="citylist">
+          <button>Bengaluru</button><button>Mumbai</button><button>Delhi NCR</button>
+          <button>Pune</button><button>Hyderabad</button><button>Chennai</button><button>Kolkata</button>
+        </div>
       </div>
     </div>
 
-    <div class="chips" role="listbox" aria-label="Quick filters">
-      <button class="chip" aria-pressed="true"><span class="em">📍</span> Near me</button>
-      <button class="chip"><span class="em">🗓️</span> This weekend</button>
-      <button class="chip"><span class="em">🧒</span> Kids &amp; juniors</button>
-      <button class="chip"><span class="em">🛼</span> U12 Skating</button>
-      <button class="chip"><span class="em">🏅</span> Junior Athletics</button>
-      <button class="chip"><span class="em">🏃</span> Marathons</button>
-      <button class="chip"><span class="em">🚴</span> Masters Cycling</button>
-      <button class="chip"><span class="em">⏳</span> Closing soon</button>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle theme">◐</button>
+    <button class="btn ghost hide-sm">Log in</button>
+    <button class="btn grad">List your event</button>
+  </div>
+
+  <div class="browse">
+    <div class="wrap">
+      <div class="nav-item" data-menu>
+        <button aria-expanded="false" aria-haspopup="true">Sports ▾</button>
+        <div class="mega sports">
+          <div class="col"><h4>Endurance</h4><ul>
+            <li><a href="#">Running <span class="n">3,180</span></a></li>
+            <li><a href="#">Cycling <span class="n">920</span></a></li>
+            <li><a href="#">Triathlon <span class="n">210</span></a></li>
+            <li><a href="#">Swimming <span class="n">480</span></a></li>
+            <li><a href="#">Trekking <span class="n">560</span></a></li></ul></div>
+          <div class="col"><h4>Track &amp; field</h4><ul>
+            <li><a href="#">Athletics <span class="n">1,240</span></a></li>
+            <li><a href="#">Sprints <span class="n">410</span></a></li>
+            <li><a href="#">Middle distance <span class="n">260</span></a></li>
+            <li><a href="#">Jumps <span class="n">180</span></a></li>
+            <li><a href="#">Throws <span class="n">150</span></a></li></ul></div>
+          <div class="col"><h4>Skill &amp; artistic</h4><ul>
+            <li><a href="#">Skating <span class="n">610</span></a></li>
+            <li><a href="#">Gymnastics <span class="n">340</span></a></li>
+            <li><a href="#">Martial arts <span class="n">520</span></a></li>
+            <li><a href="#">Badminton <span class="n">700</span></a></li>
+            <li><a href="#">Mind sports <span class="n">190</span></a></li></ul></div>
+          <div class="col"><h4>Fitness &amp; outdoor</h4><ul>
+            <li><a href="#">Fitness <span class="n">300</span></a></li>
+            <li><a href="#">Adventure <span class="n">240</span></a></li>
+            <li><a href="#">Obstacle racing <span class="n">130</span></a></li>
+            <li><a href="#">Team sports <span class="n">450</span></a></li>
+            <li><a href="#"><b>All 14 categories →</b></a></li></ul></div>
+          <div class="feat"><h4>Most entered disciplines</h4>
+            <a href="#">Half marathon <span class="n">1,410</span></a>
+            <a href="#">10K <span class="n">1,180</span></a>
+            <a href="#">Full marathon <span class="n">690</span></a>
+            <a href="#">Speed skating <span class="n">420</span></a>
+            <a href="#">100 m <span class="n">380</span></a>
+            <a href="#">Brevet / BRM <span class="n">310</span></a>
+            <a href="#">Kumite <span class="n">240</span></a>
+            <a href="#">Artistic gymnastics <span class="n">190</span></a></div>
+        </div>
+      </div>
+      <div class="nav-item"><a href="#">Cities</a></div>
+      <div class="nav-item"><a href="#">Calendar</a></div>
+      <div class="nav-item"><a href="#">Clubs</a></div>
+      <div class="nav-item"><a href="#">Results <span class="new">New</span></a></div>
+
+      <!-- marketplace -->
+      <div class="nav-item" data-menu>
+        <button aria-expanded="false" aria-haspopup="true">Shop <span class="hot">Gear</span> ▾</button>
+        <div class="mega small">
+          <div class="col"><h4>Shop by sport</h4><ul>
+            <li><a href="#">Running</a></li><li><a href="#">Cycling</a></li>
+            <li><a href="#">Skating</a></li><li><a href="#">Swimming</a></li>
+            <li><a href="#">Athletics &amp; track</a></li><li><a href="#">Martial arts</a></li></ul></div>
+          <div class="col"><h4>Shop by need</h4><ul>
+            <li><a href="#">Shoes &amp; spikes</a></li><li><a href="#">Apparel</a></li>
+            <li><a href="#">Nutrition &amp; hydration</a></li><li><a href="#">Recovery</a></li>
+            <li><a href="#">Watches &amp; sensors</a></li><li><a href="#"><b>Race-day essentials →</b></a></li></ul></div>
+          <div class="note">Kit for the event you just entered — recommended from your saved events and
+            your distance, not a generic catalogue. Fulfilment is the seller's; we never hold stock.</div>
+        </div>
+      </div>
+
+      <div class="nav-item"><a href="#">Guides</a></div>
+      <span class="spacer"></span>
+
+      <!-- organisers -->
+      <div class="nav-item" data-menu>
+        <button aria-expanded="false" aria-haspopup="true">For organisers ▾</button>
+        <div class="mega small right">
+          <div class="col"><h4>Get listed</h4><ul>
+            <li><a href="#">List your event — free</a></li><li><a href="#">Claim your organiser page</a></li>
+            <li><a href="#">Bulk upload a season</a></li><li><a href="#">Verification &amp; the blue tick</a></li></ul></div>
+          <div class="col"><h4>Run your event</h4><ul>
+            <li><a href="#">Publish your results</a></li><li><a href="#">Reach &amp; save analytics</a></li>
+            <li><a href="#">Message your followers</a></li><li><a href="#">Timing-partner integrations</a></li></ul></div>
+          <div class="note">Free to list, always. We send athletes to <i>your</i> registration page and never
+            take a cut of the entry fee — your entrants stay yours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================= HERO ============================= -->
+<section class="hero">
+  <div class="wrap">
+    <span class="klabel eyebrow"><span class="kdot"></span> Every event · every age · one place</span>
+    <h1>Find Your Next Challenge.</h1>
+    <p class="sub">Races, meets, matches and tournaments you can actually enter — near you, this season, in your event.</p>
+
+    <div class="pill" role="search" aria-label="Find events">
+      <button class="seg" type="button"><span class="lab">Where</span><span class="val">📍 Near me · Bengaluru, 100 km</span></button>
+      <div class="seg divider seg-search">
+        <div class="col"><span class="lab">When</span><span class="val">Any dates</span></div>
+        <button class="go" aria-label="Search">⌕</button>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- ===================== FILTER BAR — pinned location, scrollable rest ===================== -->
+<div class="filterbar">
+  <div class="wrap">
+    <div class="pinned">
+      <button class="pinchip" id="pinloc" aria-expanded="false">📍 Bengaluru · 100 km ▾</button>
+      <div class="pop" id="pinpop">
+        <h4>Show events within</h4>
+        <div class="seg-radius">
+          <button type="button">25 km</button><button type="button">50 km</button>
+          <button type="button" aria-pressed="true">100 km</button><button type="button">200 km</button>
+        </div>
+        <p class="geonote">Pinned on purpose: every other filter reads against it, so it must never scroll
+          out of view. Thane wants Mumbai's events and Gurugram wants Delhi's — a city name cannot say that.</p>
+        <h4 style="margin-top:14px">Or pick a city</h4>
+        <div class="citylist">
+          <button>Bengaluru</button><button>Mumbai</button><button>Delhi NCR</button><button>Pune</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroller">
+      <button class="sarr" data-fscroll="-1" aria-label="Scroll filters left">‹</button>
+      <div style="position:relative;flex:1;min-width:0">
+        <span class="fade l"></span>
+        <div class="chips" id="fchips" aria-label="Quick filters">
+          <button class="chip">🗓️ This weekend</button>
+          <button class="chip">📅 Next 30 days</button>
+          <button class="chip">🏅 Certified course</button>
+          <button class="chip">⏱️ Chip-timed</button>
+          <button class="chip">🏃 Marathons</button>
+          <button class="chip">🚴 Cycling</button>
+          <button class="chip">🛼 Skating meets</button>
+          <button class="chip">🧒 Kids &amp; juniors</button>
+          <button class="chip">🥇 Masters / veterans</button>
+          <button class="chip">💸 Under ₹500</button>
+          <button class="chip">⏳ Closing this week</button>
+          <button class="chip">📊 Results out</button>
+          <button class="chip">🆓 Free entry</button>
+        </div>
+        <span class="fade r"></span>
+      </div>
+      <button class="sarr" data-fscroll="1" aria-label="Scroll filters right">›</button>
+    </div>
+
+    <button class="allfilters">⚙︎ All filters</button>
+  </div>
+</div>
+
 <main>
-  <!-- Happening near you -->
+  <!-- ===================== FEATURED — full banner + info + nav below ===================== -->
+  <section class="featured"><div class="wrap">
+    <div class="fhead">
+      <div><h2>Featured events <span class="pending">needs is_featured</span></h2>
+        <div class="sub">Curated, and labelled as curated — never called “Popular” without a signal behind it</div></div>
+      <a class="viewall" href="#">All featured →</a>
+    </div>
+
+    <div class="fcard" id="fcard" aria-roledescription="carousel" aria-label="Featured events">
+      <div class="fbanner" id="fbanner"></div>
+      <div class="finfo">
+        <div class="blk"><span class="k">Event</span><span class="v" id="i-name">—</span></div>
+        <div class="blk"><span class="k">When</span><span class="v" id="i-when">—</span></div>
+        <div class="blk"><span class="k">Where</span><span class="v" id="i-where">—</span></div>
+        <div class="blk"><span class="k">Entries</span><span class="v" id="i-reg">—</span></div>
+        <div class="actions">
+          <span class="interested" id="i-int">—</span>
+          <span class="bigprice" id="i-price">—</span>
+          <button class="btn ghost">♥ Interested</button>
+          <button class="reg">Register Now →</button>
+        </div>
+      </div>
+      <div class="fnav">
+        <button class="icon-btn" data-car="-1" aria-label="Previous featured event">‹</button>
+        <div class="fthumbs" id="fthumbs" role="tablist" aria-label="Choose featured event"></div>
+        <button class="icon-btn" data-car="1" aria-label="Next featured event">›</button>
+        <span class="fcount" id="fcount">1 / 5</span>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- 3 — Happening near you -->
   <section class="rail"><div class="wrap">
     <div class="rail-head">
-      <div><h2>Happening near you</h2><div class="sub">Bengaluru · next 30 days · 214 events</div></div>
+      <div><h2>Happening near you</h2>
+        <div class="sub">
+          <span>Next 30 days · 214 events</span>
+          <span class="railpop">
+            <button class="radbtn" id="radbtn" aria-expanded="false">📍 Bengaluru · within 100 km ▾</button>
+            <span class="pop" id="radpop">
+              <h4>Show events within</h4>
+              <div class="seg-radius">
+                <button type="button">25 km</button><button type="button">50 km</button>
+                <button type="button" aria-pressed="true">100 km</button><button type="button">200 km</button>
+              </div>
+              <p class="geonote">Third placement of the same control — adjust in context without reopening search.</p>
+            </span>
+          </span>
+        </div></div>
       <div class="right"><a class="viewall" href="#">View all →</a>
         <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
     </div>
     <div class="track" id="r1"></div>
   </div></section>
 
-  <!-- Kids & juniors -->
-  <section class="rail kids"><div class="wrap">
+  <!-- 4 — This weekend -->
+  <section class="rail"><div class="wrap">
     <div class="rail-head">
-      <div><h2>For kids &amp; juniors near you <span class="starpill">New</span></h2>
-        <div class="sub">Age-group meets &amp; championships — the rail no one else has</div></div>
+      <div><h2>This weekend</h2><div class="sub">Sat 4 – Sun 5 Oct · 38 events within 100 km</div></div>
       <div class="right"><a class="viewall" href="#">View all →</a>
         <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
     </div>
     <div class="track" id="r2"></div>
   </div></section>
 
-  <!-- This weekend -->
+  <!-- 5 — Closing soon -->
   <section class="rail"><div class="wrap">
     <div class="rail-head">
-      <div><h2>This weekend</h2><div class="sub">Sat 4 – Sun 5 Oct</div></div>
+      <div><h2>Registration closing soon <span class="pending">needs registration_closes_at</span></h2>
+        <div class="sub">Entries shut within 14 days</div></div>
       <div class="right"><a class="viewall" href="#">View all →</a>
         <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
     </div>
     <div class="track" id="r3"></div>
   </div></section>
 
-  <!-- Closing soon -->
+  <!-- 6 — Popular right now -->
   <section class="rail"><div class="wrap">
     <div class="rail-head">
-      <div><h2>Registration closing soon</h2><div class="sub">Register before it shuts</div></div>
+      <div><h2>Popular right now <span class="pending">needs interest_count</span></h2>
+        <div class="sub">Most saved in the last 14 days — a measured signal, not a hand-picked list</div></div>
       <div class="right"><a class="viewall" href="#">View all →</a>
         <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
     </div>
     <div class="track" id="r4"></div>
   </div></section>
 
-  <!-- Browse by sport -->
+  <!-- 7 — Kids & juniors -->
+  <section class="rail kids"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>For kids &amp; juniors near you <span class="starpill">Only here</span></h2>
+        <div class="sub">Signed in as a masters athlete? This row becomes “Events at your level”.</div></div>
+      <div class="right"><a class="viewall" href="#">View all →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r5"></div>
+  </div></section>
+
+  <!-- 8 — Latest results -->
   <section class="rail"><div class="wrap">
-    <div class="rail-head"><div><h2>Browse by sport</h2><div class="sub">12 categories · 93 disciplines · live counts</div></div></div>
+    <div class="rail-head">
+      <div><h2>Latest results <span class="pending">needs results_url</span></h2>
+        <div class="sub">Finished in the last 14 days · find your time, claim it to your profile</div></div>
+      <div class="right"><a class="viewall" href="#">All results →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r6"></div>
+  </div></section>
+
+  <!-- 9 — Marketplace -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>Gear up for your next event <span class="pending">no schema yet</span></h2>
+        <div class="sub">Matched to the events you saved — 21.1K in 3 weeks means shoes, gels and a race belt</div></div>
+      <div class="right"><a class="viewall" href="#">Visit the shop →</a>
+        <div class="arrows"><button class="icon-btn" data-pscroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-pscroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="prow" id="shop"></div>
+  </div></section>
+
+  <!-- 10 — Browse by sport -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head"><div><h2>Browse by sport</h2><div class="sub">14 categories · 105 disciplines · live counts</div></div>
+      <a class="viewall" href="#">All categories →</a></div>
     <div class="sgrid" id="sports"></div>
   </div></section>
 
-  <!-- Clubs & academies -->
+  <!-- 11 — Clubs -->
   <section class="rail"><div class="wrap">
     <div class="rail-head">
-      <div><h2>Clubs &amp; academies near you</h2><div class="sub">Train for it where you find it</div></div>
+      <div><h2>Clubs &amp; academies near you <span class="pending">0 rows</span></h2><div class="sub">Train for it where you find it</div></div>
       <a class="viewall" href="#">View all →</a>
     </div>
     <div class="clubrow" id="clubs"></div>
   </div></section>
 
-  <!-- Organiser band -->
+  <!-- 12 — Organisers: the platform's second audience -->
   <section class="rail"><div class="wrap">
-    <div class="band">
-      <div>
-        <h2>List your event — free</h2>
-        <p>Reach the right athletes and their parents. Sports events only. We link to your registration — we never touch the transaction.</p>
+    <div class="obandwrap">
+      <div class="oband">
+        <div>
+          <h2>Organising an event? Get found.</h2>
+          <p>Free to list, always. We send athletes to your registration page and never take a cut of the
+             entry fee — your entrants, your data, your relationship.</p>
+        </div>
+        <div class="cta">
+          <button class="btn ghost">Organiser login</button>
+          <button class="btn solid">List your event — free</button>
+        </div>
       </div>
-      <div class="cta"><button class="btn solid">Host an event</button></div>
+      <div class="ostats">
+        <div class="ostat"><div class="n tnum">10,100</div><div class="l">events listed across India</div></div>
+        <div class="ostat"><div class="n tnum">53</div><div class="l">cities · 24 states</div></div>
+        <div class="ostat"><div class="n tnum">14</div><div class="l">sports · 105 disciplines</div></div>
+        <div class="ostat"><div class="n">₹0</div><div class="l">commission on every entry, forever</div></div>
+      </div>
+      <div class="osteps">
+        <div class="ostep"><div class="k">Step 1</div><h4>List in under five minutes</h4>
+          <p>Name, date, city, distances, entry fee, your registration link. Bulk-upload a whole season in one file.</p></div>
+        <div class="ostep"><div class="k">Step 2</div><h4>Get verified</h4>
+          <p>Claim your organiser page and earn the blue tick. Verified events carry an “Official Event” badge on every card.</p></div>
+        <div class="ostep"><div class="k">Step 3</div><h4>Publish results, keep the athletes</h4>
+          <p>Push your timing file and your finishers find their names here — then follow you for next season.</p></div>
+      </div>
     </div>
   </div></section>
 
-  <!-- Cities -->
+  <!-- 13 — Cities -->
   <section class="rail"><div class="wrap">
     <div class="rail-head"><div><h2>Browse by city</h2><div class="sub">53 cities · 24 states</div></div></div>
     <div class="citygrid" id="cities"></div>
   </div></section>
 </main>
 
-<footer class="site"><div class="wrap">
-  <span class="logo"><span class="mark">G</span></span>
-  <span>© 2026 GoAthletix — sports-event discovery for India.</span>
-  <span class="spacer"></span>
-  <span class="preview-tag">Preview · sample data</span>
-</div></footer>
+<!-- ============================= FOOTER ============================= -->
+<footer class="site">
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol"><h4>Events by city</h4><ul>
+        <li><a href="#">Events in Bengaluru</a></li><li><a href="#">Events in Mumbai</a></li>
+        <li><a href="#">Events in Delhi NCR</a></li><li><a href="#">Events in Pune</a></li>
+        <li><a href="#">Events in Hyderabad</a></li><li><a href="#">Events in Chennai</a></li>
+        <li><a href="#">Events in Kolkata</a></li><li><a href="#"><b>All 53 cities →</b></a></li></ul></div>
+      <div class="fcol"><h4>Events by sport</h4><ul>
+        <li><a href="#">Athletics events</a></li><li><a href="#">Running events</a></li>
+        <li><a href="#">Cycling events</a></li><li><a href="#">Skating events</a></li>
+        <li><a href="#">Swimming events</a></li><li><a href="#">Gymnastics events</a></li>
+        <li><a href="#">Martial arts events</a></li><li><a href="#"><b>All 14 categories →</b></a></li></ul></div>
+      <div class="fcol"><h4>Events by month</h4><ul>
+        <li><a href="#">Marathons in October 2026</a></li><li><a href="#">Events in November 2026</a></li>
+        <li><a href="#">Events in December 2026</a></li><li><a href="#">Events in January 2027</a></li>
+        <li><a href="#">Events in February 2027</a></li><li><a href="#"><b>Full calendar →</b></a></li></ul></div>
+      <div class="fcol"><h4>Popular searches</h4><ul>
+        <li><a href="#">Half marathon in Bengaluru</a></li><li><a href="#">U14 skating in Pune</a></li>
+        <li><a href="#">Cycling events this weekend</a></li><li><a href="#">AFI-certified track meets</a></li>
+        <li><a href="#">Masters athletics championships</a></li><li><a href="#">Kids sports events near me</a></li>
+        <li><a href="#">Free entry events</a></li></ul></div>
+      <div class="fcol"><h4>Results</h4><ul>
+        <li><a href="#">Latest race results</a></li><li><a href="#">Search by bib or name</a></li>
+        <li><a href="#">Claim your result</a></li><li><a href="#">Your personal bests</a></li>
+        <li><a href="#">Past events archive</a></li></ul></div>
+      <div class="fcol"><h4>Shop</h4><ul>
+        <li><a href="#">Running shoes</a></li><li><a href="#">Cycling gear</a></li>
+        <li><a href="#">Skating equipment</a></li><li><a href="#">Nutrition</a></li>
+        <li><a href="#">Watches &amp; sensors</a></li><li><a href="#">Race-day essentials</a></li>
+        <li><a href="#">Sell on GoAthletix</a></li></ul></div>
+      <div class="fcol"><h4>For organisers</h4><ul>
+        <li><a href="#">List your event — free</a></li><li><a href="#">Organiser login</a></li>
+        <li><a href="#">Publish your results</a></li><li><a href="#">Claim your page</a></li>
+        <li><a href="#">Verification</a></li><li><a href="#">Partner with us</a></li></ul>
+        <h4 style="margin-top:20px">Company</h4><ul>
+        <li><a href="#">About</a></li><li><a href="#">Blog</a></li><li><a href="#">Contact</a></li></ul></div>
+      <div class="fcol"><h4>Support</h4><ul>
+        <li><a href="#">Help centre</a></li><li><a href="#"><b>Report an incorrect listing</b></a></li>
+        <li><a href="#">FAQ</a></li><li><a href="#">Terms of use</a></li><li><a href="#">Privacy policy</a></li>
+        <li><a href="#">Shop returns &amp; shipping</a></li></ul></div>
+    </div>
+
+    <div class="fnote">
+      <span class="neutral"><b>We never handle your entry fee.</b> Every “Register” link goes to the organiser
+      or their timing partner, so refunds, transfers and cancellations are theirs to decide — there is no
+      GoAthletix entry-refund policy to publish, and we will not imply otherwise. Shop orders are a separate
+      thing entirely and are fulfilled by the seller, under their own returns policy.</span>
+    </div>
+
+    <div class="fbar">
+      <span class="logo"><span class="mark">G</span></span>
+      <span>© 2026 GoAthletix — sports-event discovery for India.</span>
+      <span class="spacer"></span>
+      <span class="social">
+        <a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="X">✕</a>
+        <a href="#" aria-label="YouTube">▷</a><a href="#" aria-label="WhatsApp">✆</a>
+      </span>
+      <span class="preview-tag">Preview · sample data</span>
+    </div>
+  </div>
+</footer>
 
 <script>
 (function(){
   "use strict";
-  // ---- theme toggle (per-viewer convenience) ----
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ---------- theme toggle (per-viewer convenience only) ---------- */
   var root=document.documentElement, tbtn=document.getElementById('theme');
   try{ var t=localStorage.getItem('ga-theme'); if(t) root.setAttribute('data-theme',t); }catch(e){}
   tbtn.addEventListener('click',function(){
@@ -375,90 +913,327 @@
     try{ localStorage.setItem('ga-theme',next); }catch(e){}
   });
 
-  // ---- chips (visual multi-select) ----
-  document.querySelectorAll('.chip').forEach(function(c){
-    c.addEventListener('click',function(){ c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true'); });
-  });
-
-  // ---- rail arrows ----
-  document.querySelectorAll('.arrows').forEach(function(a){
-    var track=a.closest('.rail').querySelector('.track');
-    a.querySelectorAll('button').forEach(function(b){
-      b.addEventListener('click',function(){ track.scrollBy({left:(+b.dataset.scroll)*Math.min(track.clientWidth*.8,560),behavior:'smooth'}); });
-    });
-  });
-
-  // ---- sport palettes / glyphs ----
+  /* ---------- sport palettes / glyphs ---------- */
   var SPORT={
     athletics:['#F2653B','#7A1E12','🏅'], running:['#2AA9C9','#124E63','🏃'],
     cycling:['#E4A11B','#7A4E06','🚴'], skating:['#7C5CFF','#3A1E8A','🛼'],
     gymnastics:['#E85CA0','#7A1E52','🤸'], martial:['#3A4658','#0F141F','🥋'],
     water:['#22B0E6','#0A5A86','🏊'], racquet:['#16A34A','#0A4522','🏸'],
     triathlon:['#0EA5A0','#0A4E4B','🏆'], trekking:['#5B8C3E','#274018','🥾'],
-    fitness:['#8B5CF6','#3B2170','🏋️'], adventure:['#D97706','#7A3D06','🧭']
+    fitness:['#8B5CF6','#3B2170','🏋️'], adventure:['#D97706','#7A3D06','🧭'],
+    team:['#DC2626','#6B1111','🏏'], mind:['#0F766E','#083F3B','♟️']
   };
-  function poster(s){var p=SPORT[s]||SPORT.running;
-    return 'background:linear-gradient(135deg,'+p[0]+','+p[1]+')';}
+  function poster(s){var p=SPORT[s]||SPORT.running;return 'background:linear-gradient(135deg,'+p[0]+','+p[1]+')';}
   function glyph(s){return (SPORT[s]||SPORT.running)[2];}
+  var AVC=['#F2653B','#2AA9C9','#7C5CFF','#16A34A','#E4A11B'];
 
+  /* ================= featured banner carousel ================= */
+  var FEATURED=[
+    {sport:'running',badge:['official','Official Event'],name:'Tata Mumbai Marathon 2027',
+     kicker:'India’s biggest road race',head:'RUN THE CITY<br>THAT NEVER STOPS',
+     day:'18',mon:'Jan 2027',wd:'Sunday',when:'Sun, 18 Jan 2027',whens:'4:45 AM onwards',
+     where:'Mumbai, Maharashtra',wheres:'CSMT → Marine Drive',dists:['42.2K','21.1K','10K','6K Dream Run'],
+     reg:'Open · closes 30 Nov',price:'2,400',int:'8.1K'},
+    {sport:'athletics',badge:['certified','AFI Ranking Event'],name:'National Open Athletics Championships',
+     kicker:'Senior national championship',head:'EVERY MEDAL<br>STARTS ON A TRACK',
+     day:'22',mon:'Oct 2026',wd:'Thursday',when:'Thu, 22 – Sun 25 Oct 2026',whens:'Heats from 7:00 AM',
+     where:'Bhubaneswar, Odisha',wheres:'Kalinga Stadium',dists:['100m','400m','5000m','Javelin','Relay'],
+     reg:'Federation entry · closes 5 Oct',price:'500',int:'2.4K'},
+    {sport:'skating',badge:['popular','Popular Event'],name:'National Roller Skating Championship 2026',
+     kicker:'U8 to Senior · 14 age groups',head:'SPEED HAS<br>NO AGE LIMIT',
+     day:'08',mon:'Nov 2026',wd:'Sunday',when:'Sun, 8 – Thu 12 Nov 2026',whens:'6:00 AM onwards',
+     where:'Vijayawada, Andhra Pradesh',wheres:'IGMC Stadium Rink',dists:['500m','1000m','Rink 3000m','Road 10K'],
+     reg:'Open · closes 20 Oct',price:'900',int:'2.8K'},
+    {sport:'cycling',badge:['green','Sustainable Event'],name:'Deccan Cliffhanger 643K',
+     kicker:'Pune to Goa · ultra-distance',head:'ONE NIGHT.<br>ONE ROAD. 643 KM.',
+     day:'21',mon:'Nov 2026',wd:'Saturday',when:'Sat, 21 Nov 2026',whens:'6:00 AM start',
+     where:'Pune → Goa',wheres:'NH-48 corridor',dists:['643K solo','643K relay'],
+     reg:'Qualifier required',price:'6,500',int:'940'},
+    {sport:'triathlon',badge:['official','Official Event'],name:'Ironman 70.3 Goa',
+     kicker:'Swim · bike · run',head:'FINISH WHAT<br>YOU STARTED',
+     day:'06',mon:'Dec 2026',wd:'Sunday',when:'Sun, 6 Dec 2026',whens:'6:15 AM onwards',
+     where:'Goa',wheres:'Miramar Beach',dists:['1.9K swim','90K bike','21.1K run'],
+     reg:'Open · filling fast',price:'18,500',int:'3.9K'}
+  ];
+  var BADGE={official:'✔',popular:'🔥',green:'🌱',certified:'🏅'};
+  var fb=document.getElementById('fbanner'), fth=document.getElementById('fthumbs'), fi=0, timer=null;
+
+  fb.innerHTML=FEATURED.map(function(f,i){
+    return '<div class="fslide" style="'+poster(f.sport)+'" data-active="'+(i===0)+'">'
+      +'<span class="wm">'+glyph(f.sport)+'</span>'
+      +'<div class="fdate"><div class="d tnum">'+f.day+'</div><div class="m">'+f.mon+'</div><div class="w">'+f.wd+'</div></div>'
+      +'<div class="fcontent">'
+        +'<div class="fbadges"><span class="tbadge '+f.badge[0]+'" style="position:static">'+BADGE[f.badge[0]]+' '+f.badge[1]+'</span></div>'
+        +'<span class="ftag">'+f.kicker+'</span>'
+        +'<h3>'+f.head+'</h3>'
+        +'<div class="fdists">'+f.dists.map(function(d){return '<span>'+d+'</span>';}).join('')+'</div>'
+      +'</div></div>';
+  }).join('');
+
+  fth.innerHTML=FEATURED.map(function(f,i){
+    return '<button class="thumb" role="tab" data-i="'+i+'" aria-current="'+(i===0)+'">'
+      +'<span class="tp" style="'+poster(f.sport)+'">'+glyph(f.sport)+'</span>'
+      +'<span class="tt">'+f.name+'</span></button>';
+  }).join('');
+
+  function showF(i){
+    fi=(i+FEATURED.length)%FEATURED.length; var f=FEATURED[fi];
+    fb.querySelectorAll('.fslide').forEach(function(s,n){ s.setAttribute('data-active', n===fi); });
+    fth.querySelectorAll('.thumb').forEach(function(b,n){ b.setAttribute('aria-current', n===fi); });
+    document.getElementById('i-name').textContent=f.name;
+    document.getElementById('i-when').innerHTML=f.when+'<small>'+f.whens+'</small>';
+    document.getElementById('i-where').innerHTML=f.where+'<small>'+f.wheres+'</small>';
+    document.getElementById('i-reg').textContent=f.reg;
+    document.getElementById('i-int').textContent='♥ '+f.int+' interested';
+    document.getElementById('i-price').innerHTML='₹'+f.price+' <small>onwards</small>';
+    document.getElementById('fcount').textContent=(fi+1)+' / '+FEATURED.length;
+    var act=fth.querySelectorAll('.thumb')[fi];
+    if(act) fth.scrollTo({left:Math.max(0,act.offsetLeft-12),behavior:'smooth'});
+  }
+  function startF(){ if(reduce) return; stopF(); timer=setInterval(function(){ showF(fi+1); },6000); }
+  function stopF(){ if(timer){ clearInterval(timer); timer=null; } }
+  // Any manual interaction stops auto-advance permanently.
+  fth.addEventListener('click',function(e){ var b=e.target.closest('.thumb'); if(!b) return; stopF(); showF(+b.dataset.i); });
+  document.querySelectorAll('[data-car]').forEach(function(b){
+    b.addEventListener('click',function(){ stopF(); showF(fi + (+b.dataset.car)); });
+  });
+  var fcard=document.getElementById('fcard');
+  fcard.addEventListener('mouseenter',stopF);
+  fcard.addEventListener('focusin',stopF);
+  showF(0); startF();
+
+  /* ================= event card v3 ================= */
+  function statusBand(e){
+    if(e.status==='results')
+      return '<div class="band-st results"><span class="bi">📊</span><div><div class="bt">Results published</div>'
+        +'<div class="bs">'+e.finishers+' finishers · search by bib or name</div></div><span class="ch">›</span></div>';
+    if(e.status==='closed')
+      return '<div class="band-st closed"><span class="bi">🔒</span><div><div class="bt">Entries closed</div>'
+        +'<div class="bs">Follow the organiser for next season</div></div><span class="ch">›</span></div>';
+    if(e.closes)
+      return '<div class="band-st soon"><span class="bi">⏱️</span><div style="flex:1"><div class="bt">Registrations closing on '+e.closes+'</div>'
+        +'<div class="prog"><i style="width:'+e.fill+'%"></i></div>'
+        +'<div class="bs">'+e.urgency+'</div></div><span class="ch">›</span></div>';
+    return '<div class="band-st open"><span class="bi">👥</span><div><div class="bt">Registrations are open</div>'
+      +'<div class="bs">'+e.openNote+'</div></div><span class="ch">›</span></div>';
+  }
+  function calibre(e){
+    var out=[];
+    if(e.cert)  out.push('<span class="bdg cert">✓ '+e.cert+'</span>');
+    if(e.timed) out.push('<span class="bdg">⏱️ Chip-timed</span>');
+    if(e.org)   out.push('<span class="bdg">🏛️ '+e.org+'</span>');
+    return out.length ? '<div class="calibre">'+out.join('')+'</div>' : '';
+  }
+  function avatars(){
+    return '<div class="avstack">'+AVC.slice(0,3).map(function(c){
+      return '<span style="background:'+c+'"></span>';}).join('')
+      +'<span style="background:var(--muted)">+</span></div>';
+  }
   function card(e){
-    var closing = e.closes ? '<span class="closing">⏳ Closes in '+e.closes+'</span>' : '';
+    var b=e.badge||['certified','Listed event'];
+    var money = e.status==='results'
+      ? '<div class="pricerow"><span class="price" style="font-size:15px">Winner <span class="tnum">'+e.win+'</span></span>'
+        +'<button class="reg outlineb">View results →</button></div>'
+      : '<div class="pricerow"><span class="price">₹ '+e.price+'<small>onwards</small></span>'
+        +'<button class="reg">Register Now →</button></div>';
     return '<article class="card" tabindex="0">'
       +'<div class="poster" style="'+poster(e.sport)+'">'
         +'<span class="glyph">'+glyph(e.sport)+'</span>'
-        +'<div class="datebadge"><div class="d tnum">'+e.day+'</div><div class="m">'+e.mon+'</div></div>'
-        +'<button class="save" aria-label="Save event">♥</button>'
-        +'<span class="sport-tag">'+e.sportName+'</span>'
+        +'<span class="tbadge '+b[0]+'">'+BADGE[b[0]]+' '+b[1]+'</span>'
+        +'<div class="ptext"><div class="pl">'+e.sportName+'</div><div class="ph">'+e.poster+'</div></div>'
+        +'<div class="dblock"><div class="d tnum">'+e.day+'</div><div class="m">'+e.mon+'</div><div class="w">'+e.wd+'</div></div>'
       +'</div>'
       +'<div class="body">'
-        +'<h3>'+e.name+'</h3>'
-        +'<div class="place">📍 '+e.city+' · '+e.venue+'</div>'
-        +'<div class="metarow"><span class="tag disc">'+e.disc+'</span><span class="tag age">'+e.age+'</span></div>'
-        +'<div class="foot"><span class="price"><small>From</small>₹'+e.price+'</span>'+closing+'</div>'
+        +'<div class="titlerow"><h3>'+e.name+'</h3>'
+          +'<span class="rating"><span class="s">★</span>'+e.rating+' <small>('+e.reviews+')</small></span></div>'
+        +'<div class="chipsline"><span class="tag sport">'+e.sportName+'</span>'
+          + e.dists.map(function(d){return '<span class="tag dist">'+d+'</span>';}).join('')
+          +'<span class="tag age">'+e.age+'</span></div>'
+        +'<div class="metagrid">'
+          +'<div class="mcell"><span class="ic">🗓️</span><div><div class="t">'+e.when+'</div><div class="s">'+e.whens+'</div></div></div>'
+          +'<div class="mcell"><span class="ic">📍</span><div><div class="t">'+e.where+'</div><div class="s">'+e.wheres+'</div></div></div>'
+        +'</div>'
+        + calibre(e)
+        + statusBand(e)
+        + money
+        +'<div class="socialrow">'+avatars()+'<span class="txt"><b>'+e.int+'</b> people are interested</span></div>'
+        +'<div class="actionbar">'
+          +'<button aria-pressed="false">♥ Interested</button><span class="sep"></span>'
+          +'<button>🔖 Save</button><span class="sep"></span>'
+          +'<button>↗ Share</button><span class="sep"></span>'
+          +'<button>💬 Comment</button>'
+        +'</div>'
       +'</div></article>';
   }
   function fill(id,list){var el=document.getElementById(id); if(el) el.innerHTML=list.map(card).join(''); }
 
   fill('r1',[
-    {sport:'running',sportName:'Running',name:'TCS World 10K Bengaluru 2026',city:'Bengaluru',venue:'Kanteerava Stadium',disc:'10K',age:'Open',price:'1,200',day:'12',mon:'Oct'},
-    {sport:'skating',sportName:'Skating',name:'Karnataka State Roller Skating Championship',city:'Bengaluru',venue:'RSFI Rink',disc:'Speed',age:'U14',price:'400',day:'05',mon:'Oct'},
-    {sport:'running',sportName:'Running',name:'Bengaluru Midnight Marathon',city:'Bengaluru',venue:'Whitefield',disc:'21.1K',age:'Open',price:'1,500',day:'18',mon:'Oct',closes:'6 days'},
-    {sport:'cycling',sportName:'Cycling',name:'Namma Bengaluru Cyclothon',city:'Bengaluru',venue:'Cubbon Park',disc:'50K',age:'Open',price:'900',day:'26',mon:'Oct'},
-    {sport:'water',sportName:'Water',name:'Ulsoor Lake Open Water Swim',city:'Bengaluru',venue:'Ulsoor Lake',disc:'2 km',age:'Open',price:'700',day:'02',mon:'Nov'}
-  ]);
-  fill('r2',[
-    {sport:'athletics',sportName:'Athletics',name:'U12 District Athletics Meet',city:'Chennai',venue:'Nehru Stadium',disc:'Sprints',age:'U12',price:'200',day:'04',mon:'Oct'},
-    {sport:'gymnastics',sportName:'Gymnastics',name:'Sub-Junior Artistic Gymnastics Open',city:'Hyderabad',venue:'GHMC Arena',disc:'Artistic',age:'U14',price:'300',day:'11',mon:'Oct'},
-    {sport:'skating',sportName:'Skating',name:'Kids Roller Skating Meet',city:'Pune',venue:'Shivaji Rink',disc:'Quad',age:'U10',price:'350',day:'06',mon:'Oct'},
-    {sport:'martial',sportName:'Martial Arts',name:'Junior Karate Open Championship',city:'New Delhi',venue:'IG Complex',disc:'Kumite',age:'Junior',price:'500',day:'19',mon:'Oct'},
-    {sport:'racquet',sportName:'Badminton',name:'School Badminton Championship',city:'Mumbai',venue:'Andheri SC',disc:'Singles',age:'U16',price:'250',day:'25',mon:'Oct'}
-  ]);
-  fill('r3',[
-    {sport:'running',sportName:'Running',name:'Tata Steel Kolkata 25K',city:'Kolkata',venue:'Red Road',disc:'25K',age:'Open',price:'1,300',day:'05',mon:'Oct'},
-    {sport:'cycling',sportName:'Cycling',name:'Deccan Cliffhanger Brevet',city:'Pune',venue:'Baner',disc:'200K',age:'Open',price:'1,800',day:'05',mon:'Oct'},
-    {sport:'running',sportName:'Running',name:'Chennai Coastal Trail Run',city:'Chennai',venue:'ECR',disc:'15K',age:'Open',price:'800',day:'04',mon:'Oct'},
-    {sport:'trekking',sportName:'Trekking',name:'Sahyadri Weekend Trek',city:'Pune',venue:'Rajmachi',disc:'Trek',age:'Open',price:'1,100',day:'05',mon:'Oct'}
-  ]);
-  fill('r4',[
-    {sport:'running',sportName:'Running',name:'Goa River Marathon',city:'Panaji',venue:'Miramar',disc:'42.2K',age:'Open',price:'2,000',day:'09',mon:'Nov',closes:'2 days'},
-    {sport:'cycling',sportName:'Cycling',name:'Nilgiris MTB Challenge',city:'Ooty',venue:'Nilgiris',disc:'MTB 60K',age:'Masters',price:'2,500',day:'15',mon:'Nov',closes:'3 days'},
-    {sport:'triathlon',sportName:'Triathlon',name:'Mumbai Masters Aquathlon',city:'Mumbai',venue:'Juhu',disc:'Aquathlon',age:'Masters',price:'1,600',day:'16',mon:'Nov',closes:'5 days'},
-    {sport:'athletics',sportName:'Athletics',name:'State Junior Track Meet',city:'Jaipur',venue:'SMS Stadium',disc:'800m',age:'Junior',price:'300',day:'12',mon:'Nov',closes:'4 days'}
+    {sport:'running',sportName:'Running',badge:['official','Official Event'],poster:'RUN<br>BENGALURU',
+     name:'TCS World 10K Bengaluru 2027',rating:'4.8',reviews:'5.2K',dists:['5K','10K','Open 10K'],age:'Open',
+     when:'Sun, 12 Oct 2026',whens:'5:30 AM onwards',where:'Bengaluru, Karnataka',wheres:'Sree Kanteerava Stadium',
+     cert:'AIMS certified',timed:true,price:'1,200',int:'3.2K',day:'12',mon:'Oct 2026',wd:'Sunday',
+     openNote:'Join thousands of runners!'},
+    {sport:'athletics',sportName:'Athletics',badge:['certified','AFI Ranking Event'],poster:'STATE<br>CHAMPIONSHIP',
+     name:'Karnataka State Senior Athletics Championship',rating:'4.6',reviews:'820',dists:['100m','800m','5000m','Long jump'],age:'Senior',
+     when:'Mon, 5 Oct 2026',whens:'Heats from 7:00 AM',where:'Bengaluru, Karnataka',wheres:'Sree Kanteerava Stadium',
+     cert:'AFI ranking',timed:true,org:'Karnataka Athletics Association',price:'400',int:'980',day:'05',mon:'Oct 2026',wd:'Monday',
+     openNote:'Entries through your district association'},
+    {sport:'running',sportName:'Running',badge:['popular','Popular Event'],poster:'MIDNIGHT<br>MARATHON',
+     name:'Bengaluru Midnight Marathon 2026',rating:'4.4',reviews:'2.1K',dists:['5K','10K','21.1K','42.2K'],age:'Open',
+     when:'Sat, 18 Oct 2026',whens:'9:00 PM onwards',where:'Bengaluru, Karnataka',wheres:'Whitefield',
+     timed:true,price:'1,500',int:'1.9K',day:'18',mon:'Oct 2026',wd:'Saturday',
+     closes:'12 Oct, 2026',fill:78,urgency:'Hurry! Few slots left'},
+    {sport:'cycling',sportName:'Cycling',badge:['green','Sustainable Event'],poster:'NAMMA<br>CYCLOTHON',
+     name:'Namma Bengaluru Cyclothon 2026',rating:'4.2',reviews:'640',dists:['25K','50K','100K'],age:'Open',
+     when:'Mon, 26 Oct 2026',whens:'5:00 AM onwards',where:'Bengaluru, Karnataka',wheres:'Cubbon Park',
+     price:'900',int:'760',day:'26',mon:'Oct 2026',wd:'Monday',openNote:'Be part of a car-free morning'},
+    {sport:'water',sportName:'Swimming',badge:['certified','Listed event'],poster:'OPEN<br>WATER SWIM',
+     name:'Ulsoor Lake Open Water Swim',rating:'4.3',reviews:'310',dists:['750 m','2 km','5 km'],age:'Open',
+     when:'Mon, 2 Nov 2026',whens:'6:00 AM onwards',where:'Bengaluru, Karnataka',wheres:'Ulsoor Lake',
+     timed:true,price:'700',int:'420',day:'02',mon:'Nov 2026',wd:'Monday',openNote:'Safety briefing at 5:30 AM'}
   ]);
 
-  // sports grid
+  fill('r2',[
+    {sport:'running',sportName:'Running',badge:['official','Official Event'],poster:'KOLKATA<br>25K',
+     name:'Tata Steel Kolkata 25K 2026',rating:'4.7',reviews:'3.4K',dists:['5K','10K','25K'],age:'Open',
+     when:'Sun, 5 Oct 2026',whens:'5:30 AM onwards',where:'Kolkata, West Bengal',wheres:'Red Road',
+     cert:'AIMS certified',timed:true,price:'1,300',int:'2.6K',day:'05',mon:'Oct 2026',wd:'Sunday',
+     openNote:'Join thousands of runners!'},
+    {sport:'cycling',sportName:'Cycling',badge:['certified','Listed event'],poster:'PUNE<br>BRM 200',
+     name:'Pune Brevet 200 BRM',rating:'4.5',reviews:'290',dists:['200K'],age:'Open',
+     when:'Sun, 5 Oct 2026',whens:'5:00 AM start',where:'Pune, Maharashtra',wheres:'Baner',
+     org:'Audax India Randonneurs',price:'1,800',int:'340',day:'05',mon:'Oct 2026',wd:'Sunday',
+     closes:'1 Oct, 2026',fill:88,urgency:'Hurry! Few slots left'},
+    {sport:'running',sportName:'Running',badge:['green','Sustainable Event'],poster:'COASTAL<br>TRAIL RUN',
+     name:'Chennai Coastal Trail Run',rating:'4.4',reviews:'510',dists:['8K','15K','25K'],age:'Open',
+     when:'Sat, 4 Oct 2026',whens:'5:45 AM onwards',where:'Chennai, Tamil Nadu',wheres:'East Coast Road',
+     timed:true,price:'800',int:'610',day:'04',mon:'Oct 2026',wd:'Saturday',openNote:'Cup-free, zero-waste race'},
+    {sport:'racquet',sportName:'Badminton',badge:['certified','Listed event'],poster:'DISTRICT<br>OPEN',
+     name:'Bengaluru District Badminton Open',rating:'4.1',reviews:'220',dists:['Singles','Doubles','Mixed'],age:'All ages',
+     when:'Sun, 5 Oct 2026',whens:'8:00 AM onwards',where:'Bengaluru, Karnataka',wheres:'Padukone Academy',
+     org:'Karnataka Badminton Association',price:'600',int:'340',day:'05',mon:'Oct 2026',wd:'Sunday',
+     openNote:'Draws published 2 days before'}
+  ]);
+
+  fill('r3',[
+    {sport:'running',sportName:'Running',badge:['official','Official Event'],poster:'GOA RIVER<br>MARATHON',
+     name:'Goa River Marathon 2026',rating:'4.6',reviews:'1.3K',dists:['10K','21.1K','42.2K'],age:'Open',
+     when:'Sun, 9 Nov 2026',whens:'5:00 AM onwards',where:'Panaji, Goa',wheres:'Miramar',
+     cert:'AIMS certified',timed:true,price:'2,000',int:'1.4K',day:'09',mon:'Nov 2026',wd:'Sunday',
+     closes:'25 Oct, 2026',fill:93,urgency:'Hurry! Few slots left'},
+    {sport:'cycling',sportName:'Cycling',badge:['popular','Popular Event'],poster:'NILGIRIS<br>MTB',
+     name:'Nilgiris MTB Challenge',rating:'4.5',reviews:'480',dists:['30K','60K'],age:'Masters',
+     when:'Sun, 15 Nov 2026',whens:'6:30 AM onwards',where:'Ooty, Tamil Nadu',wheres:'Nilgiris hills',
+     price:'2,500',int:'520',day:'15',mon:'Nov 2026',wd:'Sunday',
+     closes:'28 Oct, 2026',fill:71,urgency:'Only 3 days left to enter'},
+    {sport:'triathlon',sportName:'Triathlon',badge:['certified','Listed event'],poster:'MASTERS<br>AQUATHLON',
+     name:'Mumbai Masters Aquathlon',rating:'4.2',reviews:'160',dists:['500m + 5K','1K + 10K'],age:'Masters',
+     when:'Mon, 16 Nov 2026',whens:'6:00 AM onwards',where:'Mumbai, Maharashtra',wheres:'Juhu Beach',
+     timed:true,price:'1,600',int:'260',day:'16',mon:'Nov 2026',wd:'Monday',
+     closes:'30 Oct, 2026',fill:64,urgency:'Only 5 days left to enter'},
+    {sport:'athletics',sportName:'Athletics',badge:['certified','AFI Ranking Event'],poster:'STATE<br>TRACK MEET',
+     name:'Rajasthan State Junior Track Meet',rating:'4.3',reviews:'140',dists:['400m','800m','1500m'],age:'Junior',
+     when:'Thu, 12 Nov 2026',whens:'Heats from 7:30 AM',where:'Jaipur, Rajasthan',wheres:'SMS Stadium',
+     cert:'AFI ranking',org:'Rajasthan Athletics Association',price:'300',int:'190',day:'12',mon:'Nov 2026',wd:'Thursday',
+     closes:'27 Oct, 2026',fill:55,urgency:'Only 4 days left to enter'}
+  ]);
+
+  fill('r4',[
+    {sport:'running',sportName:'Running',badge:['official','Official Event'],poster:'MUMBAI<br>MARATHON',
+     name:'Tata Mumbai Marathon 2027',rating:'4.9',reviews:'12K',dists:['6K','10K','21.1K','42.2K'],age:'Open',
+     when:'Sun, 18 Jan 2027',whens:'4:45 AM onwards',where:'Mumbai, Maharashtra',wheres:'CSMT → Marine Drive',
+     cert:'AIMS certified',timed:true,price:'2,400',int:'8.1K',day:'18',mon:'Jan 2027',wd:'Sunday',
+     openNote:'India’s biggest road race'},
+    {sport:'triathlon',sportName:'Triathlon',badge:['popular','Popular Event'],poster:'IRONMAN<br>70.3 GOA',
+     name:'Ironman 70.3 Goa',rating:'4.8',reviews:'2.2K',dists:['1.9K swim','90K bike','21.1K run'],age:'Open',
+     when:'Sun, 6 Dec 2026',whens:'6:15 AM onwards',where:'Goa',wheres:'Miramar Beach',
+     timed:true,price:'18,500',int:'3.9K',day:'06',mon:'Dec 2026',wd:'Sunday',openNote:'Filling fast'},
+    {sport:'skating',sportName:'Skating',badge:['official','Official Event'],poster:'NATIONAL<br>SKATING',
+     name:'National Roller Skating Championship 2026',rating:'4.7',reviews:'1.1K',dists:['500m','1000m','Rink 3000m'],age:'U8 → Senior',
+     when:'Sun, 8 Nov 2026',whens:'6:00 AM onwards',where:'Vijayawada, Andhra Pradesh',wheres:'IGMC Rink',
+     org:'Roller Skating Federation of India',price:'900',int:'2.8K',day:'08',mon:'Nov 2026',wd:'Sunday',
+     openNote:'14 age groups, U8 to Senior'},
+    {sport:'trekking',sportName:'Trekking',badge:['green','Sustainable Event'],poster:'SAHYADRI<br>TREK SERIES',
+     name:'Sahyadri Monsoon Trek Series',rating:'4.4',reviews:'900',dists:['Half trek','Full trek'],age:'Open',
+     when:'Sun, 5 Oct 2026',whens:'5:00 AM departure',where:'Pune, Maharashtra',wheres:'Rajmachi',
+     price:'1,100',int:'1.5K',day:'05',mon:'Oct 2026',wd:'Sunday',openNote:'Carry-in, carry-out policy'}
+  ]);
+
+  fill('r5',[
+    {sport:'athletics',sportName:'Athletics',badge:['certified','AFI Ranking Event'],poster:'U12<br>DISTRICT MEET',
+     name:'U12 District Athletics Meet',rating:'4.5',reviews:'210',dists:['60m','100m','Relay','Long jump'],age:'U12',
+     when:'Sat, 4 Oct 2026',whens:'7:00 AM onwards',where:'Chennai, Tamil Nadu',wheres:'Nehru Stadium',
+     cert:'AFI ranking',org:'Chennai District Athletics',price:'200',int:'410',day:'04',mon:'Oct 2026',wd:'Saturday',
+     openNote:'School entries welcome'},
+    {sport:'gymnastics',sportName:'Gymnastics',badge:['official','Official Event'],poster:'SUB-JUNIOR<br>ARTISTIC',
+     name:'Sub-Junior Artistic Gymnastics Open',rating:'4.6',reviews:'180',dists:['Floor','Vault','Beam'],age:'U14',
+     when:'Sun, 11 Oct 2026',whens:'8:30 AM onwards',where:'Hyderabad, Telangana',wheres:'GHMC Arena',
+     org:'Gymnastics Federation of India',price:'300',int:'220',day:'11',mon:'Oct 2026',wd:'Sunday',
+     openNote:'Coach registration required'},
+    {sport:'skating',sportName:'Skating',badge:['certified','Listed event'],poster:'KIDS<br>SKATING MEET',
+     name:'Kids Roller Skating Meet',rating:'4.3',reviews:'120',dists:['300m','500m'],age:'U10',
+     when:'Tue, 6 Oct 2026',whens:'7:00 AM onwards',where:'Pune, Maharashtra',wheres:'Shivaji Rink',
+     price:'350',int:'180',day:'06',mon:'Oct 2026',wd:'Tuesday',openNote:'First-timers welcome'},
+    {sport:'martial',sportName:'Martial Arts',badge:['popular','Popular Event'],poster:'JUNIOR<br>KARATE OPEN',
+     name:'Junior Karate Open Championship',rating:'4.4',reviews:'260',dists:['Kata','Kumite -40kg','Kumite -45kg'],age:'Junior',
+     when:'Mon, 19 Oct 2026',whens:'9:00 AM onwards',where:'New Delhi, Delhi',wheres:'IG Sports Complex',
+     price:'500',int:'340',day:'19',mon:'Oct 2026',wd:'Monday',closes:'8 Oct, 2026',fill:60,urgency:'Weigh-in the evening before'},
+    {sport:'racquet',sportName:'Badminton',badge:['certified','Listed event'],poster:'SCHOOL<br>BADMINTON',
+     name:'Inter-School Badminton Championship',rating:'4.2',reviews:'150',dists:['Singles','Doubles'],age:'U16',
+     when:'Sun, 25 Oct 2026',whens:'8:00 AM onwards',where:'Mumbai, Maharashtra',wheres:'Andheri Sports Complex',
+     price:'250',int:'290',day:'25',mon:'Oct 2026',wd:'Sunday',openNote:'School teams only'}
+  ]);
+
+  fill('r6',[
+    {sport:'running',sportName:'Running',badge:['official','Official Event'],poster:'DELHI<br>HALF MARATHON',
+     name:'Vedanta Delhi Half Marathon 2026',rating:'4.8',reviews:'9.4K',dists:['5K','10K','21.1K'],age:'Open',
+     when:'Sun, 21 Sep 2026',whens:'Finished',where:'New Delhi, Delhi',wheres:'JLN Stadium',
+     cert:'AIMS certified',timed:true,status:'results',win:'59:04',finishers:'18,240',int:'6.2K',
+     day:'21',mon:'Sep 2026',wd:'Sunday'},
+    {sport:'athletics',sportName:'Athletics',badge:['certified','AFI Ranking Event'],poster:'INTER-STATE<br>CHAMPIONSHIPS',
+     name:'National Inter-State Athletics Championships',rating:'4.7',reviews:'1.6K',dists:['100m','400m','5000m','Javelin'],age:'Senior',
+     when:'Fri, 18 Sep 2026',whens:'Finished',where:'Chennai, Tamil Nadu',wheres:'JN Stadium',
+     cert:'AFI ranking',status:'results',win:'10.26',finishers:'1,120',int:'2.1K',day:'18',mon:'Sep 2026',wd:'Friday'},
+    {sport:'skating',sportName:'Skating',badge:['official','Official Event'],poster:'SOUTH ZONE<br>SKATING',
+     name:'South Zone Roller Skating Championship',rating:'4.5',reviews:'420',dists:['500m','1000m'],age:'U14',
+     when:'Mon, 14 Sep 2026',whens:'Finished',where:'Kochi, Kerala',wheres:'Regional Rink',
+     status:'results',win:'0:52.8',finishers:'640',int:'880',day:'14',mon:'Sep 2026',wd:'Monday'},
+    {sport:'cycling',sportName:'Cycling',badge:['green','Sustainable Event'],poster:'TOUR OF<br>NILGIRIS',
+     name:'Tour of Nilgiris 2026',rating:'4.6',reviews:'390',dists:['Stage race 900K'],age:'Open',
+     when:'Sat, 12 Sep 2026',whens:'Finished',where:'Ooty, Tamil Nadu',wheres:'Nilgiris',
+     timed:true,status:'results',win:'24:18:02',finishers:'210',int:'540',day:'12',mon:'Sep 2026',wd:'Saturday'}
+  ]);
+
+  /* ---------- marketplace ---------- */
+  var PRODUCTS=[
+    ['👟','Road running shoes — neutral','Recommended for your 21.1K','4,299','6,999','38% off'],
+    ['🧃','Energy gels — box of 12','Race-day nutrition','1,150','1,400','18% off'],
+    ['⌚','GPS running watch','Chip-timed races, tracked','12,999','16,499','21% off'],
+    ['🎽','Race singlet — breathable','Bib-ready, seamless','899','1,299','31% off'],
+    ['🛼','Inline speed skates — junior','U10 to U14 fit','7,499','9,999','25% off'],
+    ['🚴','Cycling helmet — certified','BIS + CE certified','2,799','3,999','30% off']
+  ];
+  document.getElementById('shop').innerHTML=PRODUCTS.map(function(p){
+    return '<article class="prod"><div class="pimg">'+p[0]+'</div><div class="pb">'
+      +'<div class="pn">'+p[1]+'</div><div class="pm">'+p[2]+'</div>'
+      +'<div class="pp"><b>₹'+p[3]+'</b><s>₹'+p[4]+'</s><span class="off">'+p[5]+'</span></div>'
+      +'</div></article>';
+  }).join('');
+
+  /* ---------- sports grid ---------- */
   var SPORTS=[
     ['athletics','Athletics','1,240'],['running','Running','3,180'],['cycling','Cycling','920'],
     ['skating','Skating','610'],['gymnastics','Gymnastics','340'],['martial','Martial Arts','520'],
     ['water','Swimming','480'],['racquet','Badminton','700'],['triathlon','Triathlon','210'],
-    ['trekking','Trekking','560'],['fitness','Fitness','300'],['adventure','Adventure','240']
+    ['trekking','Trekking','560'],['fitness','Fitness','300'],['adventure','Adventure','240'],
+    ['team','Team Sports','450'],['mind','Mind Sports','190']
   ];
   document.getElementById('sports').innerHTML=SPORTS.map(function(s){
     return '<button class="stile" style="'+poster(s[0])+'"><span class="g">'+glyph(s[0])+'</span>'
       +'<span class="nm">'+s[1]+'</span><span class="ct tnum">'+s[2]+' events</span></button>';
   }).join('');
 
-  // clubs
+  /* ---------- clubs ---------- */
   var CLUBS=[
     ['🏃','Bengaluru Roadrunners','Running club · 2,400 members · Bengaluru'],
     ['🛼','Wheelsports Skating Academy','Academy · U8–U16 · Pune'],
@@ -470,12 +1245,78 @@
       +'<div class="meta">'+c[2]+'</div></div><button class="btn ghost join">View</button></div>';
   }).join('');
 
-  // cities
+  /* ---------- cities ---------- */
   var CITIES=[['Bengaluru','1,180'],['Mumbai','990'],['Delhi NCR','870'],['Pune','760'],['Hyderabad','640'],
     ['Chennai','590'],['Kolkata','430'],['Ahmedabad','320'],['Jaipur','260'],['Goa','210']];
   document.getElementById('cities').innerHTML=CITIES.map(function(c){
     return '<button class="city"><span class="n">'+c[0]+'</span><span class="c tnum">'+c[1]+'</span></button>';
   }).join('');
+
+  /* ---------- chips + card action bar ---------- */
+  document.addEventListener('click',function(e){
+    var c=e.target.closest('.chip');
+    if(c){ c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true'); }
+    var a=e.target.closest('.actionbar button');
+    if(a && a.hasAttribute('aria-pressed')){ a.setAttribute('aria-pressed', a.getAttribute('aria-pressed')==='true'?'false':'true'); }
+  });
+
+  /* ---------- horizontal scrollers ---------- */
+  function scroller(sel,attr,target){
+    document.querySelectorAll(sel).forEach(function(b){
+      b.addEventListener('click',function(){
+        var t=target(b); if(!t) return;
+        t.scrollBy({left:(+b.getAttribute(attr))*Math.min(t.clientWidth*.8,560),behavior:'smooth'});
+      });
+    });
+  }
+  scroller('[data-scroll]','data-scroll',function(b){ return b.closest('.rail').querySelector('.track'); });
+  scroller('[data-pscroll]','data-pscroll',function(b){ return b.closest('.rail').querySelector('.prow'); });
+  scroller('[data-fscroll]','data-fscroll',function(){ return document.getElementById('fchips'); });
+
+  /* ---------- radius controls stay in sync across all three placements ---------- */
+  var radbtn=document.getElementById('radbtn'), locbtn=document.getElementById('locbtn'),
+      pinloc=document.getElementById('pinloc');
+  document.querySelectorAll('.seg-radius').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b) return;
+      var km=b.textContent.trim();
+      document.querySelectorAll('.seg-radius button').forEach(function(x){
+        x.setAttribute('aria-pressed', x.textContent.trim()===km);
+      });
+      radbtn.textContent='📍 Bengaluru · within '+km+' ▾';
+      pinloc.textContent='📍 Bengaluru · '+km+' ▾';
+      locbtn.innerHTML='📍 <b>Bengaluru</b> <span class="r">· '+km+'</span> ▾';
+    });
+  });
+
+  /* ---------- popovers and menus ---------- */
+  function closeAll(){
+    document.querySelectorAll('.pop').forEach(function(p){ p.setAttribute('data-open','false'); });
+    document.querySelectorAll('[aria-expanded]').forEach(function(b){ b.setAttribute('aria-expanded','false'); });
+    document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('open'); });
+  }
+  function wire(btn,pop){
+    btn.addEventListener('click',function(ev){
+      ev.stopPropagation();
+      var open=pop.getAttribute('data-open')==='true';
+      closeAll(); if(!open){ pop.setAttribute('data-open','true'); btn.setAttribute('aria-expanded','true'); }
+    });
+    pop.addEventListener('click',function(ev){ ev.stopPropagation(); });
+  }
+  wire(locbtn, document.getElementById('locpop'));
+  wire(radbtn, document.getElementById('radpop'));
+  wire(pinloc, document.getElementById('pinpop'));
+  document.querySelectorAll('.nav-item[data-menu]').forEach(function(item){
+    var btn=item.querySelector('button');
+    btn.addEventListener('click',function(ev){
+      ev.stopPropagation();
+      var open=item.classList.contains('open'); closeAll();
+      if(!open){ item.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+    });
+    item.querySelector('.mega').addEventListener('click',function(ev){ ev.stopPropagation(); });
+  });
+  document.addEventListener('click',closeAll);
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeAll(); });
 })();
 </script>
 </body>
