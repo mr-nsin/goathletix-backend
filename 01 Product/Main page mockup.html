@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>GoAthletix Homepage</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Roboto+Condensed:wght@500;700&display=swap">
+<style>
+  :root{
+    --bg:#F5F6F9; --surface:#FFFFFF; --surface-2:#FBFCFE;
+    --ink:#141A3E; --muted:#6B7180; --line:#E6E8EF;
+    --accent:#12B4A0; --accent-ink:#0B2027;
+    --grad:linear-gradient(120deg,#37DAC3 0%,#4FD9A3 45%,#86E01E 100%);
+    --warn:#B4720F; --star:#E4B23C;
+    --shadow:0 6px 20px rgba(20,26,62,.08);
+    --shadow-lg:0 14px 40px rgba(20,26,62,.14);
+    --radius:18px;
+    --sans:"Outfit",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --cond:"Roboto Condensed",system-ui,sans-serif;
+  }
+  :root:not([data-theme="light"]){ }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1120; --surface:#161A2C; --surface-2:#1B2038;
+      --ink:#EAECF6; --muted:#9AA1B6; --line:#272C44;
+      --accent:#37DAC3; --accent-ink:#0B2027;
+      --warn:#E8A33D; --star:#E4B23C;
+      --shadow:0 8px 26px rgba(0,0,0,.45); --shadow-lg:0 16px 44px rgba(0,0,0,.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1120; --surface:#161A2C; --surface-2:#1B2038;
+    --ink:#EAECF6; --muted:#9AA1B6; --line:#272C44;
+    --accent:#37DAC3; --accent-ink:#0B2027;
+    --warn:#E8A33D; --star:#E4B23C;
+    --shadow:0 8px 26px rgba(0,0,0,.45); --shadow-lg:0 16px 44px rgba(0,0,0,.55);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;line-height:1.45}
+  h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-.01em}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit}
+  .eyebrow{font-family:var(--cond);text-transform:uppercase;letter-spacing:.14em;
+    font-weight:700;font-size:12px;color:var(--muted)}
+  .tnum{font-variant-numeric:tabular-nums}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+  /* ---------- header ---------- */
+  .wrap{width:100%;max-width:1240px;margin:0 auto;padding-inline:20px}
+  header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;
+    background:color-mix(in srgb,var(--surface) 88%, transparent);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;gap:18px;height:64px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800}
+  .logo .mark{width:30px;height:30px;border-radius:8px;background:var(--grad);
+    display:grid;place-items:center;color:#08251f;font-weight:800;font-size:18px;
+    font-style:italic;box-shadow:var(--shadow)}
+  .logo .name{font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em;
+    font-weight:700;line-height:.92;font-size:15px}
+  .loc{display:none;align-items:center;gap:6px;color:var(--muted);font-size:14px;font-weight:600}
+  .loc b{color:var(--ink)}
+  nav.main{display:none;gap:20px;margin-left:8px;font-family:var(--cond);
+    text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-size:13.5px}
+  nav.main a{color:var(--muted)} nav.main a.active,nav.main a:hover{color:var(--ink)}
+  .spacer{flex:1}
+  .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);cursor:pointer;display:grid;place-items:center;font-size:16px}
+  .btn{border-radius:10px;padding:9px 15px;font-weight:700;font-size:13.5px;cursor:pointer;
+    font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn.solid{background:var(--ink);color:var(--surface);border:1px solid var(--ink)}
+  .btn.grad{background:var(--grad);color:var(--accent-ink);border:none}
+  .hide-sm{display:none}
+  @media(min-width:720px){ .loc{display:flex} .hide-sm{display:inline-flex} }
+  @media(min-width:940px){ nav.main{display:flex} }
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(120% 140% at 88% -20%, color-mix(in srgb,#37DAC3 22%, transparent), transparent 60%),
+      radial-gradient(120% 150% at -10% 120%, color-mix(in srgb,#86E01E 18%, transparent), transparent 55%),
+      var(--surface)}
+  .hero .wrap{padding-block:34px 26px}
+  .hero h1{font-size:clamp(30px,6vw,52px);font-weight:800;line-height:1.02;max-width:14ch}
+  .hero p.sub{color:var(--muted);font-size:clamp(15px,2.4vw,18px);margin:10px 0 0;max-width:52ch}
+  .klabel{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
+  .kdot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+
+  /* search pill */
+  .pill{margin-top:22px;background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;box-shadow:var(--shadow-lg);display:flex;align-items:stretch;
+    padding:6px;gap:2px;max-width:900px;flex-wrap:wrap}
+  .seg{flex:1 1 150px;min-width:120px;border:none;background:transparent;text-align:left;
+    padding:10px 18px;border-radius:999px;cursor:pointer;color:var(--ink)}
+  .seg:hover{background:var(--bg)}
+  .seg .lab{display:block;font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.1em;font-weight:700;font-size:11.5px;color:var(--ink)}
+  .seg .val{display:block;font-size:14.5px;color:var(--muted);font-weight:500;margin-top:2px}
+  .seg.divider{position:relative}
+  .seg.divider::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:1px;background:var(--line)}
+  .seg-search{flex:2 1 220px;display:flex;align-items:center;gap:8px}
+  .seg-search .col{flex:1;min-width:0}
+  .go{margin-left:auto;flex:0 0 auto;width:50px;height:50px;border-radius:999px;border:none;
+    background:var(--grad);color:var(--accent-ink);cursor:pointer;display:grid;place-items:center;
+    box-shadow:var(--shadow);font-size:20px;align-self:center}
+  .go:hover{filter:brightness(1.04)}
+
+  /* chip row */
+  .chips{margin-top:16px;display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;
+    scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+    border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:600;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .chip:hover{border-color:var(--accent)}
+  .chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+  .chip .em{font-size:15px}
+
+  /* ---------- rails ---------- */
+  section.rail{padding-block:30px}
+  .rail-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .rail-head h2{font-size:clamp(20px,3vw,26px);font-weight:800;display:flex;align-items:center;gap:9px}
+  .rail-head .sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+  .rail-head .right{display:flex;align-items:center;gap:8px}
+  .viewall{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;
+    font-weight:700;font-size:13px;color:var(--accent);white-space:nowrap}
+  .arrows{display:none;gap:6px}
+  @media(min-width:720px){ .arrows{display:flex} }
+  .track{display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
+    scroll-snap-type:x mandatory;padding:4px 2px 10px;scrollbar-width:none}
+  .track::-webkit-scrollbar{display:none}
+
+  /* event card */
+  .card{flex:0 0 82%;max-width:300px;scroll-snap-align:start;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow);cursor:pointer;transition:transform .18s ease, box-shadow .18s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  @media(min-width:560px){ .card{flex-basis:44%} }
+  @media(min-width:900px){ .card{flex-basis:262px} }
+  .poster{position:relative;aspect-ratio:16/10;display:grid;place-items:center;color:#fff;overflow:hidden}
+  .poster .glyph{font-size:58px;opacity:.9;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
+  .poster::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.42))}
+  .datebadge{position:absolute;top:10px;left:10px;z-index:2;background:var(--surface);
+    color:var(--ink);border-radius:11px;padding:5px 9px;text-align:center;line-height:1;
+    box-shadow:var(--shadow);min-width:44px}
+  .datebadge .d{font-size:18px;font-weight:800}
+  .datebadge .m{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;
+    font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
+  .save{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;
+    border:none;background:color-mix(in srgb,#fff 88%, transparent);color:#e0435f;cursor:pointer;
+    display:grid;place-items:center;font-size:15px;box-shadow:var(--shadow)}
+  .sport-tag{position:absolute;left:10px;bottom:10px;z-index:2;font-family:var(--cond);
+    text-transform:uppercase;letter-spacing:.09em;font-weight:700;font-size:11px;color:#fff;
+    background:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:4px 10px;
+    backdrop-filter:blur(3px)}
+  .body{padding:13px 14px 15px}
+  .body h3{font-size:16px;font-weight:700;line-height:1.2;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+  .place{color:var(--muted);font-size:13px;margin-top:5px;display:flex;align-items:center;gap:5px}
+  .metarow{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .tag{font-size:11.5px;font-weight:700;border-radius:999px;padding:4px 9px;line-height:1;
+    font-family:var(--cond);text-transform:uppercase;letter-spacing:.06em}
+  .tag.disc{background:color-mix(in srgb,var(--accent) 15%, transparent);color:var(--accent)}
+  .tag.age{background:color-mix(in srgb,var(--ink) 8%, transparent);color:var(--ink);border:1px solid var(--line)}
+  .foot{display:flex;align-items:center;justify-content:space-between;margin-top:13px;gap:8px}
+  .price{font-size:14px;font-weight:700}
+  .price small{font-family:var(--cond);text-transform:uppercase;letter-spacing:.07em;
+    font-weight:700;color:var(--muted);font-size:10.5px;display:block}
+  .closing{font-family:var(--cond);text-transform:uppercase;letter-spacing:.05em;font-weight:700;
+    font-size:11.5px;color:var(--warn);display:inline-flex;align-items:center;gap:5px}
+
+  /* kids rail accent */
+  .kids{background:
+      linear-gradient(180deg,color-mix(in srgb,#86E01E 8%, transparent),transparent 220px)}
+  .starpill{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-weight:700;
+    font-size:11px;color:var(--accent-ink);background:var(--grad);border-radius:999px;padding:4px 10px}
+
+  /* ---------- sport grid ---------- */
+  .sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:620px){ .sgrid{grid-template-columns:repeat(3,1fr)} }
+  @media(min-width:920px){ .sgrid{grid-template-columns:repeat(6,1fr)} }
+  .stile{position:relative;border-radius:14px;overflow:hidden;color:#fff;aspect-ratio:5/4;
+    display:flex;flex-direction:column;justify-content:flex-end;padding:12px;cursor:pointer;
+    border:none}
+  .stile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.4))}
+  .stile .g{position:absolute;top:8px;right:9px;font-size:26px;opacity:.9;z-index:1}
+  .stile .nm{position:relative;z-index:2;font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.04em;font-weight:700;font-size:15px;line-height:1}
+  .stile .ct{position:relative;z-index:2;font-size:12px;font-weight:600;opacity:.92;margin-top:3px}
+
+  /* ---------- clubs ---------- */
+  .clubrow{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px}
+  .clubrow::-webkit-scrollbar{display:none}
+  .club{flex:0 0 78%;max-width:300px;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;padding:15px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow)}
+  @media(min-width:620px){ .club{flex-basis:300px} }
+  .club .av{width:48px;height:48px;border-radius:12px;background:var(--grad);display:grid;
+    place-items:center;font-size:22px;flex:0 0 auto;color:#08251f}
+  .club h3{font-size:15px;font-weight:700}
+  .club .meta{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .club .join{margin-left:auto}
+
+  /* ---------- organiser band ---------- */
+  .band{border-radius:20px;overflow:hidden;position:relative;color:#08251f;background:var(--grad);
+    padding:26px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}
+  .band h2{font-size:clamp(20px,3.4vw,28px);font-weight:800;color:#08251f}
+  .band p{margin:6px 0 0;color:#0b3b32;font-weight:500;max-width:46ch}
+  .band .cta{margin-left:auto}
+  .band .btn.solid{background:#08251f;color:#eafff8;border-color:#08251f}
+
+  /* ---------- cities ---------- */
+  .citygrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(min-width:620px){ .citygrid{grid-template-columns:repeat(3,1fr)} }
+  @media(min-width:920px){ .citygrid{grid-template-columns:repeat(5,1fr)} }
+  .city{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 14px;
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+  .city:hover{border-color:var(--accent)}
+  .city .n{font-weight:600;font-size:14px}
+  .city .c{color:var(--muted);font-size:12.5px;font-weight:600}
+
+  footer.site{border-top:1px solid var(--line);margin-top:26px;background:var(--surface-2)}
+  footer .wrap{padding-block:26px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    color:var(--muted);font-size:13px}
+  .preview-tag{font-family:var(--cond);text-transform:uppercase;letter-spacing:.1em;font-weight:700;
+    font-size:10.5px;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:4px 10px}
+
+  @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;transition:none!important} }
+</style>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="logo" href="#" aria-label="GoAthletix home">
+      <span class="mark">G</span>
+      <span class="name">Go<br>Athletix</span>
+    </a>
+    <span class="loc">📍 You are in: <b>Bengaluru</b> ▾</span>
+    <nav class="main" aria-label="Primary">
+      <a href="#" class="active">Home</a><a href="#">Explore</a><a href="#">Clubs</a>
+      <a href="#">Academies</a><a href="#">Read</a>
+    </nav>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="theme" title="Toggle theme" aria-label="Toggle theme">◐</button>
+    <button class="btn ghost hide-sm">Log In</button>
+    <button class="btn grad">Sign Up</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="klabel eyebrow"><span class="kdot"></span> Every event · every age · one place</span>
+    <h1>Where India competes.</h1>
+    <p class="sub">Find races, meets, matches and tournaments you can actually enter — near you, this season, for your age group.</p>
+
+    <div class="pill" role="search" aria-label="Find events">
+      <button class="seg" type="button"><span class="lab">Where</span><span class="val">Bengaluru</span></button>
+      <button class="seg divider" type="button"><span class="lab">When</span><span class="val">Any dates</span></button>
+      <button class="seg divider" type="button"><span class="lab">Sport</span><span class="val">All sports</span></button>
+      <div class="seg divider seg-search">
+        <div class="col"><span class="lab">Age group</span><span class="val">Add age · Kids → Masters</span></div>
+        <button class="go" aria-label="Search">⌕</button>
+      </div>
+    </div>
+
+    <div class="chips" role="listbox" aria-label="Quick filters">
+      <button class="chip" aria-pressed="true"><span class="em">📍</span> Near me</button>
+      <button class="chip"><span class="em">🗓️</span> This weekend</button>
+      <button class="chip"><span class="em">🧒</span> Kids &amp; juniors</button>
+      <button class="chip"><span class="em">🛼</span> U12 Skating</button>
+      <button class="chip"><span class="em">🏅</span> Junior Athletics</button>
+      <button class="chip"><span class="em">🏃</span> Marathons</button>
+      <button class="chip"><span class="em">🚴</span> Masters Cycling</button>
+      <button class="chip"><span class="em">⏳</span> Closing soon</button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <!-- Happening near you -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>Happening near you</h2><div class="sub">Bengaluru · next 30 days · 214 events</div></div>
+      <div class="right"><a class="viewall" href="#">View all →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r1"></div>
+  </div></section>
+
+  <!-- Kids & juniors -->
+  <section class="rail kids"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>For kids &amp; juniors near you <span class="starpill">New</span></h2>
+        <div class="sub">Age-group meets &amp; championships — the rail no one else has</div></div>
+      <div class="right"><a class="viewall" href="#">View all →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r2"></div>
+  </div></section>
+
+  <!-- This weekend -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>This weekend</h2><div class="sub">Sat 4 – Sun 5 Oct</div></div>
+      <div class="right"><a class="viewall" href="#">View all →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r3"></div>
+  </div></section>
+
+  <!-- Closing soon -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>Registration closing soon</h2><div class="sub">Register before it shuts</div></div>
+      <div class="right"><a class="viewall" href="#">View all →</a>
+        <div class="arrows"><button class="icon-btn" data-scroll="-1" aria-label="Scroll left">‹</button><button class="icon-btn" data-scroll="1" aria-label="Scroll right">›</button></div></div>
+    </div>
+    <div class="track" id="r4"></div>
+  </div></section>
+
+  <!-- Browse by sport -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head"><div><h2>Browse by sport</h2><div class="sub">12 categories · 93 disciplines · live counts</div></div></div>
+    <div class="sgrid" id="sports"></div>
+  </div></section>
+
+  <!-- Clubs & academies -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head">
+      <div><h2>Clubs &amp; academies near you</h2><div class="sub">Train for it where you find it</div></div>
+      <a class="viewall" href="#">View all →</a>
+    </div>
+    <div class="clubrow" id="clubs"></div>
+  </div></section>
+
+  <!-- Organiser band -->
+  <section class="rail"><div class="wrap">
+    <div class="band">
+      <div>
+        <h2>List your event — free</h2>
+        <p>Reach the right athletes and their parents. Sports events only. We link to your registration — we never touch the transaction.</p>
+      </div>
+      <div class="cta"><button class="btn solid">Host an event</button></div>
+    </div>
+  </div></section>
+
+  <!-- Cities -->
+  <section class="rail"><div class="wrap">
+    <div class="rail-head"><div><h2>Browse by city</h2><div class="sub">53 cities · 24 states</div></div></div>
+    <div class="citygrid" id="cities"></div>
+  </div></section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span class="logo"><span class="mark">G</span></span>
+  <span>© 2026 GoAthletix — sports-event discovery for India.</span>
+  <span class="spacer"></span>
+  <span class="preview-tag">Preview · sample data</span>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  // ---- theme toggle (per-viewer convenience) ----
+  var root=document.documentElement, tbtn=document.getElementById('theme');
+  try{ var t=localStorage.getItem('ga-theme'); if(t) root.setAttribute('data-theme',t); }catch(e){}
+  tbtn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    var next = cur==='dark' ? 'light' : (cur==='light' ? 'dark' :
+      (matchMedia('(prefers-color-scheme:dark)').matches ? 'light':'dark'));
+    root.setAttribute('data-theme',next);
+    try{ localStorage.setItem('ga-theme',next); }catch(e){}
+  });
+
+  // ---- chips (visual multi-select) ----
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click',function(){ c.setAttribute('aria-pressed', c.getAttribute('aria-pressed')==='true'?'false':'true'); });
+  });
+
+  // ---- rail arrows ----
+  document.querySelectorAll('.arrows').forEach(function(a){
+    var track=a.closest('.rail').querySelector('.track');
+    a.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click',function(){ track.scrollBy({left:(+b.dataset.scroll)*Math.min(track.clientWidth*.8,560),behavior:'smooth'}); });
+    });
+  });
+
+  // ---- sport palettes / glyphs ----
+  var SPORT={
+    athletics:['#F2653B','#7A1E12','🏅'], running:['#2AA9C9','#124E63','🏃'],
+    cycling:['#E4A11B','#7A4E06','🚴'], skating:['#7C5CFF','#3A1E8A','🛼'],
+    gymnastics:['#E85CA0','#7A1E52','🤸'], martial:['#3A4658','#0F141F','🥋'],
+    water:['#22B0E6','#0A5A86','🏊'], racquet:['#16A34A','#0A4522','🏸'],
+    triathlon:['#0EA5A0','#0A4E4B','🏆'], trekking:['#5B8C3E','#274018','🥾'],
+    fitness:['#8B5CF6','#3B2170','🏋️'], adventure:['#D97706','#7A3D06','🧭']
+  };
+  function poster(s){var p=SPORT[s]||SPORT.running;
+    return 'background:linear-gradient(135deg,'+p[0]+','+p[1]+')';}
+  function glyph(s){return (SPORT[s]||SPORT.running)[2];}
+
+  function card(e){
+    var closing = e.closes ? '<span class="closing">⏳ Closes in '+e.closes+'</span>' : '';
+    return '<article class="card" tabindex="0">'
+      +'<div class="poster" style="'+poster(e.sport)+'">'
+        +'<span class="glyph">'+glyph(e.sport)+'</span>'
+        +'<div class="datebadge"><div class="d tnum">'+e.day+'</div><div class="m">'+e.mon+'</div></div>'
+        +'<button class="save" aria-label="Save event">♥</button>'
+        +'<span class="sport-tag">'+e.sportName+'</span>'
+      +'</div>'
+      +'<div class="body">'
+        +'<h3>'+e.name+'</h3>'
+        +'<div class="place">📍 '+e.city+' · '+e.venue+'</div>'
+        +'<div class="metarow"><span class="tag disc">'+e.disc+'</span><span class="tag age">'+e.age+'</span></div>'
+        +'<div class="foot"><span class="price"><small>From</small>₹'+e.price+'</span>'+closing+'</div>'
+      +'</div></article>';
+  }
+  function fill(id,list){var el=document.getElementById(id); if(el) el.innerHTML=list.map(card).join(''); }
+
+  fill('r1',[
+    {sport:'running',sportName:'Running',name:'TCS World 10K Bengaluru 2026',city:'Bengaluru',venue:'Kanteerava Stadium',disc:'10K',age:'Open',price:'1,200',day:'12',mon:'Oct'},
+    {sport:'skating',sportName:'Skating',name:'Karnataka State Roller Skating Championship',city:'Bengaluru',venue:'RSFI Rink',disc:'Speed',age:'U14',price:'400',day:'05',mon:'Oct'},
+    {sport:'running',sportName:'Running',name:'Bengaluru Midnight Marathon',city:'Bengaluru',venue:'Whitefield',disc:'21.1K',age:'Open',price:'1,500',day:'18',mon:'Oct',closes:'6 days'},
+    {sport:'cycling',sportName:'Cycling',name:'Namma Bengaluru Cyclothon',city:'Bengaluru',venue:'Cubbon Park',disc:'50K',age:'Open',price:'900',day:'26',mon:'Oct'},
+    {sport:'water',sportName:'Water',name:'Ulsoor Lake Open Water Swim',city:'Bengaluru',venue:'Ulsoor Lake',disc:'2 km',age:'Open',price:'700',day:'02',mon:'Nov'}
+  ]);
+  fill('r2',[
+    {sport:'athletics',sportName:'Athletics',name:'U12 District Athletics Meet',city:'Chennai',venue:'Nehru Stadium',disc:'Sprints',age:'U12',price:'200',day:'04',mon:'Oct'},
+    {sport:'gymnastics',sportName:'Gymnastics',name:'Sub-Junior Artistic Gymnastics Open',city:'Hyderabad',venue:'GHMC Arena',disc:'Artistic',age:'U14',price:'300',day:'11',mon:'Oct'},
+    {sport:'skating',sportName:'Skating',name:'Kids Roller Skating Meet',city:'Pune',venue:'Shivaji Rink',disc:'Quad',age:'U10',price:'350',day:'06',mon:'Oct'},
+    {sport:'martial',sportName:'Martial Arts',name:'Junior Karate Open Championship',city:'New Delhi',venue:'IG Complex',disc:'Kumite',age:'Junior',price:'500',day:'19',mon:'Oct'},
+    {sport:'racquet',sportName:'Badminton',name:'School Badminton Championship',city:'Mumbai',venue:'Andheri SC',disc:'Singles',age:'U16',price:'250',day:'25',mon:'Oct'}
+  ]);
+  fill('r3',[
+    {sport:'running',sportName:'Running',name:'Tata Steel Kolkata 25K',city:'Kolkata',venue:'Red Road',disc:'25K',age:'Open',price:'1,300',day:'05',mon:'Oct'},
+    {sport:'cycling',sportName:'Cycling',name:'Deccan Cliffhanger Brevet',city:'Pune',venue:'Baner',disc:'200K',age:'Open',price:'1,800',day:'05',mon:'Oct'},
+    {sport:'running',sportName:'Running',name:'Chennai Coastal Trail Run',city:'Chennai',venue:'ECR',disc:'15K',age:'Open',price:'800',day:'04',mon:'Oct'},
+    {sport:'trekking',sportName:'Trekking',name:'Sahyadri Weekend Trek',city:'Pune',venue:'Rajmachi',disc:'Trek',age:'Open',price:'1,100',day:'05',mon:'Oct'}
+  ]);
+  fill('r4',[
+    {sport:'running',sportName:'Running',name:'Goa River Marathon',city:'Panaji',venue:'Miramar',disc:'42.2K',age:'Open',price:'2,000',day:'09',mon:'Nov',closes:'2 days'},
+    {sport:'cycling',sportName:'Cycling',name:'Nilgiris MTB Challenge',city:'Ooty',venue:'Nilgiris',disc:'MTB 60K',age:'Masters',price:'2,500',day:'15',mon:'Nov',closes:'3 days'},
+    {sport:'triathlon',sportName:'Triathlon',name:'Mumbai Masters Aquathlon',city:'Mumbai',venue:'Juhu',disc:'Aquathlon',age:'Masters',price:'1,600',day:'16',mon:'Nov',closes:'5 days'},
+    {sport:'athletics',sportName:'Athletics',name:'State Junior Track Meet',city:'Jaipur',venue:'SMS Stadium',disc:'800m',age:'Junior',price:'300',day:'12',mon:'Nov',closes:'4 days'}
+  ]);
+
+  // sports grid
+  var SPORTS=[
+    ['athletics','Athletics','1,240'],['running','Running','3,180'],['cycling','Cycling','920'],
+    ['skating','Skating','610'],['gymnastics','Gymnastics','340'],['martial','Martial Arts','520'],
+    ['water','Swimming','480'],['racquet','Badminton','700'],['triathlon','Triathlon','210'],
+    ['trekking','Trekking','560'],['fitness','Fitness','300'],['adventure','Adventure','240']
+  ];
+  document.getElementById('sports').innerHTML=SPORTS.map(function(s){
+    return '<button class="stile" style="'+poster(s[0])+'"><span class="g">'+glyph(s[0])+'</span>'
+      +'<span class="nm">'+s[1]+'</span><span class="ct tnum">'+s[2]+' events</span></button>';
+  }).join('');
+
+  // clubs
+  var CLUBS=[
+    ['🏃','Bengaluru Roadrunners','Running club · 2,400 members · Bengaluru'],
+    ['🛼','Wheelsports Skating Academy','Academy · U8–U16 · Pune'],
+    ['🥋','Iron Fist Karate Dojo','Academy · all ages · Hyderabad'],
+    ['🏊','Coastal Aquatics','Swim academy · U10–Open · Chennai']
+  ];
+  document.getElementById('clubs').innerHTML=CLUBS.map(function(c){
+    return '<div class="club"><div class="av">'+c[0]+'</div><div><h3>'+c[1]+'</h3>'
+      +'<div class="meta">'+c[2]+'</div></div><button class="btn ghost join">View</button></div>';
+  }).join('');
+
+  // cities
+  var CITIES=[['Bengaluru','1,180'],['Mumbai','990'],['Delhi NCR','870'],['Pune','760'],['Hyderabad','640'],
+    ['Chennai','590'],['Kolkata','430'],['Ahmedabad','320'],['Jaipur','260'],['Goa','210']];
+  document.getElementById('cities').innerHTML=CITIES.map(function(c){
+    return '<button class="city"><span class="n">'+c[0]+'</span><span class="c tnum">'+c[1]+'</span></button>';
+  }).join('');
+})();
+</script>
+</body>
+</html>
