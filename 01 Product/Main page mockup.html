@@ -277,13 +277,14 @@
   .railpop .pop{width:300px;top:calc(100% + 8px)}
 
   /* ================= event card v3 — full-detail (spec §4a) ================= */
-  .card{flex:0 0 88%;max-width:340px;scroll-snap-align:start;background:var(--surface);
+  .card{flex:0 0 86%;max-width:440px;scroll-snap-align:start;background:var(--surface);
     border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
     box-shadow:var(--shadow);transition:transform .18s ease, box-shadow .18s ease;
     display:flex;flex-direction:column}
   .card:hover,.card:focus-within{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-  @media(min-width:640px){ .card{flex-basis:48%} }
-  @media(min-width:980px){ .card{flex-basis:330px} }
+  @media(min-width:640px){ .card{flex-basis:62%} }
+  @media(min-width:980px){ .card{flex-basis:400px} }
+  @media(min-width:1240px){ .card{flex-basis:420px} }
   .poster{position:relative;aspect-ratio:16/11;display:grid;place-items:center;color:#fff;overflow:hidden}
   .poster .glyph{font-size:62px;opacity:.28;transform:translate(22%,-8%)}
   .poster::after{content:"";position:absolute;inset:0;
@@ -474,6 +475,34 @@
     font-size:10.5px;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:4px 10px}
 
   @media (prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important;transition:none!important} }
+  /* ===== side arrow navigation (overlay, like the reference) + city carousel ===== */
+  .arrows{display:none!important}            /* retire the top-right rail arrows */
+  .railwrap{position:relative}
+  .railnav{position:absolute;top:calc(50% - 24px);z-index:6;width:46px;height:46px;border-radius:999px;
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-lg);
+    cursor:pointer;display:none;place-items:center;font-size:22px;line-height:1;transition:transform .15s ease}
+  @media(min-width:760px){ .railnav{display:grid} }
+  .railnav.prev{left:-12px} .railnav.next{right:-12px}
+  .railnav:hover{transform:scale(1.06);border-color:var(--accent)}
+  .railnav[disabled]{opacity:.32;cursor:default;transform:none}
+
+  /* tall portrait city cards */
+  .ccard{flex:0 0 200px;max-width:200px;aspect-ratio:2/3;scroll-snap-align:start;position:relative;
+    border-radius:20px;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:space-between;
+    padding:15px;cursor:pointer;box-shadow:var(--shadow);border:none;text-align:left;isolation:isolate}
+  .ccard::after{content:"";position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.05) 42%,rgba(0,0,0,.42))}
+  .ccard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);transition:transform .18s ease}
+  .cbadge{display:inline-flex;align-items:center;gap:6px;font-family:var(--cond);text-transform:uppercase;
+    letter-spacing:.06em;font-weight:700;font-size:11px;opacity:.95}
+  .cbadge .cmk{width:19px;height:19px;border-radius:6px;background:rgba(255,255,255,.92);color:#08251f;
+    font-style:italic;font-weight:800;display:grid;place-items:center;font-size:12px}
+  .ctop{display:flex;flex-direction:column;gap:9px}
+  .cname{font-family:var(--cond);text-transform:uppercase;letter-spacing:.02em;font-weight:700;
+    font-size:23px;line-height:.98;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+  .cmeta{font-size:12px;font-weight:700;opacity:.95;
+    background:rgba(0,0,0,.28);backdrop-filter:blur(3px);border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;padding:5px 10px;align-self:flex-start}
 </style>
 </head>
 <body>
@@ -1317,6 +1346,43 @@
   });
   document.addEventListener('click',closeAll);
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeAll(); });
+})();
+
+/* ===== rev 4: wider cards, portrait city carousel, overlay side-arrow nav ===== */
+(function(){
+  "use strict";
+  var CITY=[
+    ['Bengaluru','1,180','#1FA6A0','#0B5E4E'],['Mumbai','990','#F0653B','#7A1E52'],
+    ['Goa','210','#16B6C9','#0A6E86'],['Pune','760','#5B8C3E','#2A2E6A'],
+    ['New Delhi','870','#E4A11B','#7A1E12'],['Hyderabad','640','#7C5CFF','#3A1E8A'],
+    ['Chennai','590','#22B0E6','#0A5A86'],['Kolkata','430','#E4892B','#7A3D06'],
+    ['Jaipur','260','#E85CA0','#8A2E5A'],['Ahmedabad','320','#F0803B','#7A2E12']
+  ];
+  var cel=document.getElementById('cities');
+  if(cel){
+    cel.className='track';
+    cel.innerHTML=CITY.map(function(c){
+      return '<button class="ccard" style="background:linear-gradient(160deg,'+c[2]+','+c[3]+')">'
+        +'<span class="ctop"><span class="cbadge"><span class="cmk">G</span> GoAthletix</span>'
+        +'<span class="cname">'+c[0]+'</span></span>'
+        +'<span class="cmeta tnum">'+c[1]+' events</span></button>';
+    }).join('');
+  }
+  function addSideNav(track){
+    if(!track || track.dataset.snav) return; track.dataset.snav='1';
+    var wrap=document.createElement('div'); wrap.className='railwrap';
+    track.parentNode.insertBefore(wrap,track); wrap.appendChild(track);
+    function mk(dir,g,cls){var b=document.createElement('button');b.type='button';b.className='railnav '+cls;
+      b.textContent=g;b.setAttribute('aria-label',dir<0?'Scroll left':'Scroll right');
+      b.addEventListener('click',function(){track.scrollBy({left:dir*Math.min(track.clientWidth*0.85,640),behavior:'smooth'});});
+      return b;}
+    var prev=mk(-1,'‹','prev'), next=mk(1,'›','next');
+    wrap.appendChild(prev); wrap.appendChild(next);
+    function upd(){var max=track.scrollWidth-track.clientWidth-2;
+      prev.disabled=track.scrollLeft<=2; next.disabled=track.scrollLeft>=max;}
+    track.addEventListener('scroll',upd,{passive:true}); window.addEventListener('resize',upd); setTimeout(upd,80);
+  }
+  document.querySelectorAll('.track').forEach(addSideNav);
 })();
 </script>
 </body>
