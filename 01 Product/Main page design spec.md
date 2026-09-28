@@ -532,3 +532,106 @@ dropdown, the band and the footer — stated the same way each time.
 organiser's cards (§4a), which raises their click-through, which is what makes claiming a page worth
 an organiser's time — and a claimed page is how listings stay accurate without us crawling. The
 badge is not decoration; it is the incentive that keeps the data clean.
+
+---
+
+## 12. Revision 5 (2026-09-25) — de-clutter, motion, and all three audiences
+
+Implemented in `Main page mockup.html` rev 5. Rev 4's side-arrow rail navigation and portrait city
+cards (from the parallel session, `28bf0a9`) are folded in natively rather than as overrides.
+
+### 12a. Event card v4 — supersedes the row table in §4b
+
+§4b's nine-row card answered every question and was too much to read. **Rule: one fact, one place.**
+
+| Change | Why |
+| --- | --- |
+| **The date lives only in the poster date block.** The 🗓️ date line in the meta grid is gone; start time moves to the location line (`📍 Bengaluru · Kanteerava Stadium • ⏰ 5:30 AM`) | The date appeared twice on every card |
+| Sport label moves onto the poster (`RUNNING` above the headline) | It duplicated the sport chip |
+| Distances cap at 3 chips + `+N`; certification and chip-timing join the same chip row in green | Three chip rows became one |
+| Status becomes one slim tinted line; the fill bar appears **only** when entries are closing | A full-width band on every card was noise; urgency should be rare to mean anything |
+| Interested / Save / Share move to **icon buttons on the poster**, revealed on hover (always visible on touch). Comment leaves the card for the event page | The separate action-bar row is gone |
+| Footer row: price · avatar stack + count · Register | Price, proof and action on one line |
+
+Result: **card height 699 → 500px** at desktop (−28%), 480px at 375px. Width settles at 380px so
+exactly three cards fit the 1200px content width — rev 4's 420px left a clipped 2.9th card.
+
+**Motion:** resting shadow; on hover the card lifts 5px with a deeper shadow and the poster image
+zooms to 1.1× over 0.8s, reversing on leave. The same zoom applies to sport tiles, city cards,
+product and guide images, so the whole page responds consistently.
+
+### 12b. Featured banner v2
+
+- A **countdown chip** ("Starts in 115 days") computed from the event date, next to the trust badge.
+- **Ken Burns** slow zoom on the active slide.
+- Organiser line with verified tick on the banner.
+- Info strip shows **Where · Entry from · Entries (with fill bar) · Interested** — deliberately no
+  event date, because the banner's date block already carries it.
+- Thumbnails gain a **progress bar that fills over the 6-second dwell**, so the auto-advance is
+  visible and predictable. Swipe on touch, ←/→ on a focused banner. Any manual move stops
+  auto-advance permanently.
+
+### 12c. Header
+
+- **Announcement bar** above everything — one live, dismissible, time-bound message ("Entries for
+  Tata Mumbai Marathon close in 5 days · 92% full").
+- Row 1 gains an **inline search** (`/` focuses it), **My calendar**, **Alerts** and **Cart** icons
+  with count badges, and a hamburger drawer below 900px.
+- Row 2 now leads with **Events ▾** (When / Format / Collections / After the event / Big this season)
+  and **Explore ▾** (sports by family + top cities). "Sell with us" joins "For organisers" on the right.
+- Fixed a rev 3 layering bug: the sticky filter bar sat at `top: 62px` while the desktop header is
+  108px tall, so it slid under the header's second row. It now reads `--hh` (62px mobile / 108px desktop).
+
+### 12d. Motivational lines, typed
+
+The hero types its last word: **"Find Your Next Challenge." → Race. → Podium. → Personal Best. →
+Medal. → Adventure.**, holding on "Challenge." longest so the brand line is what most people read.
+The same device runs for the two other audiences:
+
+| Audience | Line |
+| --- | --- |
+| Athletes (hero) | Find Your Next **Challenge. / Race. / Podium. / Personal Best.** |
+| Organisers | Host Your Next Big **Event. / Marathon. / Championship. / Tournament. / Season.** |
+| Sellers | Equip India's Next **Champion. / Finisher. / Podium. / Record.** |
+
+Screen readers get the static sentence; the typed span is `aria-hidden`.
+
+### 12e. City cards — the count leads
+
+The event count is now the largest thing on the card (32px), with a "42 this weekend" sub-count, the
+city's top three sports, and a **NEAR YOU** tag on the viewer's own city.
+
+### 12f. Engagement additions
+
+| Section | Serves | Backed by |
+| --- | --- | --- |
+| Announcement bar | athletes | `registration_closes_at` — **empty today** |
+| Organiser / seller entry links under the hero search | organisers, sellers | — |
+| **Live activity strip** — anonymised ("A runner in Pune saved…"), never a name | athletes | `activity_logs` (exists) — needs the stream |
+| **Plan your season** — 12 month tiles with counts and a bar | athletes | `start_date` counts — **buildable now** |
+| **Organisers to follow** — verified tick, events, followers, next event, Follow | athletes → organisers | `entity_follows` (exists) |
+| **Seller band** with typed line, 4 proof points and 3 steps | sellers | no schema (#56) |
+| **Train smarter** guides rail | athletes, content | no CMS |
+| **Never miss race day** — email + WhatsApp alerts | athletes | no schema |
+
+Honesty rule carried over: the live strip anonymises to role + city because a name plus a city plus
+an event is personal data on a public page. Sample organisers in the mockup are fictional.
+
+### 12g. Parade, "Made with ♥ in India", footer
+
+Above the footer: a **parade of 12 line-sketch athletes** (running, cycling, swimming, skating,
+gymnastics, karate, badminton, cricket, football, javelin, hurdles, weightlifting) moving **left to
+right** across dashed track lanes, each bobbing in stride, pausing on hover. Beneath it,
+**"Made with ❤ in India 🇮🇳"** with a heartbeat.
+
+Footer rebuilt: a brand column (logo, "Find Your Next Challenge.", four real counts, social) + six
+link columns that collapse to **accordions below 900px**, a popular-searches chip cloud, the
+neutrality note, and a legal bar.
+
+### 12h. Motion and accessibility
+
+Every animation honours `prefers-reduced-motion`. **This development machine reports reduced motion**
+(Windows' *Animation effects* is off), so by default the typing, zoom, parade and heartbeat are all
+static here — correctly. For design review, a **▶ Preview motion** button appears in the footer bar
+only when reduced motion is active; it forces motion on and is remembered per viewer. `?motion=on`
+does the same in a normal browser; the Browser pane drops query strings, so use the button there.
