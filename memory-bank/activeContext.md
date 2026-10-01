@@ -19,6 +19,15 @@ When two sources disagree, the higher one wins and the lower one gets corrected.
 **Do NOT trust** `techContext.md` or `projectbrief.md`. They describe FastAPI services, an OpenRouter
 LLM pipeline, Algolia, Mem0 and an agent fleet. **None of that exists.** They are marked at the top.
 
+## Blocking now (2026-09-30)
+
+- **Supabase is unreachable.** The proxy returns `504 Unknown Host` for the project hostname (GitHub is fine
+  through the same proxy); the backend boots but every `/events` call logs `fetch failed`. Last good access
+  2026-09-16 — most likely a **paused free-tier project**. Restore it from the dashboard before any data work.
+- **Homepage build is planned** as [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]] — six phases from the
+  rev-5 mockup; 13 of 23 sections can ship on today's data, the rest self-hide. Blocked on the item above,
+  GA-019 landing, and ADR-002 / ADR-005.
+
 ## Where the product actually stands
 
 **The product now serves real data end to end** (GA-019, 2026-09-12). `GET /events` returns 200 with

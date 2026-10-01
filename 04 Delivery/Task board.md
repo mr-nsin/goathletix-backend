@@ -25,7 +25,7 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 
 ## Blocked
 
-- [ ] —
+- [ ] [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020 Build the homepage from the approved mockup]] — **P0, blocked.** Supabase unreachable (proxy `504 Unknown Host`, likely a paused free-tier project); needs GA-019 to land and ADR-002/005 decided. 6 phases; 13 of 23 sections can ship on today's data
 
 ## Done
 
