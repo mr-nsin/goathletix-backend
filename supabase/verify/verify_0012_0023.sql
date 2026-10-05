@@ -1,4 +1,4 @@
--- Read-only checks for migrations 0012-0022. Paste into the Supabase SQL editor AFTER applying them.
+-- Read-only checks for migrations 0012-0023. Paste into the Supabase SQL editor AFTER applying them.
 -- Changes nothing. Every row should read ok = true; anything false names what is missing.
 
 WITH expected_tables(t) AS (VALUES
@@ -17,7 +17,9 @@ WITH expected_tables(t) AS (VALUES
   ('seller_payout_items'), ('product_reviews'), ('product_moderation_log'),
   -- 0022 ticketing + private events
   ('organizer_private'), ('event_waves'), ('event_form_fields'), ('event_staff'), ('event_invites'),
-  ('tickets'), ('organizer_payouts'), ('organizer_payout_items'), ('organizer_broadcasts')
+  ('tickets'), ('organizer_payouts'), ('organizer_payout_items'), ('organizer_broadcasts'),
+  -- 0023 organiser event setup
+  ('event_schedule_items'), ('event_sponsors'), ('event_faqs'), ('event_documents')
 )
 SELECT 'table + RLS: ' || t AS check_name,
        coalesce(c.relrowsecurity, false) AS ok
@@ -37,7 +39,9 @@ FROM (VALUES
   ('disciplines', 'display_order'), ('sports', 'hero_image_url'), ('activity_logs', 'actor_city'),
   ('reminders', 'send_at'), ('products', 'review_status'), ('orders', 'fee_inr'),
   ('events', 'visibility'), ('events', 'publication_status'), ('events', 'ticketing_mode'), ('events', 'access_token'),
-  ('coupons', 'organizer_id'), ('event_categories', 'sales_end_at')
+  ('coupons', 'organizer_id'), ('event_categories', 'sales_end_at'),
+  ('events', 'waiver_text'), ('events', 'tax_mode'), ('events', 'setup_progress'), ('event_categories', 'min_age'),
+  ('event_categories', 'required_documents'), ('tickets', 'waiver_accepted_at'), ('tickets', 'guardian_name')
 ) AS x (tbl, col)
 
 UNION ALL
@@ -56,7 +60,8 @@ SELECT 'function: ' || f,
 FROM (VALUES
   ('has_role'), ('is_staff_session'), ('is_organizer_admin'), ('is_seller_owner'),
   ('events_near'), ('event_counts'), ('trending_events'), ('record_event_stat'), ('record_product_stat'),
-  ('can_view_private_event'), ('is_event_staff'), ('request_event_token'), ('enforce_ticket_capacity')
+  ('can_view_private_event'), ('is_event_staff'), ('request_event_token'), ('enforce_ticket_capacity'),
+  ('check_event_publishable')
 ) AS x (f)
 
 UNION ALL

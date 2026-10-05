@@ -218,7 +218,8 @@ public / unlisted / private events; seller products reviewed before sale. Existi
 | `…20_marketplace` | sellers, products (catalogue) |
 | `…21_seller_commerce` | seller teams + KYC, **product review & approval**, variants/stock, merchandising rules, cart, unified orders (gear + tickets), payments, shipments, returns, coupons, seller payouts, product reviews |
 | `…22_ticketing_private_events` | **visibility + publication**, organiser KYC, waves, registration forms, staff, invites, **tickets** with DB-enforced capacity, event promo codes, organiser payouts, broadcasts; replaces the "Public can read events" rule |
-| then `supabase/verify/verify_0012_0022.sql` | read-only checks + a private-event leak check |
+| `…23_event_setup` | organiser setup wizard fields (tagline, banner, end/reporting time, address + PIN, venue notes, transfer/deferral/cancellation policies, terms, **waiver**, GST mode + rate, contact + WhatsApp, safety, aid stations, amenities), per-ticket-type **eligibility** (age range + age-as-on date, required documents, qualifying standard, team size), ticket waiver/guardian fields, **agenda**, sponsors, FAQs, private **compliance documents**, and the **publish guard** |
+| then `supabase/verify/verify_0012_0023.sql` | read-only checks + a private-event leak check |
 
 **Must ship with 0022 (backend):** every events list/count/search query filters
 `visibility = 'public' AND publication_status = 'published'`; single-event fetch allows `unlisted`/`private` only

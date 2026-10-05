@@ -694,3 +694,46 @@ seller adds product (draft) ──submit──▶ pending_review ──staff─�
   The "₹0 commission, forever" stat is gone (no fee model is decided yet — do not promise a number).
 - Footer note: tickets bought on GoAthletix follow the organiser's refund policy, shown on the event page.
 - The header cart icon now means a real cart (tickets and gear), enabled once sign-in ships.
+
+---
+
+## 14. Organiser event setup, first-screen layout, "Big this season" (2026-10-05)
+
+### 14a. The create-event wizard (requirement #60, migration 0023)
+
+| Step | Organiser fills in | Required to publish a **paid** event |
+| --- | --- | --- |
+| 1 Basics | Name, sport + discipline, tagline (≤140), description, poster, wide banner, website | name, sport |
+| 2 Schedule | Start/end date and time, reporting time, agenda (expo, bib collection, flag-off per category, ceremony) | start date |
+| 3 Venue | Venue, address, city, state, PIN, map pin, parking / transport / accessibility notes | venue, city |
+| 4 Tickets & eligibility | Ticket types (distance, price, capacity, early-bird tiers, waves, sales window); per type: min/max age and the date age is measured on, gender, required documents (ID, federation ID, medical certificate, **parental consent** for minors), qualifying standard, team size | **at least one priced ticket type** |
+| 5 Registration form | Custom fields (T-shirt size, emergency contact, blood group, club, uploads) | — |
+| 6 Policies | Refund, transfer, deferral, cancellation, terms, **participant waiver** (versioned) | **refund policy, waiver** |
+| 7 Tax & payout | GST inclusive/exclusive and rate; organiser KYC + payout account | **KYC verified** |
+| 8 Support & safety | Contact email/phone, WhatsApp, medical plan, aid stations, amenities | **contact email** |
+| 9 Media & extras | Gallery, course map, sponsors (by tier), FAQs | — |
+| 10 Compliance | Police permission, venue NOC, insurance, federation sanction — private, verified by GoAthletix | (recommended; not blocking) |
+| 11 Publish | Visibility (public / unlisted / private), publish now or save draft | — |
+
+The publish gate is enforced **in the database** (`check_event_publishable`), so no frontend or backend bug can put a
+paid event live without these. It applies to the backend's service role too; only the dashboard and moderators are
+exempt. Free / external listings only need name, date, city, venue, sport and a registration link.
+
+Every confirmed ticket records the waiver version the athlete accepted; under-18 attendees carry a guardian name,
+phone and relation.
+
+### 14b. The first screen fills the viewport
+
+Announcement bar + header + hero + filter bar = exactly `100svh`, with the hero content centred vertically, so the
+next section starts at the fold on every screen (measured 1920×1080 and 1366×768: section top = viewport height).
+The announcement bar publishes its own height (`--ann`) because it wraps on phones; its review-only "pending" tag is
+hidden below 560px.
+
+### 14c. "Featured events" is renamed "Big this season"
+
+"Featured" is marketing jargon and says nothing about *why* an event is there. **"Big this season"** says what the
+section is — the marquee races and championships worth planning a season around — matches the existing Events menu
+label, and stays honest about curation without the old subtitle, which was an internal design note
+("never called Popular without a signal…") that had leaked onto the live page. New subtitle: *"Hand-picked races and
+championships worth planning your season around."* Alternatives considered: "Headline events", "Don't miss",
+"Spotlight", "Marquee events".
