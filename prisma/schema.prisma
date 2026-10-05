@@ -62,7 +62,6 @@ model user {
   auditlog          auditlog[]
   brokercredential  brokercredential[]
   order             order[]
-  eventTickets      EventTicket[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -94,72 +93,159 @@ model virtualtrade {
 // ==========================================
 
 model Organizer {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name       String   @unique
-  websiteUrl String?  @map("website_url")
-  logoUrl    String?  @map("logo_url")
-  isVerified Boolean  @default(false) @map("is_verified")
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  events     Event[]
-  follows    Follow[]
+  id            String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String               @unique
+  websiteUrl    String?              @map("website_url")
+  logoUrl       String?              @map("logo_url")
+  isVerified    Boolean              @default(false) @map("is_verified")
+  createdAt     DateTime             @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0013. `slug` is backfilled from `name` and then held unique by organizers_slug_key.
+  slug          String?              @unique(map: "organizers_slug_key")
+  description   String?
+  city          String?
+  state         String?
+  contactEmail  String?              @map("contact_email")
+  contactPhone  String?              @map("contact_phone")
+  instagramUrl  String?              @map("instagram_url")
+  coverUrl      String?              @map("cover_url")
+  sportTypes    SportCategory[]      @default([]) @map("sport_types")
+  verifiedAt    DateTime?            @map("verified_at") @db.Timestamptz(6)
+  claimedAt     DateTime?            @map("claimed_at") @db.Timestamptz(6)
+  followerCount Int                  @default(0) @map("follower_count")
+  eventCount    Int                  @default(0) @map("event_count")
+  ratingAvg     Decimal?             @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount   Int                  @default(0) @map("rating_count")
+  updatedAt     DateTime             @default(now()) @map("updated_at") @db.Timestamptz(6)
+  events        Event[]
+  follows       Follow[]
+  members       OrganizerMember[]
+  privateData   OrganizerPrivate?
+  eventRequests EventRequest[]
+  challenges    Challenge[]
+  coupons       Coupon[]
+  payouts       OrganizerPayout[]
+  broadcasts    OrganizerBroadcast[]
 
   @@map("organizers")
 }
 
 model Event {
-  id              String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sourceId        String                                 @unique @map("source_id")
-  eventName       String                                 @map("event_name")
-  sportType       SportCategory                          @map("sport_type")
-  startDate       DateTime                               @map("start_date") @db.Date
-  endDate         DateTime?                              @map("end_date") @db.Date
-  city            String
-  state           String
-  venue           String
-  geoLocation     Unsupported("geography(Point, 4326)")? @map("geo_location")
-  distanceOptions String[]                               @map("distance_options")
-  elevationGain   String?                                @map("elevation_gain")
-  difficulty      DifficultyLevel                        @default(Intermediate)
-  priceRange      String?                                @map("price_range")
-  registrationUrl String                                 @map("registration_url")
-  posterUrl       String?                                @map("poster_url")
-  isPopular       Boolean                                @default(false) @map("is_popular")
-  description     String?
-  slug            String?                                @unique
-  ageCategories   AgeCategory[]                          @map("age_categories")
-  disciplineSlugs String[]                               @map("discipline_slugs")
-  seriesId        String?                                @map("series_id") @db.Uuid
-  series          EventSeries?                           @relation(fields: [seriesId], references: [id], onDelete: SetNull)
-  clubId          String?                                @map("club_id") @db.Uuid
-  club            Club?                                  @relation(fields: [clubId], references: [id], onDelete: SetNull)
-  isClubActivity  Boolean                                @default(false) @map("is_club_activity")
-  organizerName   String?                                @map("organizer_name")
-  registrationOpensAt  DateTime?                         @map("registration_opens_at") @db.Timestamptz(6)
-  registrationClosesAt DateTime?                         @map("registration_closes_at") @db.Timestamptz(6)
-  interestCount   Int                                    @default(0) @map("interest_count")
-  viewCount       Int                                    @default(0) @map("view_count")
-  capacity        Int?
-  registrations   Int                                    @default(0)
-  isFeatured      Boolean                                @default(false) @map("is_featured")
-  featuredRank    Int?                                   @map("featured_rank")
-  badge           String?                                // 'OFFICIAL', 'POPULAR', 'CERTIFIED', 'GREEN'
-  minimumPrice    Decimal?                               @map("minimum_price") @db.Decimal(10, 2)
-  organizerId     String?                                @map("organizer_id") @db.Uuid
-  organizer       Organizer?                             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
-  terrain         String?
-  isVirtual       Boolean                                @default(false) @map("is_virtual")
-  status          EventStatus                            @default(upcoming)
-  md5PayloadHash  String                                 @map("md5_payload_hash")
-  createdAt       DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
-  follows         Follow[]
-  userCalendars   UserCalendar[]
-  reminders       Reminder[]
-  interests       EventInterest[]
-  results         EventResult[]
-  categories      EventCategory[]
-  tickets         EventTicket[]
+  id                   String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sourceId             String                                 @unique @map("source_id")
+  eventName            String                                 @map("event_name")
+  sportType            SportCategory                          @map("sport_type")
+  startDate            DateTime                               @map("start_date") @db.Date
+  endDate              DateTime?                              @map("end_date") @db.Date
+  city                 String
+  state                String
+  venue                String
+  geoLocation          Unsupported("geography(Point, 4326)")? @map("geo_location")
+  distanceOptions      String[]                               @map("distance_options")
+  elevationGain        String?                                @map("elevation_gain")
+  difficulty           DifficultyLevel                        @default(Intermediate)
+  priceRange           String?                                @map("price_range")
+  // Nullable since 0022: events with ticketing_mode = 'platform' have no external registration page
+  // (CHECK events_registration_target enforces one or the other).
+  registrationUrl      String?                                @map("registration_url")
+  posterUrl            String?                                @map("poster_url")
+  isPopular            Boolean                                @default(false) @map("is_popular")
+  description          String?
+  slug                 String?                                @unique
+  ageCategories        AgeCategory[]                          @map("age_categories")
+  disciplineSlugs      String[]                               @map("discipline_slugs")
+  seriesId             String?                                @map("series_id") @db.Uuid
+  series               EventSeries?                           @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  clubId               String?                                @map("club_id") @db.Uuid
+  club                 Club?                                  @relation(fields: [clubId], references: [id], onDelete: SetNull)
+  isClubActivity       Boolean                                @default(false) @map("is_club_activity")
+  organizerName        String?                                @map("organizer_name")
+  registrationOpensAt  DateTime?                              @map("registration_opens_at") @db.Timestamptz(6)
+  registrationClosesAt DateTime?                              @map("registration_closes_at") @db.Timestamptz(6)
+  interestCount        Int                                    @default(0) @map("interest_count")
+  viewCount            Int                                    @default(0) @map("view_count")
+  featuredRank         Int?                                   @map("featured_rank")
+  organizerId          String?                                @map("organizer_id") @db.Uuid
+  organizer            Organizer?                             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+  terrain              String?
+  isVirtual            Boolean                                @default(false) @map("is_virtual")
+  status               EventStatus                            @default(upcoming)
+  md5PayloadHash       String                                 @map("md5_payload_hash")
+  createdAt            DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
 
+  // Migration 0014: event details and pricing. `certifyingBody` is CHECK-constrained to
+  // 'AIMS' | 'World Athletics' | 'AFI' | 'state_association' | 'national_federation' | 'other'.
+  startTime        DateTime? @map("start_time") @db.Time(6)
+  timezone         String    @default("Asia/Kolkata")
+  isCertified      Boolean   @default(false) @map("is_certified")
+  certifyingBody   String?   @map("certifying_body")
+  isChipTimed      Boolean   @default(false) @map("is_chip_timed")
+  countsForRanking Boolean   @default(false) @map("counts_for_ranking")
+  timingPartner    String?   @map("timing_partner")
+  featuredUntil    DateTime? @map("featured_until") @db.Date
+  priceMinInr      Int?      @map("price_min_inr")
+  priceMaxInr      Int?      @map("price_max_inr")
+  altitudeM        Int?      @map("altitude_m")
+  courseMapUrl     String?   @map("course_map_url")
+  ratingAvg        Decimal?  @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount      Int       @default(0) @map("rating_count")
+
+  // Migration 0015. CHECK: 'venue' | 'city'. Maintained by the fill_event_geo_from_city trigger.
+  geoPrecision String? @map("geo_precision")
+
+  // Migration 0016.
+  resultsUrl         String?       @map("results_url")
+  resultsStatus      ResultsStatus @default(none) @map("results_status")
+  resultsPublishedAt DateTime?     @map("results_published_at") @db.Timestamptz(6)
+
+  // Migration 0022: visibility, publication and ticketing. CHECK-constrained text columns:
+  //   visibility         'public' | 'unlisted' | 'private'
+  //   publicationStatus  'draft' | 'published' | 'archived'
+  //   ticketingMode      'external' | 'platform'
+  //   feePaidBy          'buyer' | 'organizer'
+  //   maxTicketsPerOrder 1..50
+  visibility          String    @default("public")
+  publicationStatus   String    @default("published") @map("publication_status")
+  publishedAt         DateTime? @map("published_at") @db.Timestamptz(6)
+  accessToken         String    @unique(map: "events_access_token_key") @default(dbgenerated("encode(gen_random_bytes(12), 'hex')")) @map("access_token")
+  createdBy           String?   @map("created_by") @db.Uuid
+  creator             Profile?  @relation("EventCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  ticketingMode       String    @default("external") @map("ticketing_mode")
+  maxTicketsPerOrder  Int       @default(10) @map("max_tickets_per_order")
+  platformFeePct      Decimal?  @map("platform_fee_pct") @db.Decimal(5, 2)
+  feePaidBy           String    @default("buyer") @map("fee_paid_by")
+  refundPolicy        String?   @map("refund_policy")
+  certificateTemplate Json?     @map("certificate_template")
+
+  follows            Follow[]
+  userCalendars      UserCalendar[]
+  reminders          Reminder[]
+  interests          EventInterest[]
+  results            EventResult[]
+  categories         EventCategory[]
+  submissionRequests EventRequest[]
+  feedbacks          UserFeedback[]
+  resultEntries      EventResultEntry[]
+  reviews            EventReview[]
+  media              EventMedia[]
+  dailyStats         EventDailyStat[]
+  collectionEvents   CollectionEvent[]
+  relatedArticles    Article[]
+  announcements      SiteAnnouncement[]
+  formFields         EventFormField[]
+  staff              EventStaff[]
+  invites            EventInvite[]
+  tickets            Ticket[]
+  coupons            Coupon[]
+  organizerPayouts   OrganizerPayout[]
+  broadcasts         OrganizerBroadcast[]
+  productClicks      ProductClick[]
+  contextOrders      CheckoutOrder[]
+  contextOrderItems  OrderItem[]
+
+  // Indexes that exist in SQL but cannot be expressed here: idx_events_featured (partial, 0014),
+  // idx_events_certified (partial, 0014), idx_events_results_published (partial, 0016),
+  // idx_events_discoverable (partial, 0022), idx_events_price_min (plain btree, 0014).
   @@map("events")
 }
 
@@ -171,19 +257,68 @@ model Profile {
   onboardingCompleted Boolean         @default(false) @map("onboarding_completed")
   createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt           DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
-  follows             Follow[]
-  userCalendars       UserCalendar[]
-  reminders           Reminder[]
-  eventRequests       EventRequest[]
-  feedbacks           UserFeedback[]
-  activityLogs        ActivityLog[]
-  eventInterests      EventInterest[]
-  eventResults        EventResult[]
-  entityFollows       EntityFollow[]
-  clubMemberships     ClubMember[]
-  ownedClubs          Club[]           @relation("ClubOwner")
-  ownedCenters        TrainingCenter[] @relation("CenterOwner")
-  sharedCalendars     SharedCalendar[]
+  // Migration 0013. Public-safe fields only; personal data lives in ProfilePrivate.
+  // SQL also holds a case-insensitive unique index profiles_username_key ON (lower(username))
+  // WHERE username IS NOT NULL, plus CHECK profiles_username_format (^[a-zA-Z0-9_.]{3,30}$).
+  // Neither is expressible in Prisma, so uniqueness is NOT declared here.
+  username            String?
+  avatarUrl           String?         @map("avatar_url")
+  bio                 String?
+  city                String?
+  state               String?
+  isPublic            Boolean         @default(false) @map("is_public")
+
+  follows         Follow[]
+  userCalendars   UserCalendar[]
+  reminders       Reminder[]
+  eventRequests   EventRequest[]   @relation("EventRequestSubmitter")
+  feedbacks       UserFeedback[]
+  activityLogs    ActivityLog[]
+  eventInterests  EventInterest[]
+  eventResults    EventResult[]
+  entityFollows   EntityFollow[]
+  clubMemberships ClubMember[]
+  ownedClubs      Club[]           @relation("ClubOwner")
+  ownedCenters    TrainingCenter[] @relation("CenterOwner")
+  sharedCalendars SharedCalendar[]
+
+  privateData              ProfilePrivate?
+  userRoles                UserRole[]               @relation("UserRoleUser")
+  grantedRoles             UserRole[]               @relation("UserRoleGrantor")
+  organizerMemberships     OrganizerMember[]
+  reviewedEventRequests    EventRequest[]           @relation("EventRequestReviewer")
+  createdEvents            Event[]                  @relation("EventCreator")
+  claimedResultEntries     EventResultEntry[]
+  resultClaims             ResultClaim[]            @relation("ResultClaimUser")
+  reviewedResultClaims     ResultClaim[]            @relation("ResultClaimReviewer")
+  eventReviews             EventReview[]
+  uploadedMedia            EventMedia[]
+  notifications            Notification[]
+  notificationPreferences  NotificationPreference[]
+  pushSubscriptions        PushSubscription[]
+  alertSubscriptions       AlertSubscription[]
+  createdCollections       Collection[]
+  articles                 Article[]
+  challengeParticipations  ChallengeParticipant[]
+  ownedSellers             Seller[]                 @relation("SellerOwner")
+  sellerMemberships        SellerMember[]
+  reviewedProducts         Product[]                @relation("ProductReviewedBy")
+  productModerationActions ProductModerationLog[]
+  productClicks            ProductClick[]
+  addresses                UserAddress[]
+  productSaves             ProductSave[]
+  cart                     Cart?
+  orders                   CheckoutOrder[]
+  returnRequests           ReturnRequest[]
+  couponRedemptions        CouponRedemption[]
+  productReviews           ProductReview[]
+  ticketsBought            Ticket[]                 @relation("TicketBuyer")
+  ticketsAttending         Ticket[]                 @relation("TicketAttendee")
+  ticketsCheckedIn         Ticket[]                 @relation("TicketCheckedInBy")
+  eventStaffRoles          EventStaff[]
+  invitesReceived          EventInvite[]            @relation("EventInviteUser")
+  invitesSent              EventInvite[]            @relation("EventInviteSender")
+  broadcastsCreated        OrganizerBroadcast[]
 
   @@map("profiles")
 }
@@ -217,14 +352,17 @@ model UserCalendar {
 }
 
 model Reminder {
-  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String       @map("user_id") @db.Uuid
-  profile     Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  eventId     String       @map("event_id") @db.Uuid
-  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  triggerType ReminderType @map("trigger_type")
-  isTriggered Boolean      @default(false) @map("is_triggered")
-  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  profile     Profile             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId     String              @map("event_id") @db.Uuid
+  event       Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  triggerType ReminderType        @map("trigger_type")
+  isTriggered Boolean             @default(false) @map("is_triggered")
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0018. idx_reminders_due (partial: WHERE NOT is_triggered) exists in SQL only.
+  channel     NotificationChannel @default(in_app)
+  sendAt      DateTime?           @map("send_at") @db.Timestamptz(6)
 
   @@unique([userId, eventId, triggerType], name: "unique_user_event_reminder")
   @@map("reminders")
@@ -233,7 +371,7 @@ model Reminder {
 model EventRequest {
   id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId          String?       @map("user_id") @db.Uuid
-  profile         Profile?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  profile         Profile?      @relation("EventRequestSubmitter", fields: [userId], references: [id], onDelete: SetNull)
   eventName       String        @map("event_name")
   sportType       SportCategory @map("sport_type")
   startDate       DateTime      @map("start_date") @db.Date
@@ -246,6 +384,22 @@ model EventRequest {
   organizerName   String        @map("organizer_name")
   status          RequestStatus @default(pending)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0013 (#17 event submission).
+  organizerId     String?       @map("organizer_id") @db.Uuid
+  organizer       Organizer?    @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+  distanceOptions String[]      @default([]) @map("distance_options")
+  priceRange      String?       @map("price_range")
+  posterUrl       String?       @map("poster_url")
+  startTime       DateTime?     @map("start_time") @db.Time(6)
+  ageCategories   AgeCategory[] @default([]) @map("age_categories")
+  disciplineSlugs String[]      @default([]) @map("discipline_slugs")
+  contactEmail    String?       @map("contact_email")
+  reviewedBy      String?       @map("reviewed_by") @db.Uuid
+  reviewer        Profile?      @relation("EventRequestReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime?     @map("reviewed_at") @db.Timestamptz(6)
+  reviewNotes     String?       @map("review_notes")
+  createdEventId  String?       @map("created_event_id") @db.Uuid
+  createdEvent    Event?        @relation(fields: [createdEventId], references: [id], onDelete: SetNull)
 
   @@map("event_requests")
 }
@@ -257,6 +411,10 @@ model UserFeedback {
   feedbackType FeedbackType @map("feedback_type")
   message      String
   createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0013 (listing corrections). idx_user_feedbacks_event is partial, SQL only.
+  eventId      String?      @map("event_id") @db.Uuid
+  event        Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  pageUrl      String?      @map("page_url")
 
   @@map("user_feedbacks")
 }
@@ -270,6 +428,9 @@ model ActivityLog {
   targetId        String         @map("target_id") @db.Uuid
   targetName      String         @map("target_name")
   createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0018. idx_activity_logs_recent (partial: WHERE is_public) exists in SQL only.
+  actorCity       String?        @map("actor_city")
+  isPublic        Boolean        @default(true) @map("is_public")
 
   @@map("activity_logs")
 }
@@ -300,6 +461,8 @@ enum EventStatus {
   closed
   completed
   cancelled
+  // Migration 0012.
+  postponed
 
   @@map("event_status")
 }
@@ -340,6 +503,8 @@ enum FeedbackType {
   feature_request
   general_feedback
   bug_report
+  // Migration 0012.
+  listing_correction
 
   @@map("feedback_type")
 }
@@ -348,6 +513,13 @@ enum ActivityAction {
   save
   follow
   calendar_add
+  // Migration 0012.
+  interest
+  going
+  review
+  result_published
+  event_listed
+  registered
 
   @@map("activity_action")
 }
@@ -432,6 +604,8 @@ enum InterestStatus {
   going
   attended
   skipped
+  // Migration 0012.
+  waitlisted
 
   @@map("interest_status")
 }
@@ -442,37 +616,45 @@ enum FollowEntity {
   club
   training_center
   user
+  // Migration 0012.
+  seller
 
   @@map("follow_entity")
 }
 
 model Sport {
-  slug        SportCategory @id
-  displayName String        @map("display_name")
-  family      SportFamily
-  eventModel  EventModel    @map("event_model")
-  phase       Int           @default(9) @db.SmallInt
-  isActive    Boolean       @default(false) @map("is_active")
-  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
-  disciplines      Discipline[]
-  series           EventSeries[]
-  products         Product[]
-  eventCategories  EventCategory[]
+  slug         SportCategory @id
+  displayName  String        @map("display_name")
+  family       SportFamily
+  eventModel   EventModel    @map("event_model")
+  phase        Int           @default(9) @db.SmallInt
+  isActive     Boolean       @default(false) @map("is_active")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0014.
+  heroImageUrl String?       @map("hero_image_url")
+  icon         String?
+  description  String?
+  disciplines  Discipline[]
+  series       EventSeries[]
 
   @@map("sports")
 }
 
 model Discipline {
-  slug        String         @id
-  displayName String         @map("display_name")
-  sportType   SportCategory  @map("sport_type")
-  sport       Sport          @relation(fields: [sportType], references: [slug])
-  kind        DisciplineKind @default(sport)
-  aliases     String[]
-  isActive    Boolean        @default(true) @map("is_active")
-  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+  slug            String          @id
+  displayName     String          @map("display_name")
+  sportType       SportCategory   @map("sport_type")
+  sport           Sport           @relation(fields: [sportType], references: [slug])
+  kind            DisciplineKind  @default(sport)
+  aliases         String[]
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0014.
+  displayOrder    Int             @default(100) @map("display_order")
+  isFeatured      Boolean         @default(false) @map("is_featured")
+  eventCategories EventCategory[]
 
   @@map("disciplines")
 }
@@ -585,8 +767,10 @@ model EntityFollow {
   userId     String       @map("user_id") @db.Uuid
   user       Profile      @relation(fields: [userId], references: [id], onDelete: Cascade)
   targetType FollowEntity @map("target_type")
-  // No relation: the target spans five tables. Integrity is held by the delete triggers in
-  // migrations 0009 and 0010, which is the accepted trade for a table that never changes shape.
+  // No relation: the target spans six tables (event, organizer, club, training_center, user, seller).
+  // Integrity is held by the delete triggers in migrations 0009 and 0010, which is the accepted
+  // trade for a table that never changes shape. Counters on organizers (0013) and sellers (0021)
+  // are maintained by triggers on this table.
   targetId   String       @map("target_id") @db.Uuid
   createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
 
@@ -639,97 +823,1336 @@ model TrainingCenter {
   @@map("training_centers")
 }
 
-model Product {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String
-  price            Decimal  @db.Decimal(10, 2)
-  originalPrice    Decimal? @map("original_price") @db.Decimal(10, 2)
-  image            String
-  sellerId         String        @map("seller_id") @db.Uuid
-  sportSlug        SportCategory @map("sport_slug")
-  
-  seller           Seller        @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  sport            Sport         @relation(fields: [sportSlug], references: [slug], onDelete: Cascade)
-  variants         ProductVariant[]
-  
-  @@map("products")
+// ---------------------------------------------------------------------------
+// Roles, organiser accounts, profiles — migration 0013.
+// ---------------------------------------------------------------------------
+
+enum AppRole {
+  admin
+  editor
+  moderator
+
+  @@map("app_role")
 }
 
-// --- MARKETPLACE & MULTI-SPORT ORGANIZER ADDITIONS ---
+/// Platform roles. No client write policy: granted from the dashboard or by the service role.
+model UserRole {
+  userId    String   @map("user_id") @db.Uuid
+  user      Profile  @relation("UserRoleUser", fields: [userId], references: [id], onDelete: Cascade)
+  role      AppRole
+  grantedBy String?  @map("granted_by") @db.Uuid
+  grantor   Profile? @relation("UserRoleGrantor", fields: [grantedBy], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-enum GenderCategory {
-  male
-  female
-  mixed
-  open
-  @@map("gender_category")
+  @@id([userId, role])
+  @@map("user_roles")
 }
 
-enum PaymentStatus {
-  pending
-  succeeded
-  failed
-  refunded
-  @@map("payment_status")
+/// A claim is a row with status `pending`; staff approve it by setting `active`.
+/// idx_organizer_members_user (plain btree on user_id) exists in SQL only.
+model OrganizerMember {
+  organizerId String           @map("organizer_id") @db.Uuid
+  organizer   Organizer        @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  userId      String           @map("user_id") @db.Uuid
+  user        Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        ClubRole         @default(member)
+  status      MembershipStatus @default(pending)
+  claimNote   String?          @map("claim_note")
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@id([organizerId, userId])
+  @@map("organizer_members")
 }
 
+/// Owner-only personal data; `profiles` is publicly readable so none of this may live there.
+/// CHECKs: birth_year BETWEEN 1900 AND 2100; gender IN ('female','male','non_binary','prefer_not_to_say').
+model ProfilePrivate {
+  id               String    @id @db.Uuid
+  profile          Profile   @relation(fields: [id], references: [id], onDelete: Cascade)
+  birthYear        Int?      @map("birth_year") @db.SmallInt
+  gender           String?
+  phone            String?
+  emailOptIn       Boolean   @default(false) @map("email_opt_in")
+  whatsappOptIn    Boolean   @default(false) @map("whatsapp_opt_in")
+  consentUpdatedAt DateTime? @map("consent_updated_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("profile_private")
+}
+
+// ---------------------------------------------------------------------------
+// Event details and pricing — migration 0014 (event_categories is extended by 0022).
+// ---------------------------------------------------------------------------
+
+/// A ticket type / race category. CHECKs: gender IN ('open','female','male','mixed'); distance_km > 0;
+/// cutoff_minutes > 0; capacity > 0; slots_taken >= 0; price_inr >= 0; max_per_order > 0.
+/// slots_taken and is_sold_out are maintained by the refresh_ticket_counts trigger (0022).
 model EventCategory {
-  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  eventId       String         @db.Uuid
-  name          String         // e.g., "Men's 10K", "U-19 Boys Singles", "Corporate Relay"
-  sportSlug     SportCategory? @map("sport_slug")
-  price         Decimal        @db.Decimal(10, 2)
-  capacity      Int?
-  registrations Int            @default(0)
-  gender        GenderCategory @default(open)
-  ageMin        Int?           @map("age_min")
-  ageMax        Int?           @map("age_max")
-  
-  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  sport         Sport?         @relation(fields: [sportSlug], references: [slug])
-  tickets       EventTicket[]
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String        @map("event_id") @db.Uuid
+  event          Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  label          String
+  disciplineSlug String?       @map("discipline_slug")
+  discipline     Discipline?   @relation(fields: [disciplineSlug], references: [slug], onDelete: SetNull)
+  distanceKm     Decimal?      @map("distance_km") @db.Decimal(7, 3)
+  ageCategories  AgeCategory[] @default([]) @map("age_categories")
+  gender         String        @default("open")
+  startTime      DateTime?     @map("start_time") @db.Time(6)
+  cutoffMinutes  Int?          @map("cutoff_minutes")
+  capacity       Int?
+  slotsTaken     Int?          @map("slots_taken")
+  priceInr       Int?          @map("price_inr")
+  isSoldOut      Boolean       @default(false) @map("is_sold_out")
+  sortOrder      Int           @default(0) @map("sort_order")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0022.
+  description    String?
+  includes       String[]      @default([])
+  salesStartAt   DateTime?     @map("sales_start_at") @db.Timestamptz(6)
+  salesEndAt     DateTime?     @map("sales_end_at") @db.Timestamptz(6)
+  maxPerOrder    Int?          @map("max_per_order")
+  isHidden       Boolean       @default(false) @map("is_hidden")
 
+  priceTiers        EventPriceTier[]
+  waves             EventWave[]
+  formFields        EventFormField[]
+  tickets           Ticket[]
+  resultEntries     EventResultEntry[]
+  unlockedByCoupons Coupon[]
+
+  @@unique([eventId, label])
   @@map("event_categories")
 }
 
-model EventTicket {
-  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String        @db.Uuid
-  eventId         String        @db.Uuid
-  categoryId      String        @db.Uuid
-  paymentIntentId String?       @map("payment_intent_id")
-  status          PaymentStatus @default(pending)
-  qrCode          String?       @unique @map("qr_code")
-  purchasedAt     DateTime      @default(now()) @map("purchased_at") @db.Timestamptz(6)
-  
-  event           Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  category        EventCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  user            user          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@map("event_tickets")
+/// CHECKs: price_inr >= 0; valid_until >= valid_from when both are set.
+model EventPriceTier {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId String        @map("category_id") @db.Uuid
+  category   EventCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  label      String
+  priceInr   Int           @map("price_inr")
+  validFrom  DateTime?     @map("valid_from") @db.Date
+  validUntil DateTime?     @map("valid_until") @db.Date
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  tickets    Ticket[]
+
+  @@map("event_price_tiers")
 }
 
+// ---------------------------------------------------------------------------
+// Cities — migration 0015.
+// ---------------------------------------------------------------------------
+
+/// CHECKs: latitude BETWEEN -90 AND 90; longitude BETWEEN -180 AND 180.
+model City {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  state        String
+  slug         String   @unique
+  latitude     Float?
+  longitude    Float?
+  heroImageUrl String?  @map("hero_image_url")
+  description  String?
+  isFeatured   Boolean  @default(false) @map("is_featured")
+  displayOrder Int      @default(100) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([name, state])
+  @@map("cities")
+}
+
+// ---------------------------------------------------------------------------
+// Official results — migration 0016.
+// ---------------------------------------------------------------------------
+
+enum ResultsStatus {
+  none
+  announced
+  published
+
+  @@map("results_status")
+}
+
+enum FinishStatus {
+  finished
+  dnf
+  dns
+  dq
+
+  @@map("finish_status")
+}
+
+/// Timing-partner results, distinct from the user-entered EventResult. CHECKs: gender IN
+/// ('female','male','other'); position_* > 0. Also in SQL only: idx_result_entries_name
+/// (expression index on lower(athlete_name)) and the partial idx_result_entries_claimed.
+model EventResultEntry {
+  id               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId          String                   @map("event_id") @db.Uuid
+  event            Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId       String?                  @map("category_id") @db.Uuid
+  category         EventCategory?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryLabel    String?                  @map("category_label")
+  bib              String?
+  athleteName      String                   @map("athlete_name")
+  gender           String?
+  ageGroup         String?                  @map("age_group")
+  clubName         String?                  @map("club_name")
+  city             String?
+  finishStatus     FinishStatus             @default(finished) @map("finish_status")
+  // `interval` has no Prisma mapping (same as EventResult.finishTime): raw query / REST only.
+  gunTime          Unsupported("interval")? @map("gun_time")
+  chipTime         Unsupported("interval")? @map("chip_time")
+  positionOverall  Int?                     @map("position_overall")
+  positionGender   Int?                     @map("position_gender")
+  positionCategory Int?                     @map("position_category")
+  source           String
+  sourceRowHash    String                   @map("source_row_hash")
+  isHidden         Boolean                  @default(false) @map("is_hidden")
+  claimedBy        String?                  @map("claimed_by") @db.Uuid
+  claimant         Profile?                 @relation(fields: [claimedBy], references: [id], onDelete: SetNull)
+  claimedAt        DateTime?                @map("claimed_at") @db.Timestamptz(6)
+  createdAt        DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  claims           ResultClaim[]
+
+  @@unique([eventId, source, sourceRowHash])
+  @@map("event_result_entries")
+}
+
+model ResultClaim {
+  id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entryId      String           @map("entry_id") @db.Uuid
+  entry        EventResultEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  userId       String           @map("user_id") @db.Uuid
+  user         Profile          @relation("ResultClaimUser", fields: [userId], references: [id], onDelete: Cascade)
+  status       RequestStatus    @default(pending)
+  evidenceNote String?          @map("evidence_note")
+  reviewedBy   String?          @map("reviewed_by") @db.Uuid
+  reviewer     Profile?         @relation("ResultClaimReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewedAt   DateTime?        @map("reviewed_at") @db.Timestamptz(6)
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([entryId, userId])
+  @@map("result_claims")
+}
+
+// ---------------------------------------------------------------------------
+// Reviews and media — migration 0017.
+// ---------------------------------------------------------------------------
+
+enum ModerationStatus {
+  pending
+  published
+  hidden
+
+  @@map("moderation_status")
+}
+
+/// CHECKs: rating BETWEEN 1 AND 5; char_length(title) <= 120; char_length(body) <= 4000;
+/// edition_year BETWEEN 1990 AND 2100. `status` and `helpful_count` are forced by guard triggers.
+model EventReview {
+  id            String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId       String           @map("event_id") @db.Uuid
+  event         Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId        String           @map("user_id") @db.Uuid
+  user          Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating        Int              @db.SmallInt
+  title         String?
+  body          String?
+  editionYear   Int?             @map("edition_year") @db.SmallInt
+  categoryLabel String?          @map("category_label")
+  status        ModerationStatus @default(published)
+  helpfulCount  Int              @default(0) @map("helpful_count")
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([eventId, userId])
+  @@map("event_reviews")
+}
+
+/// CHECKs: kind IN ('photo','video'); char_length(caption) <= 300; edition_year BETWEEN 1990 AND 2100.
+model EventMedia {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId     String           @map("event_id") @db.Uuid
+  event       Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  uploadedBy  String?          @map("uploaded_by") @db.Uuid
+  uploader    Profile?         @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+  url         String
+  kind        String           @default("photo")
+  caption     String?
+  credit      String?
+  editionYear Int?             @map("edition_year") @db.SmallInt
+  isCover     Boolean          @default(false) @map("is_cover")
+  status      ModerationStatus @default(pending)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("event_media")
+}
+
+// ---------------------------------------------------------------------------
+// Stats, notifications, alerts — migration 0018.
+// ---------------------------------------------------------------------------
+
+enum NotificationChannel {
+  in_app
+  email
+  push
+  whatsapp
+
+  @@map("notification_channel")
+}
+
+enum NotificationTopic {
+  registration_opens
+  registration_closing
+  event_reminder
+  followed_new_event
+  results_published
+  weekly_digest
+  review_reply
+  account
+  order_placed
+  order_shipped
+  order_delivered
+  return_update
+  refund_issued
+  seller_new_order
+  seller_low_stock
+  seller_payout
+  product_approved
+  product_rejected
+  product_changes_requested
+  ticket_confirmed
+  ticket_cancelled
+  event_updated
+  event_cancelled
+  checkin_reminder
+  certificate_ready
+  event_invite
+  organizer_new_registration
+  organizer_payout
+
+  @@map("notification_topic")
+}
+
+/// Written only through record_event_stat() (service role), never directly.
+model EventDailyStat {
+  eventId        String   @map("event_id") @db.Uuid
+  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  day            DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date
+  views          Int      @default(0)
+  saves          Int      @default(0)
+  interests      Int      @default(0)
+  shares         Int      @default(0)
+  registerClicks Int      @default(0) @map("register_clicks")
+  registrations  Int      @default(0)
+
+  @@id([eventId, day])
+  @@map("event_daily_stats")
+}
+
+/// idx_notifications_unread is partial (WHERE read_at IS NULL) and exists in SQL only.
+model Notification {
+  id         String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String            @map("user_id") @db.Uuid
+  user       Profile           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic      NotificationTopic
+  title      String
+  body       String?
+  linkUrl    String?           @map("link_url")
+  entityType String?           @map("entity_type")
+  // No relation: the target spans many tables.
+  entityId   String?           @map("entity_id") @db.Uuid
+  readAt     DateTime?         @map("read_at") @db.Timestamptz(6)
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  userId    String              @map("user_id") @db.Uuid
+  user      Profile             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  channel   NotificationChannel
+  topic     NotificationTopic
+  enabled   Boolean             @default(true)
+  updatedAt DateTime            @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@id([userId, channel, topic])
+  @@map("notification_preferences")
+}
+
+model PushSubscription {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  user       Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String    @unique
+  p256dh     String
+  authKey    String    @map("auth_key")
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz(6)
+
+  @@map("push_subscriptions")
+}
+
+/// Anonymous sign-ups allowed (user_id NULL). CHECKs: email matches a basic address pattern;
+/// email IS NOT NULL OR phone IS NOT NULL. alert_subscriptions_email_key is a unique index on
+/// lower(email) WHERE email IS NOT NULL (expression + partial): SQL only, not expressible here.
+model AlertSubscription {
+  id               String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String?             @map("user_id") @db.Uuid
+  user             Profile?            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email            String?
+  phone            String?
+  channel          NotificationChannel @default(email)
+  city             String?
+  sportTypes       SportCategory[]     @default([]) @map("sport_types")
+  confirmedAt      DateTime?           @map("confirmed_at") @db.Timestamptz(6)
+  unsubscribeToken String              @unique @default(dbgenerated("encode(gen_random_bytes(16), 'hex')")) @map("unsubscribe_token")
+  createdAt        DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("alert_subscriptions")
+}
+
+// ---------------------------------------------------------------------------
+// Content and collections — migration 0019.
+// ---------------------------------------------------------------------------
+
+/// CHECKs: kind IN ('manual','rule'); kind <> 'rule' OR rule IS NOT NULL; ends_at > starts_at.
+model Collection {
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug        String            @unique
+  title       String
+  subtitle    String?
+  description String?
+  coverUrl    String?           @map("cover_url")
+  kind        String            @default("manual")
+  rule        Json?
+  showAsChip  Boolean           @default(false) @map("show_as_chip")
+  chipLabel   String?           @map("chip_label")
+  chipEmoji   String?           @map("chip_emoji")
+  sortOrder   Int               @default(100) @map("sort_order")
+  isPublished Boolean           @default(false) @map("is_published")
+  startsAt    DateTime?         @map("starts_at") @db.Timestamptz(6)
+  endsAt      DateTime?         @map("ends_at") @db.Timestamptz(6)
+  createdBy   String?           @map("created_by") @db.Uuid
+  creator     Profile?          @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  events      CollectionEvent[]
+
+  @@map("collections")
+}
+
+model CollectionEvent {
+  collectionId String     @map("collection_id") @db.Uuid
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  eventId      String     @map("event_id") @db.Uuid
+  event        Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  position     Int        @default(0)
+
+  @@id([collectionId, eventId])
+  @@map("collection_events")
+}
+
+/// CHECKs: kind IN ('guide','race_report','checklist','explainer','news'); read_minutes > 0;
+/// status IN ('draft','published','archived').
+model Article {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug            String          @unique
+  title           String
+  excerpt         String?
+  bodyMd          String?         @map("body_md")
+  coverUrl        String?         @map("cover_url")
+  kind            String          @default("guide")
+  sportTypes      SportCategory[] @default([]) @map("sport_types")
+  disciplineSlugs String[]        @default([]) @map("discipline_slugs")
+  ageCategories   AgeCategory[]   @default([]) @map("age_categories")
+  relatedEventId  String?         @map("related_event_id") @db.Uuid
+  relatedEvent    Event?          @relation(fields: [relatedEventId], references: [id], onDelete: SetNull)
+  authorId        String?         @map("author_id") @db.Uuid
+  author          Profile?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorName      String?         @map("author_name")
+  readMinutes     Int?            @map("read_minutes") @db.SmallInt
+  status          String          @default("draft")
+  publishedAt     DateTime?       @map("published_at") @db.Timestamptz(6)
+  seoTitle        String?         @map("seo_title")
+  seoDescription  String?         @map("seo_description")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("articles")
+}
+
+/// CHECKs: char_length(message) <= 160; ends_at > starts_at.
+model SiteAnnouncement {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  message   String
+  linkUrl   String?   @map("link_url")
+  linkLabel String?   @map("link_label")
+  eventId   String?   @map("event_id") @db.Uuid
+  event     Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  priority  Int       @default(0)
+  isActive  Boolean   @default(true) @map("is_active")
+  startsAt  DateTime  @default(now()) @map("starts_at") @db.Timestamptz(6)
+  endsAt    DateTime? @map("ends_at") @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("site_announcements")
+}
+
+/// CHECKs: metric IN ('distance_km','events_completed','elevation_m','activities'); target > 0;
+/// ends_on >= starts_on.
+model Challenge {
+  id           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug         String                 @unique
+  title        String
+  description  String?
+  coverUrl     String?                @map("cover_url")
+  sportTypes   SportCategory[]        @default([]) @map("sport_types")
+  metric       String
+  target       Decimal                @db.Decimal
+  startsOn     DateTime               @map("starts_on") @db.Date
+  endsOn       DateTime               @map("ends_on") @db.Date
+  organizerId  String?                @map("organizer_id") @db.Uuid
+  organizer    Organizer?             @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+  isPublished  Boolean                @default(false) @map("is_published")
+  createdAt    DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  participants ChallengeParticipant[]
+
+  @@map("challenges")
+}
+
+model ChallengeParticipant {
+  challengeId String    @map("challenge_id") @db.Uuid
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  userId      String    @map("user_id") @db.Uuid
+  user        Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  progress    Decimal   @default(0) @db.Decimal
+  joinedAt    DateTime  @default(now()) @map("joined_at") @db.Timestamptz(6)
+  completedAt DateTime? @map("completed_at") @db.Timestamptz(6)
+
+  @@id([challengeId, userId])
+  @@map("challenge_participants")
+}
+
+// ---------------------------------------------------------------------------
+// Marketplace — migration 0020, extended by 0021 (seller commerce).
+// ---------------------------------------------------------------------------
+
+enum OrderStatus {
+  pending_payment
+  paid
+  partially_fulfilled
+  fulfilled
+  cancelled
+  refunded
+  partially_refunded
+
+  @@map("order_status")
+}
+
+enum SellerOrderStatus {
+  pending
+  accepted
+  packed
+  shipped
+  delivered
+  cancelled
+  returned
+
+  @@map("seller_order_status")
+}
+
+enum PaymentTxnStatus {
+  created
+  authorized
+  captured
+  failed
+  refunded
+  partially_refunded
+
+  @@map("payment_txn_status")
+}
+
+/// CHECKs: status IN ('pending','active','suspended'); fulfilment_mode IN ('affiliate','marketplace');
+/// commission_pct BETWEEN 0 AND 100. status, is_verified, owner_id, fulfilment_mode, commission_pct
+/// and the counters are forced by guard_seller_status for non-staff sessions.
+/// idx_sellers_owner (plain btree on owner_id) exists in SQL only.
 model Seller {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String
-  stripeAccountId String?   @map("stripe_account_id")
-  supportEmail    String    @map("support_email")
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  
-  products        Product[]
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  slug           String   @unique
+  description    String?
+  logoUrl        String?  @map("logo_url")
+  websiteUrl     String?  @map("website_url")
+  contactEmail   String?  @map("contact_email")
+  city           String?
+  state          String?
+  ownerId        String   @map("owner_id") @db.Uuid
+  owner          Profile  @relation("SellerOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  isVerified     Boolean  @default(false) @map("is_verified")
+  status         String   @default("pending")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0021.
+  fulfilmentMode String   @default("affiliate") @map("fulfilment_mode")
+  commissionPct  Decimal? @map("commission_pct") @db.Decimal(5, 2)
+  returnPolicy   String?  @map("return_policy")
+  shippingPolicy String?  @map("shipping_policy")
+  shipsFromCity  String?  @map("ships_from_city")
+  shipsFromState String?  @map("ships_from_state")
+  followerCount  Int      @default(0) @map("follower_count")
+  productCount   Int      @default(0) @map("product_count")
+  ratingAvg      Decimal? @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount    Int      @default(0) @map("rating_count")
+
+  members            SellerMember[]
+  privateData        SellerPrivate?
+  products           Product[]
+  merchandisingRules MerchandisingRule[]
+  orders             SellerOrder[]
+  coupons            Coupon[]
+  payouts            SellerPayout[]
 
   @@map("sellers")
 }
 
-model ProductVariant {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  productId String  @map("product_id") @db.Uuid
-  sku       String  @unique
-  size      String?
-  color     String?
-  inventory Int     @default(0)
-  
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+/// CHECKs: category IN ('shoes','spikes','apparel','nutrition','hydration','recovery','wearables',
+/// 'protective','equipment','accessories','other'); stock_status IN ('in_stock','low','out_of_stock');
+/// purchase_mode IN ('external_link','checkout'); review_status IN ('draft','pending_review',
+/// 'approved','rejected','changes_requested'); price_inr/mrp_inr >= 0 with mrp_inr >= price_inr;
+/// gst_rate BETWEEN 0 AND 40; weight_grams > 0; products_link_required (external_link needs
+/// external_url). Indexes in SQL only (GIN / partial): idx_products_sports, idx_products_disciplines,
+/// idx_products_category, idx_products_review_queue. review_* columns are forced by guard_product_review.
+model Product {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerId        String          @map("seller_id") @db.Uuid
+  seller          Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  slug            String
+  title           String
+  description     String?
+  brand           String?
+  category        String
+  sportTypes      SportCategory[] @default([]) @map("sport_types")
+  disciplineSlugs String[]        @default([]) @map("discipline_slugs")
+  ageCategories   AgeCategory[]   @default([]) @map("age_categories")
+  priceInr        Int             @map("price_inr")
+  mrpInr          Int?            @map("mrp_inr")
+  imageUrls       String[]        @default([]) @map("image_urls")
+  // Nullable since 0021: checkout-mode products have no external page.
+  externalUrl     String?         @map("external_url")
+  stockStatus     String          @default("in_stock") @map("stock_status")
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0021.
+  purchaseMode    String          @default("external_link") @map("purchase_mode")
+  hsnCode         String?         @map("hsn_code")
+  gstRate         Decimal?        @map("gst_rate") @db.Decimal(4, 2)
+  weightGrams     Int?            @map("weight_grams")
+  ratingAvg       Decimal?        @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount     Int             @default(0) @map("rating_count")
+  reviewStatus    String          @default("draft") @map("review_status")
+  submittedAt     DateTime?       @map("submitted_at") @db.Timestamptz(6)
+  reviewedAt      DateTime?       @map("reviewed_at") @db.Timestamptz(6)
+  reviewedBy      String?         @map("reviewed_by") @db.Uuid
+  reviewer        Profile?        @relation("ProductReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewNotes     String?         @map("review_notes")
 
+  dailyStats         ProductDailyStat[]
+  moderationLog      ProductModerationLog[]
+  variants           ProductVariant[]
+  merchandisingRules MerchandisingRule[]
+  clicks             ProductClick[]
+  saves              ProductSave[]
+  orderItems         OrderItem[]
+  reviews            ProductReview[]
+
+  @@unique([sellerId, slug])
+  @@map("products")
+}
+
+model ProductDailyStat {
+  productId   String   @map("product_id") @db.Uuid
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  day         DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+
+  @@id([productId, day])
+  @@map("product_daily_stats")
+}
+
+/// idx_seller_members_user (plain btree on user_id) exists in SQL only.
+model SellerMember {
+  sellerId  String           @map("seller_id") @db.Uuid
+  seller    Seller           @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  userId    String           @map("user_id") @db.Uuid
+  user      Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      ClubRole         @default(member)
+  status    MembershipStatus @default(pending)
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@id([sellerId, userId])
+  @@map("seller_members")
+}
+
+/// KYC and payout details, never publicly readable. CHECKs: business_type IN ('individual',
+/// 'proprietorship','partnership','llp','private_limited','public_limited','other'); gstin and pan
+/// match the Indian formats; kyc_status IN ('not_started','submitted','verified','rejected');
+/// payout_provider IN ('razorpay','stripe','cashfree','manual').
+model SellerPrivate {
+  sellerId            String    @id @map("seller_id") @db.Uuid
+  seller              Seller    @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  legalName           String?   @map("legal_name")
+  businessType        String?   @map("business_type")
+  gstin               String?
+  pan                 String?
+  registeredAddress   Json?     @map("registered_address")
+  kycStatus           String    @default("not_started") @map("kyc_status")
+  kycVerifiedAt       DateTime? @map("kyc_verified_at") @db.Timestamptz(6)
+  kycNotes            String?   @map("kyc_notes")
+  payoutProvider      String?   @map("payout_provider")
+  payoutAccountId     String?   @map("payout_account_id")
+  agreementVersion    String?   @map("agreement_version")
+  agreementAcceptedAt DateTime? @map("agreement_accepted_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("seller_private")
+}
+
+/// Append-only, written by the log_product_review trigger. `id` is GENERATED ALWAYS AS IDENTITY.
+model ProductModerationLog {
+  id         BigInt   @id @default(autoincrement())
+  productId  String   @map("product_id") @db.Uuid
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  actorId    String?  @map("actor_id") @db.Uuid
+  actor      Profile? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus String?  @map("from_status")
+  toStatus   String   @map("to_status")
+  note       String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("product_moderation_log")
+}
+
+/// CHECKs: price_inr/mrp_inr >= 0; stock_qty >= 0; reserved_qty >= 0 and <= stock_qty;
+/// low_stock_threshold >= 0. `price_inr` NULL means "use the product price".
+/// idx_product_variants_product is partial (WHERE is_active), SQL only.
+model ProductVariant {
+  id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId         String      @map("product_id") @db.Uuid
+  product           Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku               String
+  optionSize        String?     @map("option_size")
+  optionColor       String?     @map("option_color")
+  attributes        Json        @default("{}")
+  priceInr          Int?        @map("price_inr")
+  mrpInr            Int?        @map("mrp_inr")
+  stockQty          Int         @default(0) @map("stock_qty")
+  reservedQty       Int         @default(0) @map("reserved_qty")
+  lowStockThreshold Int         @default(5) @map("low_stock_threshold")
+  isActive          Boolean     @default(true) @map("is_active")
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+
+  @@unique([productId, sku])
   @@map("product_variants")
+}
+
+/// Rules deciding which products appear against which events. CHECKs: distances >= 0 with max >= min;
+/// days_before_* >= 0 with max >= min. idx_merch_rules_sports is GIN + partial, SQL only.
+model MerchandisingRule {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerId        String          @map("seller_id") @db.Uuid
+  seller          Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  productId       String          @map("product_id") @db.Uuid
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sportTypes      SportCategory[] @default([]) @map("sport_types")
+  disciplineSlugs String[]        @default([]) @map("discipline_slugs")
+  ageCategories   AgeCategory[]   @default([]) @map("age_categories")
+  minDistanceKm   Decimal?        @map("min_distance_km") @db.Decimal(7, 3)
+  maxDistanceKm   Decimal?        @map("max_distance_km") @db.Decimal(7, 3)
+  daysBeforeMax   Int?            @map("days_before_max")
+  daysBeforeMin   Int?            @map("days_before_min")
+  isSponsored     Boolean         @default(false) @map("is_sponsored")
+  priority        Int             @default(100)
+  isActive        Boolean         @default(true) @map("is_active")
+  startsAt        DateTime?       @map("starts_at") @db.Timestamptz(6)
+  endsAt          DateTime?       @map("ends_at") @db.Timestamptz(6)
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("merchandising_rules")
+}
+
+/// `id` is GENERATED ALWAYS AS IDENTITY. CHECK: source IN ('homepage_rail','event_page','shop',
+/// 'search','notification').
+model ProductClick {
+  id        BigInt   @id @default(autoincrement())
+  productId String   @map("product_id") @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?  @map("user_id") @db.Uuid
+  user      Profile? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventId   String?  @map("event_id") @db.Uuid
+  event     Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  source    String
+  sessionId String?  @map("session_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("product_clicks")
+}
+
+/// CHECK: pincode ~ '^[1-9][0-9]{5}$'. user_addresses_one_default is a partial unique index
+/// (one default per user, WHERE is_default), SQL only.
+model UserAddress {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String?
+  fullName  String   @map("full_name")
+  phone     String
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("user_addresses")
+}
+
+model ProductSave {
+  userId    String   @map("user_id") @db.Uuid
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String   @map("product_id") @db.Uuid
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@id([userId, productId])
+  @@map("product_saves")
+}
+
+model Cart {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String     @unique @map("user_id") @db.Uuid
+  user      Profile    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  updatedAt DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+/// CHECK: quantity BETWEEN 1 AND 20.
+model CartItem {
+  cartId    String         @map("cart_id") @db.Uuid
+  cart      Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String         @map("variant_id") @db.Uuid
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity  Int
+  addedAt   DateTime       @default(now()) @map("added_at") @db.Timestamptz(6)
+
+  @@id([cartId, variantId])
+  @@map("cart_items")
+}
+
+/// Table `orders`. Named CheckoutOrder because the phantom trading model `order` (table "order",
+/// ADR-003) would collide on the generated client delegate `prisma.order`.
+/// CHECKs: order_kind IN ('merch','tickets','mixed'); currency = 'INR'; money columns >= 0;
+/// total_inr = subtotal_inr + shipping_inr + tax_inr + fee_inr - discount_inr;
+/// order_kind = 'tickets' OR shipping_address IS NOT NULL.
+model CheckoutOrder {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderNumber     String      @unique @default(dbgenerated("'GA-' || to_char(now(), 'YYMMDD') || '-' || upper(substr(md5(gen_random_uuid()::text), 1, 6))")) @map("order_number")
+  userId          String      @map("user_id") @db.Uuid
+  user            Profile     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  orderKind       String      @default("merch") @map("order_kind")
+  status          OrderStatus @default(pending_payment)
+  currency        String      @default("INR")
+  subtotalInr     Int         @map("subtotal_inr")
+  shippingInr     Int         @default(0) @map("shipping_inr")
+  discountInr     Int         @default(0) @map("discount_inr")
+  taxInr          Int         @default(0) @map("tax_inr")
+  feeInr          Int         @default(0) @map("fee_inr")
+  totalInr        Int         @map("total_inr")
+  couponCode      String?     @map("coupon_code")
+  shippingAddress Json?       @map("shipping_address")
+  billingAddress  Json?       @map("billing_address")
+  eventContextId  String?     @map("event_context_id") @db.Uuid
+  eventContext    Event?      @relation(fields: [eventContextId], references: [id], onDelete: SetNull)
+  placedAt        DateTime    @default(now()) @map("placed_at") @db.Timestamptz(6)
+  paidAt          DateTime?   @map("paid_at") @db.Timestamptz(6)
+  cancelledAt     DateTime?   @map("cancelled_at") @db.Timestamptz(6)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  sellerOrders      SellerOrder[]
+  payments          Payment[]
+  couponRedemptions CouponRedemption[]
+  tickets           Ticket[]
+
+  @@map("orders")
+}
+
+/// One slice of a CheckoutOrder per seller. CHECK: total_inr = subtotal_inr + shipping_inr + tax_inr.
+/// Money columns are frozen against non-staff updates by guard_seller_order_money.
+model SellerOrder {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId         String            @map("order_id") @db.Uuid
+  order           CheckoutOrder     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sellerId        String            @map("seller_id") @db.Uuid
+  seller          Seller            @relation(fields: [sellerId], references: [id], onDelete: Restrict)
+  status          SellerOrderStatus @default(pending)
+  subtotalInr     Int               @map("subtotal_inr")
+  shippingInr     Int               @default(0) @map("shipping_inr")
+  taxInr          Int               @default(0) @map("tax_inr")
+  totalInr        Int               @map("total_inr")
+  commissionInr   Int               @default(0) @map("commission_inr")
+  shippingAddress Json              @map("shipping_address")
+  acceptedAt      DateTime?         @map("accepted_at") @db.Timestamptz(6)
+  shippedAt       DateTime?         @map("shipped_at") @db.Timestamptz(6)
+  deliveredAt     DateTime?         @map("delivered_at") @db.Timestamptz(6)
+  cancelledAt     DateTime?         @map("cancelled_at") @db.Timestamptz(6)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  items      OrderItem[]
+  shipments  Shipment[]
+  payoutItem SellerPayoutItem?
+
+  @@unique([orderId, sellerId])
+  @@map("seller_orders")
+}
+
+/// Snapshot columns keep the line readable after the product or variant is deleted.
+model OrderItem {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerOrderId  String          @map("seller_order_id") @db.Uuid
+  sellerOrder    SellerOrder     @relation(fields: [sellerOrderId], references: [id], onDelete: Cascade)
+  productId      String?         @map("product_id") @db.Uuid
+  product        Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variantId      String?         @map("variant_id") @db.Uuid
+  variant        ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  titleSnapshot  String          @map("title_snapshot")
+  skuSnapshot    String?         @map("sku_snapshot")
+  quantity       Int
+  unitPriceInr   Int             @map("unit_price_inr")
+  gstRate        Decimal?        @map("gst_rate") @db.Decimal(4, 2)
+  taxInr         Int             @default(0) @map("tax_inr")
+  lineTotalInr   Int             @map("line_total_inr")
+  eventContextId String?         @map("event_context_id") @db.Uuid
+  eventContext   Event?          @relation(fields: [eventContextId], references: [id], onDelete: SetNull)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  refunds        Refund[]
+  returnRequests ReturnRequest[]
+  reviews        ProductReview[]
+
+  @@map("order_items")
+}
+
+/// CHECK: provider IN ('razorpay','stripe','cashfree'). `method` is 'upi'|'card'|'netbanking'|'wallet',
+/// never card numbers.
+model Payment {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId           String           @map("order_id") @db.Uuid
+  order             CheckoutOrder    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider          String
+  providerOrderId   String?          @map("provider_order_id")
+  providerPaymentId String?          @unique @map("provider_payment_id")
+  amountInr         Int              @map("amount_inr")
+  status            PaymentTxnStatus @default(created)
+  method            String?
+  failureReason     String?          @map("failure_reason")
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+  refunds           Refund[]
+
+  @@map("payments")
+}
+
+/// CHECKs: amount_inr > 0; status IN ('pending','processed','failed').
+model Refund {
+  id               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paymentId        String     @map("payment_id") @db.Uuid
+  payment          Payment    @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  orderItemId      String?    @map("order_item_id") @db.Uuid
+  orderItem        OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: SetNull)
+  amountInr        Int        @map("amount_inr")
+  providerRefundId String?    @unique @map("provider_refund_id")
+  status           String     @default("pending")
+  reason           String?
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("refunds")
+}
+
+/// CHECK: status IN ('label_created','in_transit','out_for_delivery','delivered','returned','lost').
+model Shipment {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerOrderId  String      @map("seller_order_id") @db.Uuid
+  sellerOrder    SellerOrder @relation(fields: [sellerOrderId], references: [id], onDelete: Cascade)
+  carrier        String?
+  trackingNumber String?     @map("tracking_number")
+  trackingUrl    String?     @map("tracking_url")
+  labelUrl       String?     @map("label_url")
+  status         String      @default("label_created")
+  shippedAt      DateTime?   @map("shipped_at") @db.Timestamptz(6)
+  deliveredAt    DateTime?   @map("delivered_at") @db.Timestamptz(6)
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime    @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("shipments")
+}
+
+/// CHECKs: quantity > 0; status IN ('requested','approved','rejected','received','refunded').
+model ReturnRequest {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderItemId String    @map("order_item_id") @db.Uuid
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  userId      String    @map("user_id") @db.Uuid
+  user        Profile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity    Int
+  reason      String
+  status      String    @default("requested")
+  sellerNote  String?   @map("seller_note")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("return_requests")
+}
+
+/// Owned by a seller (0021), an organiser (0022), or neither (platform-wide); never both
+/// (CHECK coupons_single_owner). CHECKs: discount_type IN ('percent','flat'); discount_value > 0 and
+/// <= 100 when percent; min_order_inr >= 0; max_discount_inr > 0; usage_limit > 0; per_user_limit > 0;
+/// used_count >= 0. coupons_code_key is a unique index on upper(code), so codes are unique
+/// case-insensitively in SQL; Prisma cannot express that, hence no @unique on `code`.
+model Coupon {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String
+  sellerId          String?            @map("seller_id") @db.Uuid
+  seller            Seller?            @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  discountType      String             @map("discount_type")
+  discountValue     Int                @map("discount_value")
+  minOrderInr       Int                @default(0) @map("min_order_inr")
+  maxDiscountInr    Int?               @map("max_discount_inr")
+  usageLimit        Int?               @map("usage_limit")
+  perUserLimit      Int                @default(1) @map("per_user_limit")
+  usedCount         Int                @default(0) @map("used_count")
+  startsAt          DateTime?          @map("starts_at") @db.Timestamptz(6)
+  endsAt            DateTime?          @map("ends_at") @db.Timestamptz(6)
+  isActive          Boolean            @default(true) @map("is_active")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  // Migration 0022.
+  organizerId       String?            @map("organizer_id") @db.Uuid
+  organizer         Organizer?         @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  eventId           String?            @map("event_id") @db.Uuid
+  event             Event?             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  unlocksCategoryId String?            @map("unlocks_category_id") @db.Uuid
+  unlocksCategory   EventCategory?     @relation(fields: [unlocksCategoryId], references: [id], onDelete: SetNull)
+  redemptions       CouponRedemption[]
+
+  @@map("coupons")
+}
+
+model CouponRedemption {
+  couponId   String        @map("coupon_id") @db.Uuid
+  coupon     Coupon        @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  orderId    String        @map("order_id") @db.Uuid
+  order      CheckoutOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId     String        @map("user_id") @db.Uuid
+  user       Profile       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountInr  Int           @map("amount_inr")
+  redeemedAt DateTime      @default(now()) @map("redeemed_at") @db.Timestamptz(6)
+
+  @@id([couponId, orderId])
+  @@map("coupon_redemptions")
+}
+
+/// CHECKs: period_end >= period_start; net_inr = gross_inr - commission_inr - refunds_inr - tcs_inr -
+/// tds_inr; status IN ('scheduled','processing','paid','failed','on_hold').
+model SellerPayout {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerId           String             @map("seller_id") @db.Uuid
+  seller             Seller             @relation(fields: [sellerId], references: [id], onDelete: Restrict)
+  periodStart        DateTime           @map("period_start") @db.Date
+  periodEnd          DateTime           @map("period_end") @db.Date
+  grossInr           Int                @map("gross_inr")
+  commissionInr      Int                @default(0) @map("commission_inr")
+  refundsInr         Int                @default(0) @map("refunds_inr")
+  tcsInr             Int                @default(0) @map("tcs_inr")
+  tdsInr             Int                @default(0) @map("tds_inr")
+  netInr             Int                @map("net_inr")
+  status             String             @default("scheduled")
+  providerTransferId String?            @unique @map("provider_transfer_id")
+  paidAt             DateTime?          @map("paid_at") @db.Timestamptz(6)
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  items              SellerPayoutItem[]
+
+  @@map("seller_payouts")
+}
+
+/// A seller order can be paid out once: seller_payout_items_once is a unique index on seller_order_id.
+model SellerPayoutItem {
+  payoutId      String       @map("payout_id") @db.Uuid
+  payout        SellerPayout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  sellerOrderId String       @unique(map: "seller_payout_items_once") @map("seller_order_id") @db.Uuid
+  sellerOrder   SellerOrder  @relation(fields: [sellerOrderId], references: [id], onDelete: Restrict)
+  amountInr     Int          @map("amount_inr")
+
+  @@id([payoutId, sellerOrderId])
+  @@map("seller_payout_items")
+}
+
+/// CHECKs: rating BETWEEN 1 AND 5; char_length(body) <= 4000. Insert policy requires a delivered order item.
+model ProductReview {
+  id          String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId   String           @map("product_id") @db.Uuid
+  product     Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId      String           @map("user_id") @db.Uuid
+  user        Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItemId String           @map("order_item_id") @db.Uuid
+  orderItem   OrderItem        @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  rating      Int              @db.SmallInt
+  body        String?
+  status      ModerationStatus @default(published)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([productId, userId])
+  @@map("product_reviews")
+}
+
+// ---------------------------------------------------------------------------
+// Ticketing and private events — migration 0022.
+// ---------------------------------------------------------------------------
+
+enum TicketStatus {
+  reserved
+  confirmed
+  checked_in
+  cancelled
+  refunded
+  transferred
+  no_show
+
+  @@map("ticket_status")
+}
+
+/// Same shape and guard trigger (guard_seller_kyc) as SellerPrivate. CHECKs: business_type also allows
+/// 'trust_society'; gstin/pan formats; kyc_status; payout_provider.
+model OrganizerPrivate {
+  organizerId         String    @id @map("organizer_id") @db.Uuid
+  organizer           Organizer @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  legalName           String?   @map("legal_name")
+  businessType        String?   @map("business_type")
+  gstin               String?
+  pan                 String?
+  registeredAddress   Json?     @map("registered_address")
+  kycStatus           String    @default("not_started") @map("kyc_status")
+  kycVerifiedAt       DateTime? @map("kyc_verified_at") @db.Timestamptz(6)
+  kycNotes            String?   @map("kyc_notes")
+  payoutProvider      String?   @map("payout_provider")
+  payoutAccountId     String?   @map("payout_account_id")
+  agreementVersion    String?   @map("agreement_version")
+  agreementAcceptedAt DateTime? @map("agreement_accepted_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("organizer_private")
+}
+
+/// Time slots within a ticket type. CHECKs: capacity > 0; slots_taken >= 0.
+model EventWave {
+  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId String        @map("category_id") @db.Uuid
+  category   EventCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  label      String
+  startTime  DateTime?     @map("start_time") @db.Time(6)
+  capacity   Int?
+  slotsTaken Int           @default(0) @map("slots_taken")
+  sortOrder  Int           @default(0) @map("sort_order")
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  tickets    Ticket[]
+
+  @@unique([categoryId, label])
+  @@map("event_waves")
+}
+
+/// Organiser-defined registration form. CHECKs: field_key ~ '^[a-z][a-z0-9_]{1,40}$'; field_type IN
+/// ('text','textarea','number','date','select','multiselect','checkbox','tshirt_size','phone','email',
+/// 'emergency_contact','blood_group','club','file'). category_id NULL means "every ticket type".
+model EventFormField {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId    String         @map("event_id") @db.Uuid
+  event      Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId String?        @map("category_id") @db.Uuid
+  category   EventCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  fieldKey   String         @map("field_key")
+  label      String
+  fieldType  String         @map("field_type")
+  options    Json?
+  isRequired Boolean        @default(false) @map("is_required")
+  helpText   String?        @map("help_text")
+  sortOrder  Int            @default(0) @map("sort_order")
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([eventId, fieldKey])
+  @@map("event_form_fields")
+}
+
+/// CHECK: role IN ('admin','checkin','volunteer').
+model EventStaff {
+  eventId   String   @map("event_id") @db.Uuid
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id") @db.Uuid
+  user      Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String   @default("volunteer")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@id([eventId, userId])
+  @@map("event_staff")
+}
+
+/// CHECKs: email matches a basic address pattern; email IS NOT NULL OR user_id IS NOT NULL;
+/// status IN ('pending','accepted','declined','revoked'). idx_event_invites_email (expression, partial)
+/// and idx_event_invites_user (partial) exist in SQL only.
+model EventInvite {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId   String   @map("event_id") @db.Uuid
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  email     String?
+  userId    String?  @map("user_id") @db.Uuid
+  user      Profile? @relation("EventInviteUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy String?  @map("invited_by") @db.Uuid
+  inviter   Profile? @relation("EventInviteSender", fields: [invitedBy], references: [id], onDelete: SetNull)
+  status    String   @default("pending")
+  token     String   @unique @default(dbgenerated("encode(gen_random_bytes(16), 'hex')"))
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("event_invites")
+}
+
+/// Platform tickets. CHECKs: attendee_gender IN ('female','male','non_binary','prefer_not_to_say');
+/// attendee_birth_year BETWEEN 1900 AND 2100; price_inr/fee_inr/discount_inr >= 0.
+/// tickets_bib_per_event is a partial unique index on (event_id, bib_number) WHERE bib_number IS NOT
+/// NULL: SQL only. Capacity is enforced by the enforce_ticket_capacity trigger.
+model Ticket {
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId             String          @map("order_id") @db.Uuid
+  order               CheckoutOrder   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  eventId             String          @map("event_id") @db.Uuid
+  event               Event           @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  categoryId          String          @map("category_id") @db.Uuid
+  category            EventCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  waveId              String?         @map("wave_id") @db.Uuid
+  wave                EventWave?      @relation(fields: [waveId], references: [id], onDelete: SetNull)
+  priceTierId         String?         @map("price_tier_id") @db.Uuid
+  priceTier           EventPriceTier? @relation(fields: [priceTierId], references: [id], onDelete: SetNull)
+  buyerId             String          @map("buyer_id") @db.Uuid
+  buyer               Profile         @relation("TicketBuyer", fields: [buyerId], references: [id], onDelete: Restrict)
+  attendeeUserId      String?         @map("attendee_user_id") @db.Uuid
+  attendee            Profile?        @relation("TicketAttendee", fields: [attendeeUserId], references: [id], onDelete: SetNull)
+  attendeeName        String          @map("attendee_name")
+  attendeeEmail       String?         @map("attendee_email")
+  attendeePhone       String?         @map("attendee_phone")
+  attendeeGender      String?         @map("attendee_gender")
+  attendeeBirthYear   Int?            @map("attendee_birth_year") @db.SmallInt
+  // Answers keyed by event_form_fields.field_key.
+  formAnswers         Json            @default("{}") @map("form_answers")
+  bibNumber           String?         @map("bib_number")
+  status              TicketStatus    @default(reserved)
+  reservedUntil       DateTime?       @map("reserved_until") @db.Timestamptz(6)
+  qrToken             String          @unique @default(dbgenerated("encode(gen_random_bytes(16), 'hex')")) @map("qr_token")
+  priceInr            Int             @map("price_inr")
+  feeInr              Int             @default(0) @map("fee_inr")
+  discountInr         Int             @default(0) @map("discount_inr")
+  checkedInAt         DateTime?       @map("checked_in_at") @db.Timestamptz(6)
+  checkedInBy         String?         @map("checked_in_by") @db.Uuid
+  checkedInByUser     Profile?        @relation("TicketCheckedInBy", fields: [checkedInBy], references: [id], onDelete: SetNull)
+  certificateUrl      String?         @map("certificate_url")
+  // Self relation: the replacement ticket issued when this one is transferred.
+  transferredTo       String?         @map("transferred_to") @db.Uuid
+  transferredToTicket Ticket?         @relation("TicketTransfer", fields: [transferredTo], references: [id], onDelete: SetNull)
+  transferredFrom     Ticket[]        @relation("TicketTransfer")
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  payoutItem OrganizerPayoutItem?
+
+  @@map("tickets")
+}
+
+/// CHECKs: period_end >= period_start; net_inr = gross_inr - platform_fee_inr - refunds_inr - tcs_inr -
+/// tds_inr; status IN ('scheduled','processing','paid','failed','on_hold').
+model OrganizerPayout {
+  id                 String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizerId        String                @map("organizer_id") @db.Uuid
+  organizer          Organizer             @relation(fields: [organizerId], references: [id], onDelete: Restrict)
+  eventId            String?               @map("event_id") @db.Uuid
+  event              Event?                @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  periodStart        DateTime              @map("period_start") @db.Date
+  periodEnd          DateTime              @map("period_end") @db.Date
+  grossInr           Int                   @map("gross_inr")
+  platformFeeInr     Int                   @default(0) @map("platform_fee_inr")
+  refundsInr         Int                   @default(0) @map("refunds_inr")
+  tcsInr             Int                   @default(0) @map("tcs_inr")
+  tdsInr             Int                   @default(0) @map("tds_inr")
+  netInr             Int                   @map("net_inr")
+  status             String                @default("scheduled")
+  providerTransferId String?               @unique @map("provider_transfer_id")
+  paidAt             DateTime?             @map("paid_at") @db.Timestamptz(6)
+  createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  items              OrganizerPayoutItem[]
+
+  @@map("organizer_payouts")
+}
+
+/// A ticket can be paid out once: organizer_payout_items_once is a unique index on ticket_id.
+model OrganizerPayoutItem {
+  payoutId  String          @map("payout_id") @db.Uuid
+  payout    OrganizerPayout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  ticketId  String          @unique(map: "organizer_payout_items_once") @map("ticket_id") @db.Uuid
+  ticket    Ticket          @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+  amountInr Int             @map("amount_inr")
+
+  @@id([payoutId, ticketId])
+  @@map("organizer_payout_items")
+}
+
+/// CHECKs: audience IN ('registrants','checked_in','waitlist','followers','interested');
+/// char_length(body) <= 4000; status IN ('draft','scheduled','sending','sent','failed','cancelled').
+model OrganizerBroadcast {
+  id             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  organizerId    String              @map("organizer_id") @db.Uuid
+  organizer      Organizer           @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  eventId        String?             @map("event_id") @db.Uuid
+  event          Event?              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  channel        NotificationChannel
+  audience       String
+  // e.g. {"category_id": "...", "city": "Pune"}
+  segment        Json                @default("{}")
+  subject        String?
+  body           String
+  status         String              @default("draft")
+  scheduledAt    DateTime?           @map("scheduled_at") @db.Timestamptz(6)
+  sentAt         DateTime?           @map("sent_at") @db.Timestamptz(6)
+  recipientCount Int?                @map("recipient_count")
+  createdBy      String?             @map("created_by") @db.Uuid
+  creator        Profile?            @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt      DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime            @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("organizer_broadcasts")
 }

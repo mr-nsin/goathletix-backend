@@ -189,10 +189,46 @@ columns, price tiers. Each one switches on its hidden section when its data exis
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Supabase reachable | **fail** | proxy `504 Unknown Host` for the project host; `api.github.com` 200 through the same proxy (2026-09-30) |
-| Backend starts | pass | Nest boots and maps all routes; every `findAll` logs `fetch failed` |
-| Rail coverage re-measured | not run | blocked by the above |
+| Supabase reachable | **pass** (2026-10-05) | was failing 2026-09-30 (paused free-tier project); owner restored it; `GET /events` 200, 10,100 rows |
+| Backend starts | pass | Nest boots and maps all routes |
+| Rail coverage re-measured | pass (2026-10-05) | upcoming 7,553 · featured 5 · this weekend 18 · Bengaluru next 30 days 3 · athletics 0 · skating 0 · kids/sub-junior/junior 0 · discipline-tagged 0 |
+| Migrations 0012–0020 applied | **not run** | written and syntax-checked; 0 of 24 new tables exist on the live project |
 
 ## Handoff
 
 Not started.
+
+## Update 2026-10-05 — decisions, schema, homepage build
+
+**Decisions ([[03 Decisions/ADR-007-discovery-plus-ticketing|ADR-007]]):** discovery + ticketing (ticketing first);
+public / unlisted / private events; seller products reviewed before sale. Existing 10,100 events are test data.
+
+**Migrations — apply in this order in the Supabase SQL editor** (none applied yet):
+
+| File | Adds |
+| --- | --- |
+| `20261001000012_enum_values.sql` — **run alone first** | new enum values (feed actions incl. `registered`, `postponed`, `waitlisted`, `seller`, `listing_correction`) |
+| `…13_roles_organizers_profiles` | admin/editor/moderator roles, organiser teams + claims, public/private profile split, richer submissions |
+| `…14_event_details_pricing` | start time, calibre flags, featured rank, numeric prices, ticket types (`event_categories`) + early-bird tiers |
+| `…15_geo_cities_discovery` | 53 cities, geo backfill, `events_near()`, `event_counts()` |
+| `…16_results` | results link, official finisher list, claim-your-result |
+| `…17_reviews_media` | event reviews + ratings, photo galleries, moderation guard |
+| `…18_stats_notifications_feed` | daily stats incl. registrations, `trending_events()`, notifications, alerts, live feed |
+| `…19_content_collections` | collections / chips, guides, announcement bar, challenges |
+| `…20_marketplace` | sellers, products (catalogue) |
+| `…21_seller_commerce` | seller teams + KYC, **product review & approval**, variants/stock, merchandising rules, cart, unified orders (gear + tickets), payments, shipments, returns, coupons, seller payouts, product reviews |
+| `…22_ticketing_private_events` | **visibility + publication**, organiser KYC, waves, registration forms, staff, invites, **tickets** with DB-enforced capacity, event promo codes, organiser payouts, broadcasts; replaces the "Public can read events" rule |
+| then `supabase/verify/verify_0012_0022.sql` | read-only checks + a private-event leak check |
+
+**Must ship with 0022 (backend):** every events list/count/search query filters
+`visibility = 'public' AND publication_status = 'published'`; single-event fetch allows `unlisted`/`private` only
+with the access token (and, for private, an authorised user). Until then, do not create unlisted/private events.
+
+**Homepage:** rebuilt from mockup rev 5 on `feat/implement-main-page-mockup` — all 25 sections, centred 1440px
+column with full-bleed bands, live data where the API supports it, sample content tagged "pending" elsewhere,
+no floating bottom ticker. Mobile fixes 2026-10-05: drawer grouped (page anchors, sports, cities, "coming soon"),
+footer accordions closed on first paint, 44px close target, 11px label floor on phones.
+
+**New phases this adds:** checkout + payment provider integration; ticket purchase flow (type → wave → form →
+pay → QR); organiser dashboard (events, ticket types, forms, check-in, broadcasts, payouts); seller dashboard
+(products → review queue → orders → shipments → payouts); admin moderation queues (products, sellers, KYC).

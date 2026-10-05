@@ -1,5 +1,7 @@
 # Product Context: GoAthletix
 
+> **Decisions 2026-10-05 ([[03 Decisions/ADR-007-discovery-plus-ticketing|ADR-007]]):** discovery + ticketing, ticketing first; organisers choose public / unlisted / private visibility; seller products are reviewed and approved before sale. Schema: `supabase/migrations/20261001000012`–`…22`. The 10,100 seeded events are test data. Where this file and `01 Product/Main page design spec.md` §13 disagree, the spec wins.
+
 ## Why the Product Exists
 The active lifestyle segment in India (runners, cyclists, trekkers, triathletes) is booming, but finding events is highly manual. Events are scattered across Instagram posts, WhatsApp groups, and old-school listing sites. We exist to provide a single, clean, mobile-responsive gateway for event discovery and season planning.
 
@@ -17,7 +19,7 @@ Based on the latest Main Page Mockup, the product has evolved into a robust thre
 - **Taxonomy Filtering:** Complex tagging (age brackets, formats, difficulty) mapped to scrollable chip filters.
 
 ### 2. Scarcity & Real-Time Engagement
-- **Live Activity Ticker:** A persistent bottom strip broadcasting real-time platform actions ("Rahul just registered").
+- **Live Activity Feed:** An in-page "Live" section after "Happening near you" plus a notifications panel on the header bell — **never a floating strip at the bottom of the screen** (owner, 2026-10-05). Entries are anonymised to role + city ("A runner in Pune registered for …"); a person's name appears only if they made their profile public.
 - **Dynamic Announcement Bar:** Admin-driven top banner for urgent notifications (e.g., event registration closing).
 - **Inventory/Capacity Tracking:** Event cards displaying visual progress bars when events reach high capacity (e.g., 92% full).
 

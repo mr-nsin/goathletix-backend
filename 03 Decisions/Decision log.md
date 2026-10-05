@@ -15,3 +15,5 @@ Create one ADR from [[99 Templates/Decision record|the decision template]] for e
 | [[03 Decisions/ADR-003-phantom-trading-models\|ADR-003]] | Remove phantom trading-app models; there is no shared database | accepted | 2026-09-09 |
 | [[03 Decisions/ADR-004-supabase-rest-data-path\|ADR-004]] | Stay on Supabase REST; do not adopt the Prisma rewrite | accepted | 2026-09-09 |
 | [[03 Decisions/ADR-005-event-imagery\|ADR-005]] | How event imagery works (placeholders now, column next) | **proposed** | 2026-09-09 |
+| [[03 Decisions/ADR-006-sport-taxonomy-two-axis\|ADR-006]] | Two-axis sport taxonomy (family × category × discipline) | accepted | 2026-09-16 |
+| [[03 Decisions/ADR-007-discovery-plus-ticketing\|ADR-007]] | Discovery + ticketing (ticketing first); moderated seller marketplace; public / unlisted / private events | accepted | 2026-10-05 |

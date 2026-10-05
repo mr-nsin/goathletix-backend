@@ -21,7 +21,7 @@ exist** or **help someone act on one**. Anything that does neither comes off.
 | Pillar | What it means in the UI |
 | --- | --- |
 | **Completeness** | Data is the product. Show volume and density; never a taxonomy wall. |
-| **Neutrality** | We link to the organiser and never own the transaction. "Register" always leaves the site. |
+| **Transparency** *(was "Neutrality" — replaced by [[03 Decisions/ADR-007-discovery-plus-ticketing\|ADR-007]], 2026-10-05)* | We sell entries for organisers who choose to, and link out for those who don't — and the card always says which. Fees, refund policy and the organiser behind every ticket are shown before payment. See §13. |
 | **Inclusion** | Every age, every sport. A 10-year-old skater counts as much as a sub-4 marathoner. |
 | **Trust** | No fabricated listings. No "Popular" without a signal behind it. |
 
@@ -635,3 +635,62 @@ Every animation honours `prefers-reduced-motion`. **This development machine rep
 static here — correctly. For design review, a **▶ Preview motion** button appears in the footer bar
 only when reduced motion is active; it forces motion on and is remembered per viewer. `?motion=on`
 does the same in a normal browser; the Browser pane drops query strings, so use the button there.
+
+---
+
+## 13. Discovery + ticketing, public/private events, moderated sellers (2026-10-05)
+
+Decided by the product owner and recorded as [[03 Decisions/ADR-007-discovery-plus-ticketing|ADR-007]]. It
+**replaces the Neutrality pillar** in §1 and every "we never take a cut / never handle your entry fee" line in
+§8, §10 and §11.
+
+### 13a. Two kinds of event, one card
+
+| `events.ticketing_mode` | What "Register" does | Card shows |
+| --- | --- | --- |
+| `platform` | Opens GoAthletix checkout: ticket type → wave → registration form → pay | "Book on GoAthletix", live "N% full" from real `slots_taken` |
+| `external` | Links out to the organiser (`registration_url`) | "Register on organiser site ↗" |
+
+The current 10,100 events are test data (`external`, seeded). The "% full" bar finally has an honest source:
+`event_categories.slots_taken / capacity`, maintained by the database (0022), never typed in by hand.
+
+### 13b. Event visibility — chosen by the organiser
+
+| `visibility` | Who can see it | Where it appears |
+| --- | --- | --- |
+| `public` | Everyone | Discovery, search, rails, sitemap |
+| `unlisted` | Anyone with the share link | Nowhere in listings; reachable by link only |
+| `private` | Invitees, ticket holders, event staff, organiser team | Nowhere; invite + link required |
+
+Plus `publication_status`: `draft` (organiser only) → `published` → `archived`. Rules that follow:
+- Private and unlisted events never appear in rails, counts, search, the live activity feed, or the sitemap.
+- The share link carries a revocable token (`events.access_token`); rotating it invalidates old links.
+- The backend must filter `visibility = 'public' AND publication_status = 'published'` in every list and count
+  query — it uses the service role, so RLS does not protect it. This ships with migration 0022.
+
+### 13c. Ticketing for organisers (productContext "For Organizers")
+
+Ticket types (`event_categories`) with early-bird tiers (`event_price_tiers`), waves with their own capacity,
+custom registration forms (`event_form_fields`: T-shirt size, emergency contact, blood group, club…), hidden
+ticket types unlocked by promo code, booking for friends and family (one `tickets` row per participant), QR
+check-in by event staff, certificates, segmented broadcasts to registrants/followers/waitlist, and payouts net
+of platform fee, refunds and TDS. Capacity is enforced in the database: the last seat cannot be sold twice.
+
+### 13d. Seller marketplace — every product is reviewed before sale
+
+```
+seller applies ──staff──▶ seller active
+seller adds product (draft) ──submit──▶ pending_review ──staff──▶ approved ──▶ visible & buyable
+                                             └──staff──▶ rejected / changes_requested ──edit + resubmit──┘
+```
+- Shoppers only ever see `approved` products of `active` sellers. Changing title, description, images,
+  category, tags or link on an approved product sends it back to review; price and stock edits do not.
+- Every decision is logged (`product_moderation_log`) so the seller sees why a product was rejected.
+- New notifications: product approved / rejected / changes requested.
+
+### 13e. Header and copy changes this implies
+
+- Organiser band: "Listing is free. Sell entries right here — or keep linking to your own registration page."
+  The "₹0 commission, forever" stat is gone (no fee model is decided yet — do not promise a number).
+- Footer note: tickets bought on GoAthletix follow the organiser's refund policy, shown on the event page.
+- The header cart icon now means a real cart (tickets and gear), enabled once sign-in ships.

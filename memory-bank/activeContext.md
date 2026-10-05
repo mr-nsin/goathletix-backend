@@ -21,9 +21,19 @@ LLM pipeline, Algolia, Mem0 and an agent fleet. **None of that exists.** They ar
 
 ## Blocking now (2026-09-30)
 
-- **Supabase is unreachable.** The proxy returns `504 Unknown Host` for the project hostname (GitHub is fine
-  through the same proxy); the backend boots but every `/events` call logs `fetch failed`. Last good access
-  2026-09-16 — most likely a **paused free-tier project**. Restore it from the dashboard before any data work.
+- **Supabase restored 2026-10-05** (it was a paused free-tier project — pauses after ~7 days idle; Pro
+  never pauses). `/events` serves all 10,100 rows again. **Migrations 0012–0022 are written, syntax-checked and mirrored in
+  `schema.prisma` (validate + generate + build pass) but NOT applied** to the live database. git-bash `curl` cannot reach Supabase
+  through the proxy (its CA bundle lacks the corporate root); use Node with `tls.getCACertificates`, as `main.ts` does.
+- **All 10,100 events are synthetic** (`source_id` = `seed_…`, from `scripts/generate_10000_events.py`): names like
+  "Goa Snowboarding 2026", and every `registration_url` is a fabricated `townscript.com/e/...` link — a real
+  company's domain, so "Register" sends visitors to broken pages on Townscript's site. Launch blocker: real
+  ingestion (GA-009) or delete the seed rows before anything is public.
+- **Live data per rail (2026-10-05):** 7,553 upcoming · 5 featured (`is_popular`) · 18 this weekend ·
+  **0** athletics, skating, kids/junior, or any discipline-tagged rows. Bengaluru has only 3 in the next 30 days.
+- **ADR-007 (2026-10-05): discovery + ticketing, ticketing first;** events are public / unlisted / private; seller
+  products are reviewed before sale. Migrations 0012–0022 are written + syntax-checked, **not applied**. The backend
+  visibility filter must ship with 0022 (service role bypasses RLS). Homepage rebuilt on `feat/implement-main-page-mockup`.
 - **Homepage build is planned** as [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]] — six phases from the
   rev-5 mockup; 13 of 23 sections can ship on today's data, the rest self-hide. Blocked on the item above,
   GA-019 landing, and ADR-002 / ADR-005.

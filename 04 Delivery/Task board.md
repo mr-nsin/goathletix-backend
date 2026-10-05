@@ -20,12 +20,13 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 
 ## In progress
 
+- [ ] [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020 Build the homepage from the approved mockup]] — **P0, in progress** on `feat/implement-main-page-mockup` (both repos). Homepage rebuilt on live data; migrations 0012–0022 (incl. ticketing, private events, seller approval — ADR-007) written + mirrored in schema.prisma, **not applied**. Next: apply migrations, backend visibility filter, checkout
 - [ ] [[04 Delivery/GA-019-multiday-date-cutover|GA-019 Multi-day date cutover]] — **in-review, uncommitted.** Migration applied; API/DTO/seed/generators/frontend all cut over; `/events` serving 10,100 live rows. Root cause of the long-standing 500 was TLS interception, now fixed. Multi-day rendering unverified (no multi-day rows exist)
 - [ ] [[04 Delivery/GA-017-searchbar-airbnb-parity|GA-017 Airbnb parity for the hero search bar]] — in-review, uncommitted. Animations unverified (pane does not composite); needs a human browser check
 
 ## Blocked
 
-- [ ] [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020 Build the homepage from the approved mockup]] — **P0, blocked.** Supabase unreachable (proxy `504 Unknown Host`, likely a paused free-tier project); needs GA-019 to land and ADR-002/005 decided. 6 phases; 13 of 23 sections can ship on today's data
+- [ ] —
 
 ## Done
 
