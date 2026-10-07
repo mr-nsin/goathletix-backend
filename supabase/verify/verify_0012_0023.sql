@@ -73,7 +73,8 @@ SELECT 'old public-read rule on events is gone',
        NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'events' AND policyname = 'Public can read events')
 
 UNION ALL
-SELECT 'cities seeded (expect 53)', (SELECT count(*) FROM cities) = 53
+-- 54, not 53: Srinagar exists in both Jammu & Kashmir and Uttarakhand (53 names, 54 city/state pairs).
+SELECT 'cities seeded (expect 54)', (SELECT count(*) FROM cities) = 54
 
 ORDER BY 2, 1;
 

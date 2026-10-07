@@ -192,7 +192,7 @@ columns, price tiers. Each one switches on its hidden section when its data exis
 | Supabase reachable | **pass** (2026-10-05) | was failing 2026-09-30 (paused free-tier project); owner restored it; `GET /events` 200, 10,100 rows |
 | Backend starts | pass | Nest boots and maps all routes |
 | Rail coverage re-measured | pass (2026-10-05) | upcoming 7,553 · featured 5 · this weekend 18 · Bengaluru next 30 days 3 · athletics 0 · skating 0 · kids/sub-junior/junior 0 · discipline-tagged 0 |
-| Migrations 0012–0020 applied | **not run** | written and syntax-checked; 0 of 24 new tables exist on the live project |
+| Migrations 0012–0023 applied | **pass** (2026-10-06) | 84 tables exposed; all 59 new tables + columns present; backfills complete (54 cities, 10,100 events geocoded/priced/public); RPCs respond |
 
 ## Handoff
 
@@ -203,7 +203,7 @@ Not started.
 **Decisions ([[03 Decisions/ADR-007-discovery-plus-ticketing|ADR-007]]):** discovery + ticketing (ticketing first);
 public / unlisted / private events; seller products reviewed before sale. Existing 10,100 events are test data.
 
-**Migrations — apply in this order in the Supabase SQL editor** (none applied yet):
+**Migrations — apply in this order in the Supabase SQL editor** — **all applied and verified 2026-10-06**:
 
 | File | Adds |
 | --- | --- |
