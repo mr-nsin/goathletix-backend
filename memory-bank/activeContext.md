@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-09-09.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-10-08.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -36,9 +36,15 @@ LLM pipeline, Algolia, Mem0 and an agent fleet. **None of that exists.** They ar
 - **ADR-007 (2026-10-05): discovery + ticketing, ticketing first;** events are public / unlisted / private; seller
   products are reviewed before sale. Migrations 0012–0023 are **applied** (2026-10-06). The backend
   visibility filter must ship with 0022 (service role bypasses RLS). Homepage rebuilt on `feat/implement-main-page-mockup`.
-- **Homepage build is planned** as [[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]] — six phases from the
-  rev-5 mockup; 13 of 23 sections can ship on today's data, the rest self-hide. Blocked on the item above,
-  GA-019 landing, and ADR-002 / ADR-005.
+- **Homepage ([[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]]) — state 2026-10-08:** header is
+  Logo | Location | Search | bell · cart | Sign in | List your event | Partner with us (organisers + sellers),
+  row 2 has Blog; the header search hides while the hero search is on screen, has type-ahead (sports, cities,
+  events via `search`, recent searches) and `/` / Ctrl+K. Location is a BookMyShow-style modal (search all 53
+  cities, landmark icons, radius kept). Hero: local count line, sport icon row, "Next up" strip, resume chip,
+  stats + partner band; light background (a dark navy hero was tried and **rejected by the owner**). The sticky
+  filter row is **removed from the homepage** — it moves to a future Explore page. Live activity now rotates
+  inside the announcement bar. **Event card design is frozen** by the owner; three candidate directions live
+  in the mockup's "card directions" section, undecided.
 
 ## Where the product actually stands
 
@@ -89,11 +95,18 @@ Still open:
 - `crawler.py` never calls the `urllib`/`re` it imports; its "extraction" is ~15 hardcoded events
   written to a hardcoded macOS path. GA-009 is a rewrite.
 - `.DS_Store` is still tracked in `goathletix-backend` (GA-012 open).
+- **Forcepoint intermittently blocks Supabase.** When it does, the backend logs an HTML "Access to this site
+  is blocked" page or `fetch failed` and every `/events` call 500s; it clears on its own within minutes. The
+  homepage hides it because Next caches API responses for 5 minutes — probe `curl localhost:3000/events?limit=1`
+  before suspecting code.
+- **Turbopack sometimes misses `globals.css` edits** (TSX hot-reloads, the stylesheet stays stale). Stop the
+  frontend, delete `.next`, restart. Moving the workspace-root lockfile also needed a `.next` wipe.
 
 ## Branch state
 
-- **Both repos are on `codex/ga-019-multiday-date-cutover`, pushed, working trees clean**
-  (backend `7f0e34e`, frontend `69c31e1`, 2026-09-15). Nothing is uncommitted.
+- **Both repos are on `feat/implement-main-page-mockup`, pushed** (2026-10-08). The workspace-root
+  `package.json` / `package-lock.json` / `node_modules` (a stray `headroom-ai` install, not used by the
+  headroom MCP server) were moved out so Turbopack resolves the frontend as its root.
 - `goathletix-frontend/main` is 4 weeks stale and `chore/sync-from-monorepo` has **no merge base**
   with it, so it cannot be merged conventionally. GA-019 branched from the sync branch, so it
   inherits that problem — decide the reconciliation before opening a PR.

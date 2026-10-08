@@ -607,6 +607,146 @@
   @media (prefers-reduced-motion:reduce){
     html:not(.force-motion) *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
   }
+
+  /* ================= card directions (design review, 2026-10-08) =================
+     Three candidate event cards, same three events each. Classes are cv-* so nothing here touches
+     the live .card styles above. */
+  .cvsec{border-top:1px dashed var(--line)}
+  .cvrow{margin-top:26px}
+  .cvlabel{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .cvlabel b{font-size:17px;font-weight:800}
+  .cvlabel span{color:var(--muted);font-size:13.5px}
+  .cvgrid{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 2px 18px;scrollbar-width:none}
+  .cvgrid::-webkit-scrollbar{display:none}
+  .cvgrid > article{flex:0 0 84%;scroll-snap-align:start}
+  @media(min-width:640px){ .cvgrid > article{flex-basis:46%} }
+  @media(min-width:980px){ .cvgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible} .cvgrid > article{flex:none} }
+
+  /* shared pieces */
+  .cv-i{width:15px;height:15px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .cv-run{background:linear-gradient(135deg,#12B4A0 0%,#1F6F8B 55%,#2C3D8F 100%)}
+  .cv-run::before{content:"";position:absolute;inset:0;opacity:.18;
+    background:repeating-linear-gradient(100deg,transparent 0 26px,#fff 26px 28px)}
+  .cv-cyc{background:linear-gradient(135deg,#F0803B 0%,#C2410C 45%,#7A1E52 100%)}
+  .cv-cyc::before{content:"";position:absolute;inset:0;opacity:.16;
+    background:repeating-linear-gradient(-14deg,transparent 0 14px,#fff 14px 15px)}
+  .cv-trail{background:linear-gradient(160deg,#6E9E3E 0%,#2F6B3A 50%,#123829 100%)}
+  .cv-trail::before{content:"";position:absolute;inset:0;opacity:.16;
+    background:repeating-radial-gradient(circle at 70% 120%,transparent 0 16px,#fff 16px 17px)}
+  .cv-glyph{position:absolute;right:-6px;bottom:-10px;width:128px;height:128px;stroke:#fff;fill:none;stroke-width:3.2;
+    stroke-linecap:round;stroke-linejoin:round;opacity:.32}
+  .cv-chip{position:absolute;left:12px;top:12px;z-index:2;font-family:var(--cond);text-transform:uppercase;letter-spacing:.09em;
+    font-weight:700;font-size:11px;color:#fff;background:rgba(10,14,30,.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border-radius:999px;padding:5px 10px}
+  .cv-urgent{position:absolute;left:12px;top:42px;z-index:2;font-weight:700;font-size:12px;color:#fff;background:var(--cta);
+    border-radius:999px;padding:4px 10px}
+  .cv-save{position:absolute;right:10px;top:10px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;background:rgba(255,255,255,.92);color:#141A3E;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .cv-save[aria-pressed="true"]{color:var(--cta)}
+  .cv-save[aria-pressed="true"] .cv-i{fill:currentColor}
+  .cv-meta{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13.5px;margin-top:5px}
+  .cv-meta b{color:var(--ink);font-weight:600}
+  .cv-dists{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+  .cv-dists button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;cursor:pointer;
+    font-family:var(--cond);font-weight:700;font-size:13px;letter-spacing:.05em;padding:5px 12px}
+  .cv-dists button:hover{border-color:var(--accent)}
+  .cv-dists button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+  .cv-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cv-badges span{display:inline-flex;align-items:center;gap:4px}
+  .cv-price{font-size:21px;font-weight:800;line-height:1;color:var(--ink)}
+  .cv-price small{font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-left:4px}
+  .cv-spots{display:block;height:5px;border-radius:999px;background:var(--line);margin-top:8px;overflow:hidden;width:130px}
+  .cv-spots > span{display:block;height:100%;width:var(--p);border-radius:inherit;background:var(--grad)}
+  .cv-spots.hot > span{background:var(--cta)}
+  .cv-spotsl{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+  .cv-spotsl.hot{color:var(--cta);font-weight:600}
+  .cv-reg{border:none;border-radius:11px;background:var(--grad);color:var(--accent-ink);font-weight:700;font-size:14.5px;
+    padding:11px 16px;cursor:pointer;white-space:nowrap;box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 24%,transparent)}
+  .cv-org{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .cv-org b{color:var(--ink);font-weight:600}
+  .cv-av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800;flex:0 0 auto}
+  .cv-tick{color:#2F80ED}
+  .cv-elev{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+  .cv-elev > svg:first-child{width:96px;height:24px;flex:0 0 auto}
+  .cv-elev b{color:var(--ink)}
+
+  /* ---------- A · Ticket stub ---------- */
+  .cvA{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 1px 2px -1px rgba(20,26,62,.10),0 6px 10px -5px rgba(20,26,62,.14);transition:transform .2s ease}
+  .cvA:hover{transform:translateY(-4px)}
+  .cvA-img{position:relative;height:150px;overflow:hidden}
+  .cvA-body{padding:14px 16px 4px;flex:1}
+  .cvA h3,.cvC h3{font-size:17.5px;font-weight:800;line-height:1.2;color:var(--ink)}
+  .cvA-perf{position:relative;height:22px;margin-top:10px}
+  .cvA-perf::after{content:"";position:absolute;left:16px;right:16px;top:50%;border-top:2px dashed var(--line)}
+  .cvA-perf i{position:absolute;top:50%;width:22px;height:22px;border-radius:50%;background:var(--bg);transform:translateY(-50%);
+    box-shadow:inset 0 0 0 1px var(--line)}
+  .cvA-perf i:first-child{left:-12px} .cvA-perf i:last-child{right:-12px}
+  .cvA-stub{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 16px 12px}
+  .cvA .cv-org{padding:10px 16px 12px;border-top:1px solid var(--line);background:var(--surface-2)}
+
+  /* ---------- B · Poster-first ---------- */
+  .cvB{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/5;min-height:420px;color:#fff;
+    box-shadow:0 2px 4px -2px rgba(20,26,62,.12),0 16px 24px -12px rgba(20,26,62,.28)}
+  .cvB-poster{position:absolute;inset:0}
+  .cvB-poster .cv-glyph{width:210px;height:210px;right:-20px;bottom:auto;top:30px;opacity:.28}
+  .cvB-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,24,0) 30%,rgba(6,10,24,.55) 60%,rgba(6,10,24,.92) 100%)}
+  .cvB-date{position:absolute;left:12px;top:12px;z-index:2;background:#fff;color:#141A3E;border-radius:12px;text-align:center;
+    min-width:52px;padding:6px 8px 5px;box-shadow:0 4px 12px rgba(0,0,0,.22)}
+  .cvB-date b{display:block;font-size:22px;font-weight:800;line-height:1}
+  .cvB-date span{font-family:var(--cond);font-size:11px;font-weight:700;letter-spacing:.1em}
+  .cvB .cv-urgent{left:72px;top:16px}
+  .cvB-info{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px 16px 16px;transition:transform .28s ease,opacity .2s ease}
+  .cvB-k{font-family:var(--cond);text-transform:uppercase;letter-spacing:.12em;font-size:11.5px;font-weight:700;opacity:.85}
+  .cvB h3{font-size:23px;font-weight:800;line-height:1.1;margin-top:4px;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+  .cvB-m{font-size:13.5px;opacity:.9;margin-top:6px}
+  .cvB-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+  .cvB-foot .cv-price{color:#fff;font-size:20px}
+  .cvB-foot .cv-price small{color:rgba(255,255,255,.75)}
+  .cvB-qvbtn{position:absolute;right:56px;top:10px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;cursor:pointer;
+    display:grid;place-items:center;background:rgba(255,255,255,.92);color:#141A3E;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .cvB-qv{position:absolute;left:0;right:0;bottom:0;z-index:4;background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;
+    padding:16px;transform:translateY(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:0 -10px 30px rgba(0,0,0,.25)}
+  .cvB-qv h4{font-size:16px;font-weight:800;line-height:1.2}
+  .cvB-qv .cv-dists{margin-top:10px}
+  .cvB-qvrow{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:12px}
+  .cvB-qv .cv-org{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+  @media (hover:hover){ .cvB:hover .cvB-qv,.cvB:focus-within .cvB-qv{transform:none} }
+  .cvB.open .cvB-qv{transform:none}
+
+  /* ---------- C · Race bib ---------- */
+  .cvC{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 1px 2px -1px rgba(20,26,62,.10),0 6px 10px -5px rgba(20,26,62,.14);transition:transform .2s ease}
+  .cvC:hover{transform:translateY(-4px)}
+  .cvC:hover .cvC-bib{transform:rotate(0deg)}
+  .cvC-head{position:relative;height:132px;overflow:hidden}
+  .cvC-body{padding:0 16px 14px;flex:1;display:flex;flex-direction:column}
+  .cvC-top{min-height:52px}
+  .cvC-bib{float:left;position:relative;z-index:2;width:88px;margin:-46px 14px 6px 0;background:#fff;color:#141A3E;border-radius:7px;
+    text-align:center;overflow:hidden;transform:rotate(-3deg);transition:transform .25s ease;
+    box-shadow:0 1px 0 rgba(0,0,0,.06),0 8px 18px -6px rgba(0,0,0,.35)}
+  .cvC-bib .band{display:block;font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.1em;color:#fff;padding:4px 0 3px}
+  .cvC-bib .num{display:block;font-family:var(--cond);font-weight:700;font-style:italic;font-size:44px;line-height:.95;letter-spacing:-.02em;padding-top:6px}
+  .cvC-bib .cat{display:block;font-family:var(--cond);font-weight:700;font-size:12px;letter-spacing:.1em;color:#6B7180;padding:2px 0 8px}
+  .cvC-bib .pin{position:absolute;width:6px;height:6px;border-radius:50%;background:#C9CDD8;box-shadow:inset 0 1px 1px rgba(0,0,0,.35)}
+  .cvC-bib .pin.a{left:6px;top:24px} .cvC-bib .pin.b{right:6px;top:24px} .cvC-bib .pin.c{left:6px;bottom:6px} .cvC-bib .pin.d{right:6px;bottom:6px}
+  .cvC-when{display:block;padding-top:10px;font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-size:12.5px;color:var(--accent)}
+  .cvC-when.hot{color:var(--cta)}
+  .cvC h3{margin-top:2px}
+  .cvC-rest{clear:both}
+  .cvC-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:14px}
+  .cvC .cv-org{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+
+  /* comparison */
+  .cvtable{width:100%;border-collapse:collapse;margin-top:30px;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .cvtable th,.cvtable td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .cvtable thead th{font-family:var(--cond);text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--muted);background:var(--surface-2)}
+  .cvtable tbody th{font-weight:700;color:var(--ink);white-space:nowrap}
+  .cvtable td{color:var(--muted)}
+  .cvtable tr:last-child th,.cvtable tr:last-child td{border-bottom:none}
+  .cvtablewrap{overflow-x:auto}
+  .cvnote{margin-top:14px;font-size:13.5px;color:var(--muted);line-height:1.5}
+  @media (prefers-reduced-motion:reduce){ .cvA,.cvC,.cvC-bib,.cvB-qv,.cvB-info{transition:none} }
 </style>
 </head>
 <body>
@@ -842,6 +982,221 @@
         <span class="fcount" id="fcount">1 / 5</span>
       </div>
     </div>
+  </div></section>
+
+  <!-- ===== Card directions (design review, 2026-10-08) ===== -->
+  <section class="rail cvsec" id="card-directions"><div class="wrap">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="cv-cal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></symbol>
+  <symbol id="cv-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="cv-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="cv-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9.2-9.4A5 5 0 0 1 12 6a5 5 0 0 1 9.2 4.6C19.5 15.4 12 20 12 20z"/></symbol>
+  <symbol id="cv-check" viewBox="0 0 24 24"><path d="M12 2.5l2.4 1.8 3-.2.9 2.9 2.5 1.7-1 2.8 1 2.8-2.5 1.7-.9 2.9-3-.2L12 21.5l-2.4-1.8-3 .2-.9-2.9-2.5-1.7 1-2.8-1-2.8 2.5-1.7.9-2.9 3 .2z"/><path d="M8.5 12l2.3 2.3 4.7-4.7"/></symbol>
+  <symbol id="cv-timer" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V10M9.5 2.5h5M18.5 6.5l1.5-1.5"/></symbol>
+  <symbol id="cv-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></symbol>
+  <symbol id="cv-mtn" viewBox="0 0 24 24"><path d="M2.5 20l7-11 4 6 3-4 5 9z"/></symbol>
+</svg>
+    <div class="rail-head"><div>
+      <h2>Event card — three directions <span class="pending">design review · sample events</span></h2>
+      <div class="sub">The same three events in each style. Tap a distance to change the price; hover a B card (or tap ⓘ) for quick view.</div>
+    </div></div>
+    <div class="cvrow">
+      <div class="cvlabel"><b>A · Ticket stub</b><span>Perforated tear-line between the event and the entry: reads as “you buy your entry here” at a glance (ADR-007).</span></div>
+      <div class="cvgrid">
+<article class="cvA" aria-label="Cubbon Park Monsoon Run">
+  <div class="cvA-img cv-run"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="38" cy="10" r="5"/><path d="M35 17L28 34M33 21l9 5 6-4M33 21l-9 3-4 7M28 34l10 8-2 12M28 34l-8 10H10"/></svg><span class="cv-chip">Running · Road</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvA-body">
+    <h3>Cubbon Park Monsoon Run</h3>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-cal"/></svg> <span>Sun 26 Oct · <b>in 12 days</b> · 6:00 AM</span></div>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Cubbon Park, Bengaluru · <b>6 km away</b></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="5K" data-p="₹600" data-c="No cutoff">5K</button><button type="button" aria-pressed="true" data-d="10K" data-p="₹900" data-c="1:30 cutoff">10K</button><button type="button" aria-pressed="false" data-d="21K" data-p="₹1,400" data-c="3:15 cutoff">21K</button></div>
+    <div class="cv-badges"><span><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg> AIMS certified</span><span><svg class="cv-i" aria-hidden="true"><use href="#cv-timer"/></svg> Chip-timed</span></div>
+  </div>
+  <div class="cvA-perf" aria-hidden="true"><i></i><i></i></div>
+  <div class="cvA-stub">
+    <div><div class="cv-price"><span data-show="p">₹900</span><small data-show="d">10K</small></div><span class="cv-spots"><span style="--p:82%"></span></span><span class="cv-spotsl">412 / 500 spots taken</span></div>
+    <button type="button" class="cv-reg">Register</button>
+  </div>
+  <div class="cv-org"><span class="cv-av" style="background:#2AA9C9">RB</span><span>by <b>RunBengaluru Events</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+</article>
+<article class="cvA" aria-label="Nandi Hills Gran Fondo">
+  <div class="cvA-img cv-cyc"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="15" cy="46" r="11"/><circle cx="49" cy="46" r="11"/><path d="M15 46l12-16h16l6 16M27 30l7 16 9-16M40 30l-3-7h-6"/><circle cx="34" cy="11" r="4"/><path d="M33 16l-4 10 9 2"/></svg><span class="cv-chip">Cycling · Gran Fondo</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvA-body">
+    <h3>Nandi Hills Gran Fondo</h3>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-cal"/></svg> <span>Sat 8 Nov · <b>in 25 days</b> · 5:30 AM</span></div>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Nandi Hills, Chikkaballapur · <b>61 km away</b></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="true" data-d="75K" data-p="₹1,200" data-c="5h cutoff">75K</button><button type="button" aria-pressed="false" data-d="120K" data-p="₹1,800" data-c="7h cutoff">120K</button></div>
+    <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,450 m</b> elevation</span></div>
+  </div>
+  <div class="cvA-perf" aria-hidden="true"><i></i><i></i></div>
+  <div class="cvA-stub">
+    <div><div class="cv-price"><span data-show="p">₹1,200</span><small data-show="d">75K</small></div><span class="cv-spots"><span style="--p:63%"></span></span><span class="cv-spotsl">188 / 300 spots taken</span></div>
+    <button type="button" class="cv-reg">Register</button>
+  </div>
+  <div class="cv-org"><span class="cv-av" style="background:#E4892B">DR</span><span>by <b>Deccan Randonneurs</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+</article>
+<article class="cvA" aria-label="Savandurga Trail Ultra">
+  <div class="cvA-img cv-trail"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M2 54l20-30 10 12 12-20 18 38z"/><path d="M40 22l4-6 4 6"/></svg><span class="cv-chip">Running · Trail</span><span class="cv-urgent">Closes in 3 days</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvA-body">
+    <h3>Savandurga Trail Ultra</h3>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-cal"/></svg> <span>Sun 16 Nov · <b>in 33 days</b> · 5:00 AM</span></div>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Savandurga, Magadi · <b>54 km away</b></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="12K" data-p="₹750" data-c="2:30 cutoff">12K</button><button type="button" aria-pressed="true" data-d="25K" data-p="₹1,250" data-c="5h cutoff">25K</button><button type="button" aria-pressed="false" data-d="50K" data-p="₹2,200" data-c="9h cutoff">50K</button></div>
+    <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,100 m</b> elevation</span></div>
+  </div>
+  <div class="cvA-perf" aria-hidden="true"><i></i><i></i></div>
+  <div class="cvA-stub">
+    <div><div class="cv-price"><span data-show="p">₹1,250</span><small data-show="d">25K</small></div><span class="cv-spots hot"><span style="--p:96%"></span></span><span class="cv-spotsl hot">96% full · 12 spots left</span></div>
+    <button type="button" class="cv-reg">Register</button>
+  </div>
+  <div class="cv-org"><span class="cv-av" style="background:#5B8C3E">TI</span><span>by <b>Trailblazers India</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+</article>
+      </div>
+    </div>
+    <div class="cvrow">
+      <div class="cvlabel"><b>B · Poster-first</b><span>The DICE pattern: the poster carries the card; details slide up on hover, or tap ⓘ on phones.</span></div>
+      <div class="cvgrid">
+<article class="cvB" aria-label="Cubbon Park Monsoon Run">
+  <div class="cvB-poster cv-run"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="38" cy="10" r="5"/><path d="M35 17L28 34M33 21l9 5 6-4M33 21l-9 3-4 7M28 34l10 8-2 12M28 34l-8 10H10"/></svg><span class="cvB-shade"></span></div>
+  <span class="cvB-date"><b>26</b><span>OCT</span></span>
+  <button type="button" class="cvB-qvbtn" aria-expanded="false" aria-label="Quick view"><svg class="cv-i" aria-hidden="true"><use href="#cv-info"/></svg></button>
+  <button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button>
+  <div class="cvB-info">
+    <span class="cvB-k">Running · Road · Bengaluru</span>
+    <h3>Cubbon Park Monsoon Run</h3>
+    <div class="cvB-m">Sun 26 Oct · in 12 days · 6 km away</div>
+    <div class="cvB-foot"><div class="cv-price"><small style="margin:0 4px 0 0">from</small>₹600</div><button type="button" class="cv-reg">Register</button></div>
+  </div>
+  <div class="cvB-qv">
+    <h4>Cubbon Park Monsoon Run</h4>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-clock"/></svg> <span>Start 6:00 AM · <span data-show="c">1:30 cutoff</span></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="5K" data-p="₹600" data-c="No cutoff">5K</button><button type="button" aria-pressed="true" data-d="10K" data-p="₹900" data-c="1:30 cutoff">10K</button><button type="button" aria-pressed="false" data-d="21K" data-p="₹1,400" data-c="3:15 cutoff">21K</button></div>
+    <div class="cv-badges"><span><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg> AIMS certified</span><span><svg class="cv-i" aria-hidden="true"><use href="#cv-timer"/></svg> Chip-timed</span></div>
+    <div class="cvB-qvrow"><div><div class="cv-price"><span data-show="p">₹900</span><small data-show="d">10K</small></div><span class="cv-spots"><span style="--p:82%"></span></span><span class="cv-spotsl">412 / 500 spots taken</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#2AA9C9">RB</span><span>by <b>RunBengaluru Events</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+<article class="cvB" aria-label="Nandi Hills Gran Fondo">
+  <div class="cvB-poster cv-cyc"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="15" cy="46" r="11"/><circle cx="49" cy="46" r="11"/><path d="M15 46l12-16h16l6 16M27 30l7 16 9-16M40 30l-3-7h-6"/><circle cx="34" cy="11" r="4"/><path d="M33 16l-4 10 9 2"/></svg><span class="cvB-shade"></span></div>
+  <span class="cvB-date"><b>08</b><span>NOV</span></span>
+  <button type="button" class="cvB-qvbtn" aria-expanded="false" aria-label="Quick view"><svg class="cv-i" aria-hidden="true"><use href="#cv-info"/></svg></button>
+  <button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button>
+  <div class="cvB-info">
+    <span class="cvB-k">Cycling · Gran Fondo · Chikkaballapur</span>
+    <h3>Nandi Hills Gran Fondo</h3>
+    <div class="cvB-m">Sat 8 Nov · in 25 days · 61 km away</div>
+    <div class="cvB-foot"><div class="cv-price"><small style="margin:0 4px 0 0">from</small>₹1,200</div><button type="button" class="cv-reg">Register</button></div>
+  </div>
+  <div class="cvB-qv">
+    <h4>Nandi Hills Gran Fondo</h4>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-clock"/></svg> <span>Start 5:30 AM · <span data-show="c">5h cutoff</span></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="true" data-d="75K" data-p="₹1,200" data-c="5h cutoff">75K</button><button type="button" aria-pressed="false" data-d="120K" data-p="₹1,800" data-c="7h cutoff">120K</button></div>
+    <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,450 m</b> elevation</span></div>
+    <div class="cvB-qvrow"><div><div class="cv-price"><span data-show="p">₹1,200</span><small data-show="d">75K</small></div><span class="cv-spots"><span style="--p:63%"></span></span><span class="cv-spotsl">188 / 300 spots taken</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#E4892B">DR</span><span>by <b>Deccan Randonneurs</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+<article class="cvB" aria-label="Savandurga Trail Ultra">
+  <div class="cvB-poster cv-trail"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M2 54l20-30 10 12 12-20 18 38z"/><path d="M40 22l4-6 4 6"/></svg><span class="cvB-shade"></span></div>
+  <span class="cvB-date"><b>16</b><span>NOV</span></span><span class="cv-urgent">Closes in 3 days</span>
+  <button type="button" class="cvB-qvbtn" aria-expanded="false" aria-label="Quick view"><svg class="cv-i" aria-hidden="true"><use href="#cv-info"/></svg></button>
+  <button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button>
+  <div class="cvB-info">
+    <span class="cvB-k">Running · Trail · Magadi</span>
+    <h3>Savandurga Trail Ultra</h3>
+    <div class="cvB-m">Sun 16 Nov · in 33 days · 54 km away</div>
+    <div class="cvB-foot"><div class="cv-price"><small style="margin:0 4px 0 0">from</small>₹750</div><button type="button" class="cv-reg">Register</button></div>
+  </div>
+  <div class="cvB-qv">
+    <h4>Savandurga Trail Ultra</h4>
+    <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-clock"/></svg> <span>Start 5:00 AM · <span data-show="c">5h cutoff</span></span></div>
+    <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="12K" data-p="₹750" data-c="2:30 cutoff">12K</button><button type="button" aria-pressed="true" data-d="25K" data-p="₹1,250" data-c="5h cutoff">25K</button><button type="button" aria-pressed="false" data-d="50K" data-p="₹2,200" data-c="9h cutoff">50K</button></div>
+    <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,100 m</b> elevation</span></div>
+    <div class="cvB-qvrow"><div><div class="cv-price"><span data-show="p">₹1,250</span><small data-show="d">25K</small></div><span class="cv-spots hot"><span style="--p:96%"></span></span><span class="cv-spotsl hot">96% full · 12 spots left</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#5B8C3E">TI</span><span>by <b>Trailblazers India</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+      </div>
+    </div>
+    <div class="cvrow">
+      <div class="cvlabel"><b>C · Race bib</b><span>The date is a pinned race bib that shows the distance you picked — a look no other platform has.</span></div>
+      <div class="cvgrid">
+<article class="cvC" aria-label="Cubbon Park Monsoon Run">
+  <div class="cvC-head cv-run"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="38" cy="10" r="5"/><path d="M35 17L28 34M33 21l9 5 6-4M33 21l-9 3-4 7M28 34l10 8-2 12M28 34l-8 10H10"/></svg><span class="cv-chip">Running · Road</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvC-body">
+    <div class="cvC-top">
+      <span class="cvC-bib" aria-label="Sun 26 Oct"><span class="band" style="background:#12B4A0">OCT · SUN</span>
+        <span class="num">26</span><span class="cat" data-show="d">10K</span>
+        <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span><span class="pin d"></span></span>
+      <span class="cvC-when">in 12 days · 6:00 AM</span>
+      <h3>Cubbon Park Monsoon Run</h3>
+    </div>
+    <div class="cvC-rest">
+      <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Cubbon Park, Bengaluru · <b>6 km away</b></span></div>
+      <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="5K" data-p="₹600" data-c="No cutoff">5K</button><button type="button" aria-pressed="true" data-d="10K" data-p="₹900" data-c="1:30 cutoff">10K</button><button type="button" aria-pressed="false" data-d="21K" data-p="₹1,400" data-c="3:15 cutoff">21K</button></div>
+      <div class="cv-badges"><span><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg> AIMS certified</span><span><svg class="cv-i" aria-hidden="true"><use href="#cv-timer"/></svg> Chip-timed</span></div>
+    </div>
+    <div class="cvC-foot"><div><div class="cv-price"><span data-show="p">₹900</span><small data-show="c">1:30 cutoff</small></div><span class="cv-spots"><span style="--p:82%"></span></span><span class="cv-spotsl">412 / 500 spots taken</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#2AA9C9">RB</span><span>by <b>RunBengaluru Events</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+<article class="cvC" aria-label="Nandi Hills Gran Fondo">
+  <div class="cvC-head cv-cyc"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="15" cy="46" r="11"/><circle cx="49" cy="46" r="11"/><path d="M15 46l12-16h16l6 16M27 30l7 16 9-16M40 30l-3-7h-6"/><circle cx="34" cy="11" r="4"/><path d="M33 16l-4 10 9 2"/></svg><span class="cv-chip">Cycling · Gran Fondo</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvC-body">
+    <div class="cvC-top">
+      <span class="cvC-bib" aria-label="Sat 8 Nov"><span class="band" style="background:#C2410C">NOV · SAT</span>
+        <span class="num">08</span><span class="cat" data-show="d">75K</span>
+        <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span><span class="pin d"></span></span>
+      <span class="cvC-when">in 25 days · 5:30 AM</span>
+      <h3>Nandi Hills Gran Fondo</h3>
+    </div>
+    <div class="cvC-rest">
+      <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Nandi Hills, Chikkaballapur · <b>61 km away</b></span></div>
+      <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="true" data-d="75K" data-p="₹1,200" data-c="5h cutoff">75K</button><button type="button" aria-pressed="false" data-d="120K" data-p="₹1,800" data-c="7h cutoff">120K</button></div>
+      <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,20 14,18 26,12 38,14 50,6 60,4 72,10 84,16 96,19" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,450 m</b> elevation</span></div>
+    </div>
+    <div class="cvC-foot"><div><div class="cv-price"><span data-show="p">₹1,200</span><small data-show="c">5h cutoff</small></div><span class="cv-spots"><span style="--p:63%"></span></span><span class="cv-spotsl">188 / 300 spots taken</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#E4892B">DR</span><span>by <b>Deccan Randonneurs</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+<article class="cvC" aria-label="Savandurga Trail Ultra">
+  <div class="cvC-head cv-trail"><svg class="cv-glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M2 54l20-30 10 12 12-20 18 38z"/><path d="M40 22l4-6 4 6"/></svg><span class="cv-chip">Running · Trail</span><button type="button" class="cv-save" aria-pressed="false" aria-label="Save event"><svg class="cv-i" aria-hidden="true"><use href="#cv-heart"/></svg></button></div>
+  <div class="cvC-body">
+    <div class="cvC-top">
+      <span class="cvC-bib" aria-label="Sun 16 Nov"><span class="band" style="background:#2F6B3A">NOV · SUN</span>
+        <span class="num">16</span><span class="cat" data-show="d">25K</span>
+        <span class="pin a"></span><span class="pin b"></span><span class="pin c"></span><span class="pin d"></span></span>
+      <span class="cvC-when hot">Closes in 3 days</span>
+      <h3>Savandurga Trail Ultra</h3>
+    </div>
+    <div class="cvC-rest">
+      <div class="cv-meta"><svg class="cv-i" aria-hidden="true"><use href="#cv-pin"/></svg> <span>Savandurga, Magadi · <b>54 km away</b></span></div>
+      <div class="cv-dists" role="group" aria-label="Distance"><button type="button" aria-pressed="false" data-d="12K" data-p="₹750" data-c="2:30 cutoff">12K</button><button type="button" aria-pressed="true" data-d="25K" data-p="₹1,250" data-c="5h cutoff">25K</button><button type="button" aria-pressed="false" data-d="50K" data-p="₹2,200" data-c="9h cutoff">50K</button></div>
+      <div class="cv-elev"><svg viewBox="0 0 96 24" aria-hidden="true"><polygon points="0,24 0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20 96,24" fill="color-mix(in srgb,var(--accent) 18%,transparent)"/><polyline points="0,21 10,15 20,17 32,7 42,10 52,3 64,12 78,8 96,20" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg><svg class="cv-i" aria-hidden="true"><use href="#cv-mtn"/></svg> <span><b>+1,100 m</b> elevation</span></div>
+    </div>
+    <div class="cvC-foot"><div><div class="cv-price"><span data-show="p">₹1,250</span><small data-show="c">5h cutoff</small></div><span class="cv-spots hot"><span style="--p:96%"></span></span><span class="cv-spotsl hot">96% full · 12 spots left</span></div>
+      <button type="button" class="cv-reg">Register</button></div>
+    <div class="cv-org"><span class="cv-av" style="background:#5B8C3E">TI</span><span>by <b>Trailblazers India</b></span><span class="cv-tick" title="Verified organiser"><svg class="cv-i" aria-hidden="true"><use href="#cv-check"/></svg></span></div>
+  </div>
+</article>
+      </div>
+    </div>
+    <div class="cvtablewrap"><table class="cvtable">
+      <thead><tr><th></th><th>A · Ticket stub</th><th>B · Poster-first</th><th>C · Race bib</th></tr></thead>
+      <tbody>
+        <tr><th>Strongest at</th><td>Making ticketing obvious; works for every event type, team tournaments included</td><td>Visual pull and browsing; featured slots and sport pages</td><td>A sporty identity no competitor has</td></tr>
+        <tr><th>Info at a glance</th><td>High — everything visible</td><td>Low until hover / tap</td><td>High — everything visible</td></tr>
+        <tr><th>Phones</th><td>Good</td><td>Details need a tap</td><td>Good</td></tr>
+        <tr><th>Weak spot</th><td>Smallest image of the three</td><td>Looks generic without real event photos (ADR-005)</td><td>The bib means less for non-race events (fixtures, meets)</td></tr>
+        <tr><th>Needs from the data</th><td colspan="3">All three: spots taken vs capacity, price and cutoff per distance, registration close date, distance from the athlete. Elevation exists (<code>elevation_gain</code>).</td></tr>
+      </tbody>
+    </table></div>
+    <p class="cvnote"><b>Suggested mix:</b> A's structure as the default rail card, with C's bib as its date block; B for “Big this season” and sport pages once real posters exist. All three use the same shared parts — distance chips that change the price, the spots bar, “in N days”, “N km away” and the verified organiser — so any mix is cheap.</p>
   </div></section>
 
   <!-- Happening near you -->
@@ -1554,6 +1909,25 @@
   /* ---------- footer columns: open on desktop, accordions on mobile ---------- */
   if(innerWidth<900) document.querySelectorAll('.fcol').forEach(function(d){ d.open=false; });
   window.addEventListener('resize',function(){ if(innerWidth>=900) document.querySelectorAll('.fcol').forEach(function(d){ d.open=true; }); });
+})();
+</script>
+<script>
+/* card directions: distance chips update price / distance / cutoff; save toggles; B quick view on tap */
+(function(){
+  document.querySelectorAll('.cvsec article').forEach(function(card){
+    card.querySelectorAll('.cv-dists button').forEach(function(b){
+      b.addEventListener('click',function(){
+        card.querySelectorAll('.cv-dists button').forEach(function(x){ x.setAttribute('aria-pressed', x.dataset.d===b.dataset.d ? 'true' : 'false'); });
+        card.querySelectorAll('[data-show="p"]').forEach(function(el){ el.textContent=b.dataset.p; });
+        card.querySelectorAll('[data-show="d"]').forEach(function(el){ el.textContent=b.dataset.d; });
+        card.querySelectorAll('[data-show="c"]').forEach(function(el){ el.textContent=b.dataset.c; });
+      });
+    });
+    var s=card.querySelector('.cv-save');
+    if(s) s.addEventListener('click',function(){ s.setAttribute('aria-pressed', s.getAttribute('aria-pressed')==='true' ? 'false' : 'true'); });
+    var q=card.querySelector('.cvB-qvbtn');
+    if(q) q.addEventListener('click',function(){ var o=card.classList.toggle('open'); q.setAttribute('aria-expanded', o ? 'true' : 'false'); });
+  });
 })();
 </script>
 </body>
