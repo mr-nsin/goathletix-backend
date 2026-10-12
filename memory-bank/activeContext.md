@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-10-08.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-10-12.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -36,9 +36,17 @@ LLM pipeline, Algolia, Mem0 and an agent fleet. **None of that exists.** They ar
 - **ADR-007 (2026-10-05): discovery + ticketing, ticketing first;** events are public / unlisted / private; seller
   products are reviewed before sale. Migrations 0012–0023 are **applied** (2026-10-06). The backend
   visibility filter must ship with 0022 (service role bypasses RLS). Homepage rebuilt on `feat/implement-main-page-mockup`.
+- **Coach trainings — requirement #61 (2026-10-12).** Owner decision: coaches and academies host their own
+  trainings. Header row 2 has **Training**, the Partner menu has a "For coaches" column and the hero has a
+  "Coach or academy?" card; all inert "Soon" until pages exist. Product doc:
+  `01 Product/Organizer and seller platform features.md` §5. Model and phasing are
+  [[03 Decisions/ADR-008-coach-trainings|ADR-008]] **proposed** (own tables not `events`; Phase 1 find-a-coach with
+  no payments, Phase 2 book-and-pay). **No migration yet** (proposed 0026); `training_centers` (0010) is the only
+  existing table. Open: evidence for coaches who work with minors (legal), GST on coaching fees (CA), platform fee.
+  `docs/04` "never build coaching" now narrowed to "never author plans or employ coaches".
 - **Homepage ([[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]]) — state 2026-10-08:** header is
-  Logo | Location | Search | bell · cart | Sign in | List your event | Partner with us (organisers + sellers),
-  row 2 has Blog; the header search hides while the hero search is on screen, has type-ahead (sports, cities,
+  Logo | Location | Search | bell · cart | Sign in | List your event | Partner with us (organisers + sellers + coaches),
+  row 2 has Training and Blog; the header search hides while the hero search is on screen, has type-ahead (sports, cities,
   events via `search`, recent searches) and `/` / Ctrl+K. Location is a BookMyShow-style modal (search all 53
   cities, landmark icons, radius kept). Hero: local count line, sport icon row, "Next up" strip, resume chip,
   stats + partner band; light background (a dark navy hero was tried and **rejected by the owner**). The sticky

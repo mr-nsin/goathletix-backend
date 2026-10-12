@@ -22,11 +22,17 @@
 
 ## What the Product Must NEVER Do in V1
 
+> **Updated 2026-10-12 — read before relying on this table.** Three rows no longer hold as written. Ticketing and
+> the gear marketplace were reversed by ADR-007 (2026-10-05). "Training plans or coaching" is narrowed by
+> requirement #61 and ADR-008 (proposed): GoAthletix will let coaches and academies **host their own
+> trainings**, a listing and booking marketplace. It must still not author training plans or employ coaches;
+> the coach runs the session and is accountable for it. The rows below are left as written for history.
+
 | Never Do | Why |
 |----------|-----|
 | ❌ Build ticketing or payment processing | Enormous regulatory, financial, and technical complexity. Compete with Townscript, Razorpay, etc. on their home turf. |
 | ❌ Build activity tracking (GPS, pace, distance) | Compete with Strava, Garmin, Nike Run Club. Cannot win this fight. |
-| ❌ Build training plans or coaching | Requires deep sports science expertise. Will distract from core discovery value. |
+| ❌ Author training plans or employ coaches ourselves (hosting coaches' own trainings is allowed, #61) | Requires deep sports science expertise. Will distract from core discovery value. |
 | ❌ Build a social feed (timeline, posts, likes) | Premature. Social only works with density. Need 50K+ users before social is valuable. |
 | ❌ Build in-app messaging/chat | WhatsApp already solves this. Don't rebuild WhatsApp poorly. |
 | ❌ Build a marketplace for sports gear/nutrition | Scope explosion. E-commerce is a different business. |

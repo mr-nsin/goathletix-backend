@@ -737,3 +737,40 @@ label, and stays honest about curation without the old subtitle, which was an in
 ("never called Popular without a signal…") that had leaked onto the live page. New subtitle: *"Hand-picked races and
 championships worth planning your season around."* Alternatives considered: "Headline events", "Don't miss",
 "Spotlight", "Marquee events".
+
+## 15. Trainings — coaches as the third audience (2026-10-12)
+
+Requirement #61, proposed in [[03 Decisions/ADR-008-coach-trainings|ADR-008]]. Coaches and academies host their own
+trainings; the product doc is `01 Product/Organizer and seller platform features.md` §5. This section is only the
+front-end entry points.
+
+### 15a. Where trainings show up
+
+| Place | What it does | State today |
+|---|---|---|
+| **Header, row 2: "Training"** | Sits after "Clubs" (the people-and-places links) and before "Shop". Goes to the Training page | inert "Soon" entry |
+| **Header: Partner with us** | The menu now has three columns: For organisers, For sellers, **For coaches** (Host a training, Batches camps & clinics, Academy & coach profiles, Verified coach badge). It is one door for every kind of host | built; the coach entries are inert |
+| **Hero, end of the first screen** | A third card beside "Organising an event?" and "Selling sports gear?": **"Coach or academy? — Host trainings & batches"** | built, inert "Soon" |
+| **Mobile menu** | A "Host your training" row under Partner with us, and "Training" in the coming-soon list | built, inert |
+| **Homepage rail "Training near you"** | After "Happening near you"; Phase 1 | not built |
+| **Event detail: "Train for this event"** | Programmes that finish before the race date and match the distance; Phase 3 | not built |
+
+The label is **"Training"**, not "Coaching" or "Academies": it covers batches, camps, clinics and race-prep, and it
+is what athletes type ("marathon training"). The risk is that "Training" reads as a tool for tracking workouts;
+the Partner menu's "For coaches" column and the page copy ("find a coach, join a batch") carry the meaning.
+Alternatives considered: Coaching, Academies, Classes, Programmes.
+
+### 15b. The three partner cards (hero)
+
+- **Layout.** From 1400px wide the stats and the three cards share one row, and the cards take all the width the
+  stats leave (about 250px each at 1440px and 1905px), one line of title and one of description, 61px tall. Below
+  1400px the stats sit above a row of three full-width cards; on phones the cards stack. The earlier two-card
+  version was ~280px each; with three cards in the same row, titles wrapped to 3–4 lines and the cards grew to
+  121px, so the "Soon" tag and the arrow moved to the card's top-right corner to keep the title on one line.
+- **Entrance.** When the band first scrolls into view the cards slide in from the right one after another
+  (0.75s each, 150ms apart), the icon tiles pop as each lands, and the one live card (organisers) pulses its
+  outline twice. It plays once per page load. It deliberately plays even when the operating system asks for
+  reduced motion, because the owner asked for it to be noticeable and the setting is on for their machine; to
+  honour the setting, add a reduced-motion block that turns the card animation off.
+- **Stats.** The four numbers count up (events listed, cities, sports, disciplines) when the band comes into view,
+  also once.
