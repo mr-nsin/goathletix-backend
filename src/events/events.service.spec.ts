@@ -1,4 +1,5 @@
 import { EventsService } from './events.service';
+import { NotFoundException } from '@nestjs/common';
 import { SupabaseService } from '../supabase.service';
 
 /**
@@ -13,6 +14,8 @@ class FakeQueryBuilder {
     count: 0,
     error: null,
   };
+
+  single: unknown = null;
 
   private record(method: string, args: unknown[]) {
     this.calls.push({ method, args });
@@ -49,6 +52,10 @@ class FakeQueryBuilder {
   order(...args: unknown[]) {
     this.record('order', args);
     return this;
+  }
+  maybeSingle() {
+    this.calls.push({ method: 'maybeSingle', args: [] });
+    return Promise.resolve({ data: this.single, error: null });
   }
   range(...args: unknown[]) {
     this.record('range', args);
@@ -158,5 +165,71 @@ describe('EventsService', () => {
     );
     expect(call).toBeDefined();
     expect(call?.args[1]).toEqual(['running', 'cycling']);
+  });
+
+  const VISIBILITY_ID = '123e4567-e89b-42d3-a456-426614174000';
+
+  function eqCalls(builder: FakeQueryBuilder) {
+    return builder.calls
+      .filter((c) => c.method === 'eq')
+      .map((c) => [c.args[0], c.args[1]]);
+  }
+
+  it('list restricts to public + published on the same builder as the exact count', async () => {
+    const { service, eventsBuilder } = makeService();
+
+    await service.findAll({});
+
+    expect(eqCalls(eventsBuilder)).toEqual(
+      expect.arrayContaining([
+        ['visibility', 'public'],
+        ['publication_status', 'published'],
+      ]),
+    );
+    // Filters must precede .range() and live on the builder created with count: 'exact'.
+    const names = eventsBuilder.calls.map((c) => c.method);
+    expect(eventsBuilder.calls[0]).toEqual({
+      method: 'select',
+      args: [expect.any(String), { count: 'exact' }],
+    });
+    expect(names.indexOf('eq')).toBeLessThan(names.indexOf('range'));
+  });
+
+  it('list keeps the visibility filters alongside user filters', async () => {
+    const { service, eventsBuilder } = makeService();
+
+    await service.findAll({ sport: 'running' });
+
+    expect(eqCalls(eventsBuilder)).toEqual(
+      expect.arrayContaining([
+        ['visibility', 'public'],
+        ['publication_status', 'published'],
+        ['sport_type', 'running'],
+      ]),
+    );
+  });
+
+  it('findOne filters by public + published and returns the row', async () => {
+    const { service, eventsBuilder } = makeService();
+    eventsBuilder.single = { id: VISIBILITY_ID };
+
+    await expect(service.findOne(VISIBILITY_ID)).resolves.toEqual({
+      id: VISIBILITY_ID,
+    });
+    expect(eqCalls(eventsBuilder)).toEqual(
+      expect.arrayContaining([
+        ['id', VISIBILITY_ID],
+        ['visibility', 'public'],
+        ['publication_status', 'published'],
+      ]),
+    );
+  });
+
+  it('findOne throws NotFoundException when no public published row matches', async () => {
+    const { service } = makeService();
+
+    await expect(service.findOne(VISIBILITY_ID)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });
