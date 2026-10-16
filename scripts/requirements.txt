@@ -1,0 +1,17 @@
+# Third-party imports found by grep over scripts/*.py and scratch/*.py.
+# Everything else imported (json, os, re, random, socket, sys, datetime, urllib) is stdlib.
+# Pins come from `python -I -m pip list` on Python 3.14.6 (2026-10-16).
+
+# psycopg2-binary, not psycopg2: it is the variant installed here, and it ships wheels so no
+# libpq/compiler is needed. Imported as `psycopg2` by db_utils.py.
+psycopg2-binary==2.9.12
+
+# beautifulsoup4 (imported as bs4): used by crawler.py and scratch/scrape_text.py.
+# UNPINNED: not installed in the interpreter used, so no real version to copy.
+# Pin it after the first `pip install -r` and `pip freeze`.
+beautifulsoup4
+
+# playwright: scratch/layout_analyzer.py only (competitor research, not a runtime dependency).
+# UNPINNED: not installed here. After install, run `python -m playwright install chromium`.
+# Playwright needs the proxy passed explicitly behind the corporate proxy.
+playwright
