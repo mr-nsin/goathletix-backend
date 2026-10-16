@@ -147,7 +147,11 @@ export class EventsService {
 
     let builder = this.supabase.client
       .from('events')
-      .select(EVENT_SELECT, { count: 'exact' });
+      .select(EVENT_SELECT, { count: 'exact' })
+      // Service-role key bypasses RLS, so public visibility is enforced here (GA-022). The same
+      // builder carries the `count: 'exact'` total, so meta.total matches the rows.
+      .eq('visibility', 'public')
+      .eq('publication_status', 'published');
 
     if (search) {
       // Strip anything tsquery would read as an operator, so user input is matched literally.
@@ -261,6 +265,9 @@ export class EventsService {
       .from('events')
       .select(EVENT_SELECT)
       .eq('id', id)
+      // Non-public or unpublished events 404 exactly like a missing row (GA-022).
+      .eq('visibility', 'public')
+      .eq('publication_status', 'published')
       .maybeSingle();
 
     if (error) {
