@@ -38,3 +38,5 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 - [x] [[04 Delivery/GA-030-clubs-and-guides-cards|GA-030 Clubs and guides cards]] (frontend, 2026-10-17)
 - [x] [[04 Delivery/GA-031-partners-alerts-footer-flow|GA-031 Partners infographics, alerts, footer flow]] (frontend, 2026-10-17)
 - [x] [[04 Delivery/GA-032-club-academy-listing-research|GA-032 Club and academy listing research]] (docs, 2026-10-17)
+- [x] [[04 Delivery/GA-033-event-card-comment-and-rating|GA-033 Comment action and ratings back on event cards]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-034-partners-section-redesign-v2|GA-034 Partners circle stepper and redesign]] (frontend, 2026-10-17)
