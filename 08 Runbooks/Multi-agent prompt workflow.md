@@ -81,3 +81,12 @@ Then `repo-auditor` on each branch, then the merges, then `vault-scribe`.
   and the coordinator did the single wiring edit in `page.tsx`. Four writers merged with zero conflicts.
 - The global `prefers-reduced-motion` kill rule silently removes hover transitions and animations on machines with reduced
   motion on; any motion the owner must see is re-declared with `!important` inside a reduced-motion block.
+- **Real-render verification replaces guessing.** The browser pane here is often hidden and never paints animation frames, but headless
+  Edge works: drive it over CDP (`--remote-debugging-port`, fixed viewport via `Emulation.setDeviceMetricsOverride`, capture with
+  `Page.captureScreenshot` and `captureBeyondViewport`). Never use a very tall window: it stretches everything sized in `vh`. A scripted
+  click-through of the alerts flow found two bugs (a stretched chip, a clipped Send button on phones) that no static check could.
+- **CSS validity is not checked by tsc, eslint or `next build`.** `!important` in the middle of a comma list (for example
+  `transition: a 1s !important, b 1s !important`) is invalid; the dev server returned 500 on every page until it was fixed. After merging
+  agent CSS, grep for `!important\s*,` and load the dev server before declaring success.
+- Agents in worktrees cannot judge fit or clipping (no browser). Anything involving widths (two buttons in a card, a chip in a row) needs
+  the real render.

@@ -40,3 +40,8 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 - [x] [[04 Delivery/GA-032-club-academy-listing-research|GA-032 Club and academy listing research]] (docs, 2026-10-17)
 - [x] [[04 Delivery/GA-033-event-card-comment-and-rating|GA-033 Comment action and ratings back on event cards]] (frontend, 2026-10-17)
 - [x] [[04 Delivery/GA-034-partners-section-redesign-v2|GA-034 Partners circle stepper and redesign]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-035-event-card-info-comment-rating|GA-035 Event card info design, Comment, rating slot]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-036-sport-gear-city-cards-v3|GA-036 Static sport tiles, gear cards v2, city cards]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-037-clubs-directions-and-card-system|GA-037 Club directions, guides on the type system]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-038-partners-width-and-page-flow|GA-038 Partners width, athlete strip, page flow]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-039-finish-line-section-with-alerts|GA-039 One finish-line section with alerts (Email or WhatsApp)]] (frontend, 2026-10-17)
