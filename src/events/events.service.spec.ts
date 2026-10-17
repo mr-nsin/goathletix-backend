@@ -1,5 +1,13 @@
-import { EventsService } from './events.service';
-import { NotFoundException } from '@nestjs/common';
+import {
+  EventsService,
+  PriceTier,
+  pickCurrentTierId,
+  todayInIst,
+} from './events.service';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SupabaseService } from '../supabase.service';
 
 /**
@@ -60,6 +68,10 @@ class FakeQueryBuilder {
   range(...args: unknown[]) {
     this.record('range', args);
     return Promise.resolve(this.result);
+  }
+  /** Awaiting the builder directly (no terminal call) resolves `result`, like PostgREST. */
+  then<T>(resolve: (value: FakeQueryBuilder['result']) => T) {
+    return Promise.resolve(this.result).then(resolve);
   }
 }
 
@@ -231,5 +243,327 @@ describe('EventsService', () => {
     await expect(service.findOne(VISIBILITY_ID)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+});
+
+describe('EventsService.findDetails', () => {
+  const EVENT_ID = '123e4567-e89b-42d3-a456-426614174000';
+
+  type TableResult = { data: unknown[] | null; error: unknown };
+
+  function makeDetailsService(
+    eventRow: unknown,
+    tables: Record<string, TableResult> = {},
+  ) {
+    const builders = new Map<string, FakeQueryBuilder>();
+    const client = {
+      from: (table: string) => {
+        const builder = new FakeQueryBuilder();
+        if (table === 'events') {
+          builder.single = eventRow;
+        } else {
+          const r = tables[table] ?? { data: [], error: null };
+          builder.result = {
+            data: r.data as unknown[],
+            count: 0,
+            error: r.error,
+          };
+        }
+        builders.set(table, builder);
+        return builder;
+      },
+    } as unknown as SupabaseService['client'];
+    const service = new EventsService({ client });
+    return { service, builders };
+  }
+
+  function eqPairs(builder: FakeQueryBuilder | undefined) {
+    return (builder?.calls ?? [])
+      .filter((c) => c.method === 'eq')
+      .map((c) => [c.args[0], c.args[1]]);
+  }
+
+  const EVENT_ROW = {
+    id: EVENT_ID,
+    event_name: 'Hill Run',
+    ticketing_mode: 'external',
+    organizer: { id: 'org-1', name: 'Org', instagram_url: null },
+  };
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('404s on a non-UUID id without querying', async () => {
+    const { service, builders } = makeDetailsService(EVENT_ROW);
+
+    await expect(service.findDetails('not-a-uuid')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(builders.size).toBe(0);
+  });
+
+  it('404s when no public + published event matches and reads no child tables', async () => {
+    const { service, builders } = makeDetailsService(null);
+
+    await expect(service.findDetails(EVENT_ID)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(eqPairs(builders.get('events'))).toEqual(
+      expect.arrayContaining([
+        ['id', EVENT_ID],
+        ['visibility', 'public'],
+        ['publication_status', 'published'],
+      ]),
+    );
+    expect([...builders.keys()]).toEqual(['events']);
+  });
+
+  it('returns empty arrays (never null) and splits the organizer out of the event', async () => {
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_categories: { data: null, error: null },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.ticket_types).toEqual([]);
+    expect(data.media).toEqual([]);
+    expect(data.faqs).toEqual([]);
+    expect(data.schedule).toEqual([]);
+    expect(data.organizer).toEqual(EVENT_ROW.organizer);
+    expect(data.event).toEqual({
+      id: EVENT_ID,
+      event_name: 'Hill Run',
+      ticketing_mode: 'external',
+    });
+  });
+
+  it('returns organizer null when the event has none', async () => {
+    const { service } = makeDetailsService({ id: EVENT_ID, organizer: null });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.organizer).toBeNull();
+  });
+
+  it('excludes hidden ticket types and keeps only published media in the query', async () => {
+    const { service, builders } = makeDetailsService(EVENT_ROW);
+
+    await service.findDetails(EVENT_ID);
+
+    expect(eqPairs(builders.get('event_categories'))).toEqual([
+      ['event_id', EVENT_ID],
+      ['is_hidden', false],
+    ]);
+    expect(eqPairs(builders.get('event_media'))).toEqual([
+      ['event_id', EVENT_ID],
+      ['status', 'published'],
+    ]);
+  });
+
+  it('orders ticket types and tiers, and picks the tier valid today in IST', async () => {
+    // 2026-10-31T20:00Z is already 1 Nov in India (UTC+5:30).
+    jest.useFakeTimers({ now: new Date('2026-10-31T20:00:00Z') });
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_categories: {
+        data: [
+          {
+            id: 'c-10k',
+            label: '10K',
+            sort_order: 1,
+            event_price_tiers: [
+              {
+                id: 't-late',
+                label: 'Late',
+                price_inr: 1500,
+                valid_from: '2026-11-15',
+                valid_until: null,
+              },
+              {
+                id: 't-reg',
+                label: 'Regular',
+                price_inr: 1200,
+                valid_from: '2026-11-01',
+                valid_until: '2026-11-14',
+              },
+              {
+                id: 't-early',
+                label: 'Early bird',
+                price_inr: 900,
+                valid_from: null,
+                valid_until: '2026-10-31',
+              },
+            ],
+          },
+          { id: 'c-hm', label: 'Half', sort_order: 0, event_price_tiers: [] },
+          { id: 'c-5k', label: '5K', sort_order: 1, event_price_tiers: null },
+        ],
+        error: null,
+      },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.ticket_types.map((t) => t.id)).toEqual([
+      'c-hm',
+      'c-10k',
+      'c-5k',
+    ]);
+    const tenK = data.ticket_types[1];
+    expect(tenK.tiers.map((t) => t.id)).toEqual(['t-early', 't-reg', 't-late']);
+    expect(tenK.current_tier_id).toBe('t-reg');
+    expect(tenK).not.toHaveProperty('event_price_tiers');
+    expect(data.ticket_types[0].tiers).toEqual([]);
+    expect(data.ticket_types[0].current_tier_id).toBeNull();
+    expect(data.ticket_types[2].tiers).toEqual([]);
+  });
+
+  it('orders media cover first, then newest edition', async () => {
+    const media = (
+      id: string,
+      is_cover: boolean,
+      edition_year: number | null,
+    ) => ({
+      id,
+      url: `https://x/${id}.jpg`,
+      kind: 'photo',
+      caption: null,
+      credit: null,
+      edition_year,
+      is_cover,
+      created_at: '2026-01-01T00:00:00Z',
+    });
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_media: {
+        data: [
+          media('m-2023', false, 2023),
+          media('m-none', false, null),
+          media('m-2025', false, 2025),
+          media('m-cover', true, 2024),
+        ],
+        error: null,
+      },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.media.map((m) => m.id)).toEqual([
+      'm-cover',
+      'm-2025',
+      'm-2023',
+      'm-none',
+    ]);
+    expect(data.media[0]).not.toHaveProperty('created_at');
+  });
+
+  it('maps faqs and schedule to contract keys in order', async () => {
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_faqs: {
+        data: [
+          { question: 'B?', answer: 'b', sort_order: 2, created_at: null },
+          { question: 'A?', answer: 'a', sort_order: 1, created_at: null },
+        ],
+        error: null,
+      },
+      event_schedule_items: {
+        data: [
+          {
+            title: 'Flag off',
+            starts_at: '2026-11-02T00:30:00+00:00',
+            ends_at: null,
+            notes: null,
+            sort_order: 0,
+          },
+          {
+            title: 'Expo',
+            starts_at: '2026-11-01T04:30:00+00:00',
+            ends_at: '2026-11-01T12:30:00+00:00',
+            notes: 'Bring ID',
+            sort_order: 0,
+          },
+        ],
+        error: null,
+      },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.faqs).toEqual([
+      { question: 'A?', answer: 'a' },
+      { question: 'B?', answer: 'b' },
+    ]);
+    expect(data.schedule).toEqual([
+      {
+        title: 'Expo',
+        starts_at: '2026-11-01T04:30:00+00:00',
+        ends_at: '2026-11-01T12:30:00+00:00',
+        notes: 'Bring ID',
+      },
+      {
+        title: 'Flag off',
+        starts_at: '2026-11-02T00:30:00+00:00',
+        ends_at: null,
+        notes: null,
+      },
+    ]);
+  });
+
+  it('treats an absent faq table as [] but fails on a ticket query error', async () => {
+    const missing = makeDetailsService(EVENT_ROW, {
+      event_faqs: { data: null, error: { code: 'PGRST205', message: 'x' } },
+    });
+    await expect(missing.service.findDetails(EVENT_ID)).resolves.toMatchObject({
+      data: { faqs: [] },
+    });
+
+    const broken = makeDetailsService(EVENT_ROW, {
+      event_categories: { data: null, error: { code: '500', message: 'boom' } },
+    });
+    jest
+      .spyOn(
+        (broken.service as unknown as { logger: { error: () => void } }).logger,
+        'error',
+      )
+      .mockImplementation(() => undefined);
+    await expect(broken.service.findDetails(EVENT_ID)).rejects.toBeInstanceOf(
+      InternalServerErrorException,
+    );
+  });
+});
+
+describe('pickCurrentTierId', () => {
+  const tier = (
+    id: string,
+    valid_from: string | null,
+    valid_until: string | null,
+  ): PriceTier => ({ id, label: id, price_inr: 0, valid_from, valid_until });
+
+  it('returns null when no tier covers today', () => {
+    expect(
+      pickCurrentTierId([tier('a', '2026-12-01', null)], '2026-11-01'),
+    ).toBeNull();
+    expect(pickCurrentTierId([], '2026-11-01')).toBeNull();
+  });
+
+  it('includes both boundary dates', () => {
+    const tiers = [tier('a', '2026-11-01', '2026-11-10')];
+    expect(pickCurrentTierId(tiers, '2026-11-01')).toBe('a');
+    expect(pickCurrentTierId(tiers, '2026-11-10')).toBe('a');
+  });
+
+  it('prefers a dated early bird over an undated regular tier', () => {
+    const tiers = [
+      tier('regular', null, null),
+      tier('early', null, '2026-11-10'),
+    ];
+    expect(pickCurrentTierId(tiers, '2026-11-05')).toBe('early');
+    expect(pickCurrentTierId(tiers, '2026-11-11')).toBe('regular');
+  });
+});
+
+describe('todayInIst', () => {
+  it('formats the Asia/Kolkata calendar date', () => {
+    expect(todayInIst(new Date('2026-10-31T18:29:00Z'))).toBe('2026-10-31');
+    expect(todayInIst(new Date('2026-10-31T18:30:00Z'))).toBe('2026-11-01');
   });
 });
