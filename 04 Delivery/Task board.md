@@ -30,4 +30,6 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 
 ## Done
 
-- [ ] —
+- [x] [[04 Delivery/GA-021-age-and-search-params-on-listing-pages|GA-021]] Age and `q` filters on city and sport pages (frontend, 2026-10-16)
+- [x] [[04 Delivery/GA-022-event-visibility-filter|GA-022]] Public-only filter on `/events` (backend, 2026-10-16)
+- [x] [[04 Delivery/GA-023-python-requirements-manifest|GA-023]] Pinned `requirements.txt` + scripts README (2026-10-16)
