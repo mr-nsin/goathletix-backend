@@ -8,8 +8,172 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase.service';
 import { GetEventsQueryDto } from './dto/get-events-query.dto';
 
-const EVENT_SELECT =
-  'id, source_id, event_name, sport_type, description, slug, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, registration_opens_at, registration_closes_at, poster_url, is_popular, age_categories, discipline_slugs, organizer_id, organizer_name, club_id, is_club_activity, interest_count, terrain, is_virtual, status, created_at, updated_at, organizer:organizers(id, name, logo_url, website_url, is_verified)';
+const EVENT_COLUMNS =
+  'id, source_id, event_name, sport_type, description, slug, start_date, end_date, city, state, venue, distance_options, elevation_gain, difficulty, price_range, registration_url, registration_opens_at, registration_closes_at, poster_url, is_popular, age_categories, discipline_slugs, organizer_id, organizer_name, club_id, is_club_activity, interest_count, terrain, is_virtual, status, created_at, updated_at';
+
+const EVENT_SELECT = `${EVENT_COLUMNS}, organizer:organizers(id, name, logo_url, website_url, is_verified)`;
+
+/**
+ * Event page select (GA-043): the list columns plus the fields only the detail page needs, and the
+ * organiser with its social links. `organizers` has no `page_url` column, so it is not selected.
+ */
+const EVENT_DETAILS_SELECT = `${EVENT_COLUMNS}, social_share_image_url, ticketing_mode, max_tickets_per_order, organizer:organizers(id, name, logo_url, website_url, instagram_url, cover_url, is_verified)`;
+
+const TICKET_TYPE_SELECT =
+  'id, label, discipline_slug, distance_km, age_categories, gender, start_time, cutoff_minutes, capacity, slots_taken, price_inr, is_sold_out, sort_order, event_price_tiers(id, label, price_inr, valid_from, valid_until)';
+
+const MEDIA_SELECT =
+  'id, url, kind, caption, credit, edition_year, is_cover, created_at';
+
+const FAQ_SELECT = 'question, answer, sort_order, created_at';
+
+const SCHEDULE_SELECT = 'title, starts_at, ends_at, notes, sort_order';
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** PostgREST / Postgres codes for "this relation does not exist". */
+const MISSING_TABLE_CODES = new Set(['PGRST205', '42P01']);
+
+export interface PriceTier {
+  id: string;
+  label: string;
+  price_inr: number;
+  valid_from: string | null;
+  valid_until: string | null;
+}
+
+interface TicketTypeRow {
+  id: string;
+  label: string;
+  sort_order: number | null;
+  event_price_tiers?: PriceTier[] | null;
+  [key: string]: unknown;
+}
+
+interface MediaRow {
+  id: string;
+  url: string;
+  kind: 'photo' | 'video';
+  caption: string | null;
+  credit: string | null;
+  edition_year: number | null;
+  is_cover: boolean;
+  created_at: string | null;
+}
+
+interface FaqRow {
+  question: string;
+  answer: string;
+  sort_order: number | null;
+  created_at: string | null;
+}
+
+interface ScheduleRow {
+  title: string;
+  starts_at: string;
+  ends_at: string | null;
+  notes: string | null;
+  sort_order: number | null;
+}
+
+/** Today's calendar date in India (YYYY-MM-DD), which is what tier validity dates mean. */
+export function todayInIst(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(
+    now,
+  );
+}
+
+/** Ascending string compare with nulls first. ISO dates compare correctly as strings. */
+function compareNullsFirst(a: string | null, b: string | null): number {
+  if (a === b) return 0;
+  if (a === null) return -1;
+  if (b === null) return 1;
+  return a < b ? -1 : 1;
+}
+
+/** Ascending string compare with nulls last. */
+function compareNullsLast(a: string | null, b: string | null): number {
+  if (a === b) return 0;
+  if (a === null) return 1;
+  if (b === null) return -1;
+  return a < b ? -1 : 1;
+}
+
+/** Tiers ordered by valid_from, nulls first, then valid_until (open-ended last). */
+export function sortTiers(tiers: PriceTier[]): PriceTier[] {
+  return [...tiers].sort(
+    (a, b) =>
+      compareNullsFirst(a.valid_from, b.valid_from) ||
+      compareNullsLast(a.valid_until, b.valid_until),
+  );
+}
+
+/**
+ * The tier whose [valid_from, valid_until] window (inclusive, null = unbounded) contains `today`.
+ * When several match (an undated "Regular" alongside a dated "Early bird"), the most specific wins:
+ * latest valid_from, then earliest valid_until.
+ */
+export function pickCurrentTierId(
+  tiers: PriceTier[],
+  today: string,
+): string | null {
+  const matching = tiers.filter(
+    (t) =>
+      (t.valid_from === null || t.valid_from <= today) &&
+      (t.valid_until === null || t.valid_until >= today),
+  );
+  if (matching.length === 0) return null;
+  matching.sort(
+    (a, b) =>
+      compareNullsFirst(b.valid_from, a.valid_from) ||
+      compareNullsLast(a.valid_until, b.valid_until),
+  );
+  return matching[0].id;
+}
+
+export function shapeTicketTypes(rows: TicketTypeRow[], today: string) {
+  return [...rows]
+    .sort(
+      (a, b) =>
+        (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+        a.label.localeCompare(b.label),
+    )
+    .map(({ event_price_tiers, ...ticketType }) => {
+      const tiers = sortTiers(event_price_tiers ?? []).map((t) => ({
+        id: t.id,
+        label: t.label,
+        price_inr: t.price_inr,
+        valid_from: t.valid_from,
+        valid_until: t.valid_until,
+      }));
+      return {
+        ...ticketType,
+        tiers,
+        current_tier_id: pickCurrentTierId(tiers, today),
+      };
+    });
+}
+
+/** Cover first, then newest edition (undated last), then newest upload. */
+export function shapeMedia(rows: MediaRow[]) {
+  return [...rows]
+    .sort(
+      (a, b) =>
+        Number(b.is_cover) - Number(a.is_cover) ||
+        (b.edition_year ?? -Infinity) - (a.edition_year ?? -Infinity) ||
+        compareNullsLast(b.created_at, a.created_at),
+    )
+    .map(({ id, url, kind, caption, credit, edition_year, is_cover }) => ({
+      id,
+      url,
+      kind,
+      caption,
+      credit,
+      edition_year,
+      is_cover,
+    }));
+}
 
 /**
  * Sport-family -> sport-slug lookup, backing the `family` filter. The `sports` table changes
@@ -255,9 +419,7 @@ export class EventsService {
   }
 
   async findOne(id: string) {
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(id)) {
+    if (!UUID_REGEX.test(id)) {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
@@ -279,5 +441,122 @@ export class EventsService {
     }
 
     return data;
+  }
+  /**
+   * Everything the event page needs in one call (GA-043). The event is resolved first with the same
+   * public + published filter as findOne, so a private or draft event 404s before any child table
+   * is read. Child rows are then fetched in parallel and ordered here, not in SQL.
+   */
+  async findDetails(id: string) {
+    if (!UUID_REGEX.test(id)) {
+      throw new NotFoundException(`Event with ID "${id}" not found`);
+    }
+
+    const client = this.supabase.client;
+
+    const { data: row, error } = await client
+      .from('events')
+      .select(EVENT_DETAILS_SELECT)
+      .eq('id', id)
+      .eq('visibility', 'public')
+      .eq('publication_status', 'published')
+      .maybeSingle();
+
+    if (error) {
+      this.logSupabaseError('findDetails', error);
+      throw new InternalServerErrorException(error.message);
+    }
+    if (!row) {
+      throw new NotFoundException(`Event with ID "${id}" not found`);
+    }
+
+    const [ticketRes, mediaRes, faqRes, scheduleRes] = await Promise.all([
+      client
+        .from('event_categories')
+        .select(TICKET_TYPE_SELECT)
+        .eq('event_id', id)
+        // Hidden ticket types are sold only through an access code (0022).
+        .eq('is_hidden', false),
+      client
+        .from('event_media')
+        .select(MEDIA_SELECT)
+        .eq('event_id', id)
+        .eq('status', 'published'),
+      client.from('event_faqs').select(FAQ_SELECT).eq('event_id', id),
+      client
+        .from('event_schedule_items')
+        .select(SCHEDULE_SELECT)
+        .eq('event_id', id),
+    ]);
+
+    const ticketRows = this.rowsOrThrow<TicketTypeRow>(
+      'findDetails:event_categories',
+      ticketRes,
+    );
+    const mediaRows = this.rowsOrThrow<MediaRow>(
+      'findDetails:event_media',
+      mediaRes,
+    );
+    const faqRows = this.rowsOrThrow<FaqRow>('findDetails:event_faqs', faqRes, {
+      allowMissingTable: true,
+    });
+    const scheduleRows = this.rowsOrThrow<ScheduleRow>(
+      'findDetails:event_schedule_items',
+      scheduleRes,
+      { allowMissingTable: true },
+    );
+
+    const { organizer, ...event } = row as Record<string, unknown> & {
+      organizer?: unknown;
+    };
+
+    return {
+      data: {
+        event,
+        organizer: organizer ?? null,
+        ticket_types: shapeTicketTypes(ticketRows, todayInIst()),
+        media: shapeMedia(mediaRows),
+        faqs: [...faqRows]
+          .sort(
+            (a, b) =>
+              (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+              compareNullsLast(a.created_at, b.created_at),
+          )
+          .map(({ question, answer }) => ({ question, answer })),
+        schedule: [...scheduleRows]
+          .sort(
+            (a, b) =>
+              compareNullsLast(a.starts_at, b.starts_at) ||
+              (a.sort_order ?? 0) - (b.sort_order ?? 0),
+          )
+          .map(({ title, starts_at, ends_at, notes }) => ({
+            title,
+            starts_at,
+            ends_at,
+            notes,
+          })),
+      },
+    };
+  }
+
+  /** Unwrap a child-table result: [] for no rows, 500 on error (or [] for an absent table). */
+  private rowsOrThrow<T>(
+    context: string,
+    result: { data: unknown; error: unknown },
+    options: { allowMissingTable?: boolean } = {},
+  ): T[] {
+    if (result.error) {
+      const code = (result.error as { code?: unknown }).code;
+      if (
+        options.allowMissingTable &&
+        typeof code === 'string' &&
+        MISSING_TABLE_CODES.has(code)
+      ) {
+        return [];
+      }
+      this.logSupabaseError(context, result.error);
+      throw new InternalServerErrorException('Failed to fetch event details');
+    }
+    return (result.data ?? []) as T[];
   }
 }

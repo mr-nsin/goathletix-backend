@@ -11,6 +11,13 @@ export class EventsController {
     return this.eventsService.findAll(query);
   }
 
+  // Registered before ':id'. Express would not match '/events/x/details' against ':id' anyway
+  // (a param does not span '/'), but keeping the more specific route first makes the intent explicit.
+  @Get(':id/details')
+  async findDetails(@Param('id') id: string) {
+    return this.eventsService.findDetails(id);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.eventsService.findOne(id);
