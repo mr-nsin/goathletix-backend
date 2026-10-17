@@ -73,3 +73,11 @@ Then `repo-auditor` on each branch, then the merges, then `vault-scribe`.
   say so in the handoff. Agents that cannot run a server must list that as "not verified".
 - Dev servers kept getting stopped by the app between turns; restart them (and clear `.next`) before step 6.
 - `wt.ps1 remove` removes the `node_modules` junction without touching the main checkout's folder (verified).
+- **Batch 2/3: `next build` is a required step.** `tsc` and `eslint` passed on a file that contained one byte in the wrong
+  encoding (a Windows-1252 middle dot); only the production build rejected it. Agents cannot run the build in a worktree
+  (Turbopack refuses the `node_modules` junction), so the coordinator runs `npm run build` on the merge result, with the dev
+  server stopped, before restarting it on a cleared `.next`.
+- **Parallel-safe layout that worked:** agents created new files (`*V2.tsx`, new `.css`), only one task owned `globals.css`,
+  and the coordinator did the single wiring edit in `page.tsx`. Four writers merged with zero conflicts.
+- The global `prefers-reduced-motion` kill rule silently removes hover transitions and animations on machines with reduced
+  motion on; any motion the owner must see is re-declared with `!important` inside a reduced-motion block.

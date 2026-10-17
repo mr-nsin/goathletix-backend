@@ -33,3 +33,8 @@ PRD-vs-code comparison (13 P0 features: 0 built, 6 partial, 7 not built).
 - [x] [[04 Delivery/GA-021-age-and-search-params-on-listing-pages|GA-021]] Age and `q` filters on city and sport pages (frontend, 2026-10-16)
 - [x] [[04 Delivery/GA-022-event-visibility-filter|GA-022]] Public-only filter on `/events` (backend, 2026-10-16)
 - [x] [[04 Delivery/GA-023-python-requirements-manifest|GA-023]] Pinned `requirements.txt` + scripts README (2026-10-16)
+- [x] [[04 Delivery/GA-028-featured-banner-rail-arrows-hover|GA-028 Featured banner, rail arrows, smooth hover]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-029-sport-and-city-cards-v2|GA-029 Sport tiles and city cards v2]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-030-clubs-and-guides-cards|GA-030 Clubs and guides cards]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-031-partners-alerts-footer-flow|GA-031 Partners infographics, alerts, footer flow]] (frontend, 2026-10-17)
+- [x] [[04 Delivery/GA-032-club-academy-listing-research|GA-032 Club and academy listing research]] (docs, 2026-10-17)
