@@ -14,13 +14,68 @@ const EVENT_COLUMNS =
 const EVENT_SELECT = `${EVENT_COLUMNS}, organizer:organizers(id, name, logo_url, website_url, is_verified)`;
 
 /**
- * Event page select (GA-043): the list columns plus the fields only the detail page needs, and the
- * organiser with its social links. `organizers` has no `page_url` column, so it is not selected.
+ * Event page columns beyond the list select (GA-043, GA-048). Every column here is verified against
+ * an APPLIED migration (0014, 0016, 0022, 0023, 0025). Never add a column from an unapplied draft:
+ * PostgREST errors on an unknown column and the whole page 500s.
  */
-const EVENT_DETAILS_SELECT = `${EVENT_COLUMNS}, social_share_image_url, ticketing_mode, max_tickets_per_order, organizer:organizers(id, name, logo_url, website_url, instagram_url, cover_url, is_verified)`;
+const EVENT_DETAIL_COLUMNS = [
+  // 0022 ticketing
+  'social_share_image_url',
+  'ticketing_mode',
+  'max_tickets_per_order',
+  // 0023 overview and timing
+  'tagline',
+  'start_time',
+  'end_time',
+  'reporting_time',
+  // 0014 certification, timing and course
+  'is_certified',
+  'certifying_body',
+  'is_chip_timed',
+  'timing_partner',
+  'altitude_m',
+  'course_map_url',
+  // 0023 course and venue
+  'aid_stations',
+  'amenities',
+  'safety_info',
+  'address_line',
+  'pincode',
+  'venue_notes',
+  // 0022 + 0023 policies
+  'refund_policy',
+  'transfer_policy',
+  'deferral_policy',
+  'cancellation_policy',
+  'terms_text',
+  'waiver_text',
+  // 0023 pricing and contact
+  'tax_mode',
+  'gst_rate',
+  'waitlist_enabled',
+  'contact_email',
+  'contact_phone',
+  'whatsapp_url',
+  // 0025 race-day logistics
+  'bib_expo_opens_at',
+  'bib_expo_closes_at',
+  'certificate_available_at',
+  // 0016 results, 0014 ratings
+  'results_url',
+  'rating_avg',
+  'rating_count',
+].join(', ');
+
+/** `organizers` has no `page_url` column, so it is not selected. */
+const EVENT_DETAILS_SELECT = `${EVENT_COLUMNS}, ${EVENT_DETAIL_COLUMNS}, organizer:organizers(id, name, logo_url, website_url, instagram_url, cover_url, is_verified)`;
 
 const TICKET_TYPE_SELECT =
-  'id, label, discipline_slug, distance_km, age_categories, gender, start_time, cutoff_minutes, capacity, slots_taken, price_inr, is_sold_out, sort_order, event_price_tiers(id, label, price_inr, valid_from, valid_until)';
+  'id, label, discipline_slug, distance_km, age_categories, gender, start_time, cutoff_minutes, capacity, slots_taken, price_inr, is_sold_out, sort_order, ' +
+  // 0022 inclusions and sales window
+  'description, includes, sales_start_at, sales_end_at, max_per_order, ' +
+  // 0023 eligibility
+  'min_age, max_age, age_as_on_date, required_documents, qualifying_standard, team_size_min, team_size_max, eligibility_notes, ' +
+  'event_price_tiers(id, label, price_inr, valid_from, valid_until)';
 
 const MEDIA_SELECT =
   'id, url, kind, caption, credit, edition_year, is_cover, created_at';
@@ -28,6 +83,19 @@ const MEDIA_SELECT =
 const FAQ_SELECT = 'question, answer, sort_order, created_at';
 
 const SCHEDULE_SELECT = 'title, starts_at, ends_at, notes, sort_order';
+
+const SPONSOR_SELECT =
+  'name, tier, logo_url, website_url, sort_order, created_at';
+
+/** Display rank of `event_sponsors.tier` (CHECK constraint in 0023); unknown tiers sort last. */
+const SPONSOR_TIER_RANK: Record<string, number> = {
+  title: 0,
+  presenting: 1,
+  gold: 2,
+  silver: 3,
+  partner: 4,
+  media: 5,
+};
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -65,6 +133,15 @@ interface MediaRow {
 interface FaqRow {
   question: string;
   answer: string;
+  sort_order: number | null;
+  created_at: string | null;
+}
+
+interface SponsorRow {
+  name: string;
+  tier: string;
+  logo_url: string | null;
+  website_url: string | null;
   sort_order: number | null;
   created_at: string | null;
 }
@@ -172,6 +249,25 @@ export function shapeMedia(rows: MediaRow[]) {
       credit,
       edition_year,
       is_cover,
+    }));
+}
+
+/** Organiser's sort_order first, then tier rank (title before media), then oldest first. */
+export function shapeSponsors(rows: SponsorRow[]) {
+  const rank = (tier: string) =>
+    SPONSOR_TIER_RANK[tier] ?? Object.keys(SPONSOR_TIER_RANK).length;
+  return [...rows]
+    .sort(
+      (a, b) =>
+        (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+        rank(a.tier) - rank(b.tier) ||
+        compareNullsLast(a.created_at, b.created_at),
+    )
+    .map(({ name, tier, logo_url, website_url }) => ({
+      name,
+      tier,
+      logo_url,
+      website_url,
     }));
 }
 
@@ -470,24 +566,26 @@ export class EventsService {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
-    const [ticketRes, mediaRes, faqRes, scheduleRes] = await Promise.all([
-      client
-        .from('event_categories')
-        .select(TICKET_TYPE_SELECT)
-        .eq('event_id', id)
-        // Hidden ticket types are sold only through an access code (0022).
-        .eq('is_hidden', false),
-      client
-        .from('event_media')
-        .select(MEDIA_SELECT)
-        .eq('event_id', id)
-        .eq('status', 'published'),
-      client.from('event_faqs').select(FAQ_SELECT).eq('event_id', id),
-      client
-        .from('event_schedule_items')
-        .select(SCHEDULE_SELECT)
-        .eq('event_id', id),
-    ]);
+    const [ticketRes, mediaRes, faqRes, scheduleRes, sponsorRes] =
+      await Promise.all([
+        client
+          .from('event_categories')
+          .select(TICKET_TYPE_SELECT)
+          .eq('event_id', id)
+          // Hidden ticket types are sold only through an access code (0022).
+          .eq('is_hidden', false),
+        client
+          .from('event_media')
+          .select(MEDIA_SELECT)
+          .eq('event_id', id)
+          .eq('status', 'published'),
+        client.from('event_faqs').select(FAQ_SELECT).eq('event_id', id),
+        client
+          .from('event_schedule_items')
+          .select(SCHEDULE_SELECT)
+          .eq('event_id', id),
+        client.from('event_sponsors').select(SPONSOR_SELECT).eq('event_id', id),
+      ]);
 
     const ticketRows = this.rowsOrThrow<TicketTypeRow>(
       'findDetails:event_categories',
@@ -505,8 +603,17 @@ export class EventsService {
       scheduleRes,
       { allowMissingTable: true },
     );
+    const sponsorRows = this.rowsOrThrow<SponsorRow>(
+      'findDetails:event_sponsors',
+      sponsorRes,
+      { allowMissingTable: true },
+    );
 
-    const { organizer, ...event } = row as Record<string, unknown> & {
+    // The select is assembled from a column list, so supabase-js cannot infer the row type.
+    const { organizer, ...event } = row as unknown as Record<
+      string,
+      unknown
+    > & {
       organizer?: unknown;
     };
 
@@ -535,6 +642,7 @@ export class EventsService {
             ends_at,
             notes,
           })),
+        sponsors: shapeSponsors(sponsorRows),
       },
     };
   }
