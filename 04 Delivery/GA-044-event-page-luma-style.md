@@ -80,9 +80,11 @@ Two routes are needed:
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| tsc --noEmit | not run | - |
-| eslint src | not run | - |
-| Server/client boundary self-check | not run | - |
+| tsc --noEmit | pass | `npx tsc --noEmit` in the worktree, exit 0, no output (2026-10-19) |
+| eslint src | pass, 0 errors | `npx eslint src`: 0 errors, 6 warnings, all pre-existing in files GA-044 does not touch (CategoryGrid, EventsDirectory, LiveTicker, Footer) |
+| Server/client boundary self-check | pass | Client files: MediaGallery, TicketStepper, ShareButton (import only react, next/image, lucide). Server files (page, EventPage, EventTickets, OrganizerCard) only render them with serialisable props and import a type from MediaGallery; no function from a client file is called on the server. eventDetails.ts, sampleContent.ts, format.ts are plain modules |
+| Invalid CSS grep `!important\s*,` | pass | no matches in src/components/event/event.css |
+| Normaliser / pricing smoke test | pass | jiti script against src/lib/eventDetails.ts: sample tiers (Early bird 2,400, then 2,900 from 1 Nov), capacity left 1,120 of 14,000, 10K sold out, IST schedule times, `?mode=external` override, basics-only sample card, placeholder fields dropped on live rows |
 | Loaded in a browser | not run | coordinator, after merge (real renders with headless Edge) |
 
 ## Handoff
