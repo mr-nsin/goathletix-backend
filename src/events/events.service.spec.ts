@@ -330,6 +330,7 @@ describe('EventsService.findDetails', () => {
     expect(data.media).toEqual([]);
     expect(data.faqs).toEqual([]);
     expect(data.schedule).toEqual([]);
+    expect(data.sponsors).toEqual([]);
     expect(data.organizer).toEqual(EVENT_ROW.organizer);
     expect(data.event).toEqual({
       id: EVENT_ID,
@@ -506,6 +507,209 @@ describe('EventsService.findDetails', () => {
         notes: null,
       },
     ]);
+  });
+
+  function selectOf(builder: FakeQueryBuilder | undefined): string {
+    const call = builder?.calls.find((c) => c.method === 'select');
+    const select = call?.args[0];
+    return typeof select === 'string' ? select : '';
+  }
+
+  function topLevelColumns(select: string): string[] {
+    // Drop embedded resources such as organizer:organizers(...) before splitting.
+    return select
+      .replace(/[\w:]+\([^)]*\)/g, '')
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
+  }
+
+  it('selects the GA-048 event and ticket-type columns', async () => {
+    const { service, builders } = makeDetailsService(EVENT_ROW);
+
+    await service.findDetails(EVENT_ID);
+
+    const eventColumns = topLevelColumns(selectOf(builders.get('events')));
+    expect(eventColumns).toEqual(
+      expect.arrayContaining([
+        'tagline',
+        'start_time',
+        'end_time',
+        'reporting_time',
+        'is_certified',
+        'certifying_body',
+        'is_chip_timed',
+        'timing_partner',
+        'altitude_m',
+        'course_map_url',
+        'aid_stations',
+        'amenities',
+        'safety_info',
+        'address_line',
+        'pincode',
+        'venue_notes',
+        'refund_policy',
+        'transfer_policy',
+        'deferral_policy',
+        'cancellation_policy',
+        'terms_text',
+        'waiver_text',
+        'tax_mode',
+        'gst_rate',
+        'waitlist_enabled',
+        'contact_email',
+        'contact_phone',
+        'whatsapp_url',
+        'bib_expo_opens_at',
+        'bib_expo_closes_at',
+        'certificate_available_at',
+        'results_url',
+        'rating_avg',
+        'rating_count',
+      ]),
+    );
+    // No duplicate column names, which PostgREST would reject.
+    expect(new Set(eventColumns).size).toBe(eventColumns.length);
+
+    const ticketColumns = topLevelColumns(
+      selectOf(builders.get('event_categories')),
+    );
+    expect(ticketColumns).toEqual(
+      expect.arrayContaining([
+        'description',
+        'includes',
+        'sales_start_at',
+        'sales_end_at',
+        'max_per_order',
+        'min_age',
+        'max_age',
+        'age_as_on_date',
+        'required_documents',
+        'qualifying_standard',
+        'team_size_min',
+        'team_size_max',
+        'eligibility_notes',
+      ]),
+    );
+    expect(new Set(ticketColumns).size).toBe(ticketColumns.length);
+    expect(eqPairs(builders.get('event_sponsors'))).toEqual([
+      ['event_id', EVENT_ID],
+    ]);
+  });
+
+  it('passes the new event and ticket-type fields through unchanged', async () => {
+    const eventRow = {
+      ...EVENT_ROW,
+      tagline: 'Run the ghats',
+      refund_policy: 'No refunds after 1 Nov',
+      amenities: ['parking', 'medical'],
+      aid_stations: [{ km: 5, offers: ['water'] }],
+      gst_rate: 18,
+      waitlist_enabled: true,
+      bib_expo_opens_at: '2026-11-01T04:30:00+00:00',
+      rating_avg: 4.5,
+    };
+    const { service } = makeDetailsService(eventRow, {
+      event_categories: {
+        data: [
+          {
+            id: 'c-10k',
+            label: '10K',
+            sort_order: 0,
+            includes: ['T-shirt', 'Medal'],
+            min_age: 18,
+            max_age: null,
+            age_as_on_date: '2026-11-02',
+            required_documents: ['medical_certificate'],
+            team_size_min: null,
+            eligibility_notes: 'Open to all',
+            event_price_tiers: [],
+          },
+        ],
+        error: null,
+      },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    const { organizer: _organizer, ...expectedEvent } = eventRow;
+    void _organizer;
+    expect(data.event).toEqual(expectedEvent);
+    expect(data.ticket_types[0]).toMatchObject({
+      includes: ['T-shirt', 'Medal'],
+      min_age: 18,
+      max_age: null,
+      age_as_on_date: '2026-11-02',
+      required_documents: ['medical_certificate'],
+      team_size_min: null,
+      eligibility_notes: 'Open to all',
+    });
+  });
+
+  it('orders sponsors by sort_order, then tier, and maps to contract keys', async () => {
+    const sponsor = (
+      name: string,
+      tier: string,
+      sort_order: number,
+      created_at = '2026-01-01T00:00:00Z',
+    ) => ({
+      name,
+      tier,
+      logo_url: `https://x/${name}.png`,
+      website_url: null,
+      sort_order,
+      created_at,
+    });
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_sponsors: {
+        data: [
+          sponsor('Media Co', 'media', 0),
+          sponsor('Late Partner', 'partner', 1, '2026-02-01T00:00:00Z'),
+          sponsor('Title Co', 'title', 0),
+          sponsor('Early Partner', 'partner', 1, '2026-01-15T00:00:00Z'),
+          sponsor('Gold Co', 'gold', 0),
+        ],
+        error: null,
+      },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.sponsors.map((s) => s.name)).toEqual([
+      'Title Co',
+      'Gold Co',
+      'Media Co',
+      'Early Partner',
+      'Late Partner',
+    ]);
+    expect(data.sponsors[0]).toEqual({
+      name: 'Title Co',
+      tier: 'title',
+      logo_url: 'https://x/Title Co.png',
+      website_url: null,
+    });
+  });
+
+  it('treats an absent sponsors table as [] but fails on a sponsors query error', async () => {
+    const missing = makeDetailsService(EVENT_ROW, {
+      event_sponsors: { data: null, error: { code: '42P01', message: 'x' } },
+    });
+    await expect(missing.service.findDetails(EVENT_ID)).resolves.toMatchObject({
+      data: { sponsors: [] },
+    });
+
+    const broken = makeDetailsService(EVENT_ROW, {
+      event_sponsors: { data: null, error: { code: '500', message: 'boom' } },
+    });
+    jest
+      .spyOn(
+        (broken.service as unknown as { logger: { error: () => void } }).logger,
+        'error',
+      )
+      .mockImplementation(() => undefined);
+    await expect(broken.service.findDetails(EVENT_ID)).rejects.toBeInstanceOf(
+      InternalServerErrorException,
+    );
   });
 
   it('treats an absent faq table as [] but fails on a ticket query error', async () => {
