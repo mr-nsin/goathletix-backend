@@ -64,10 +64,33 @@ const EVENT_DETAIL_COLUMNS = [
   'results_url',
   'rating_avg',
   'rating_count',
+  // 0026 event-page fields (GA-050): requirements, policies, course, badges, safety, urgency
+  'sport_details',
+  'mandatory_gear',
+  'recommended_gear',
+  'fitness_requirement',
+  'changes_allowed_until',
+  'kit_collection_mandatory',
+  'race_day_collection',
+  'gpx_url',
+  'elevation_gain_m',
+  'sanction_reference',
+  'edition_number',
+  'women_safety',
+  'sponsorship_contact',
+  'closes_when_sold_out',
+  // 0026 event social links (organiser social links are on the organizer join below)
+  'instagram_url',
+  'facebook_url',
+  'youtube_url',
+  'x_url',
+  'linkedin_url',
+  'strava_url',
+  'hashtag',
 ].join(', ');
 
 /** `organizers` has no `page_url` column, so it is not selected. */
-const EVENT_DETAILS_SELECT = `${EVENT_COLUMNS}, ${EVENT_DETAIL_COLUMNS}, organizer:organizers(id, name, logo_url, website_url, instagram_url, cover_url, is_verified)`;
+const EVENT_DETAILS_SELECT = `${EVENT_COLUMNS}, ${EVENT_DETAIL_COLUMNS}, organizer:organizers(id, name, logo_url, website_url, instagram_url, cover_url, is_verified, facebook_url, youtube_url, x_url, linkedin_url, strava_url, whatsapp_url)`;
 
 const TICKET_TYPE_SELECT =
   'id, label, discipline_slug, distance_km, age_categories, gender, start_time, cutoff_minutes, capacity, slots_taken, price_inr, is_sold_out, sort_order, ' +
@@ -75,6 +98,8 @@ const TICKET_TYPE_SELECT =
   'description, includes, sales_start_at, sales_end_at, max_per_order, ' +
   // 0023 eligibility
   'min_age, max_age, age_as_on_date, required_documents, qualifying_standard, team_size_min, team_size_max, eligibility_notes, ' +
+  // 0026 per-sport ticket-type facts and extras (GA-050)
+  'sport_details, is_timed, compare_at_price_inr, excludes, team_composition, ticket_kind, session_starts_on, session_ends_on, deposit_inr, balance_due_days, course_map_url, ' +
   'event_price_tiers(id, label, price_inr, valid_from, valid_until)';
 
 const MEDIA_SELECT =
@@ -86,6 +111,21 @@ const SCHEDULE_SELECT = 'title, starts_at, ends_at, notes, sort_order';
 
 const SPONSOR_SELECT =
   'name, tier, logo_url, website_url, sort_order, created_at';
+
+// 0026 event child tables (GA-050). Column names grep-verified against
+// `supabase/migrations/20261019000026_event_page_fields.sql`. Ordered in SQL by the real sort
+// column from the migration — `sort_order` on four of them, `seq` on event_checkpoints which
+// has no `sort_order`. Each fetch is wrapped in a try/catch so one failing child-table does
+// not 500 the whole /details response (log the failure, return []).
+const AWARD_SELECT =
+  'id, category_id, scope, age_band, gender, position_from, position_to, cash_inr, prize_text, min_entries_female, min_entries_male, sort_order';
+const CHECKPOINT_SELECT =
+  'id, category_id, seq, name, km, location, cutoff_at, cutoff_after_minutes, services, notes';
+const RESOURCE_SELECT = 'id, category_id, kind, label, url, sort_order';
+const OFFER_SELECT =
+  'id, category_id, label, audience, discount_type, discount_value, min_qty, valid_from, valid_until, terms, is_active, sort_order';
+const ITINERARY_SELECT =
+  'id, day_no, title, description, distance_km, duration_text, start_altitude_m, end_altitude_m, meals, stay, sort_order';
 
 /** Display rank of `event_sponsors.tier` (CHECK constraint in 0023); unknown tiers sort last. */
 const SPONSOR_TIER_RANK: Record<string, number> = {
@@ -152,6 +192,75 @@ interface ScheduleRow {
   ends_at: string | null;
   notes: string | null;
   sort_order: number | null;
+}
+
+// 0026 child-table row shapes. snake_case passthrough (CLAUDE.md §6): the service does not
+// rename or reshape — these interfaces just document what safeChildRows returns.
+// Exported so the controller's inferred return type can name them (TS4053).
+export interface AwardRow {
+  id: string;
+  category_id: string | null;
+  scope: string;
+  age_band: string | null;
+  gender: string | null;
+  position_from: number;
+  position_to: number;
+  cash_inr: number | null;
+  prize_text: string | null;
+  min_entries_female: number | null;
+  min_entries_male: number | null;
+  sort_order: number;
+}
+
+export interface CheckpointRow {
+  id: string;
+  category_id: string | null;
+  seq: number;
+  name: string;
+  km: number | null;
+  location: string | null;
+  cutoff_at: string | null;
+  cutoff_after_minutes: number | null;
+  services: string[];
+  notes: string | null;
+}
+
+export interface ResourceRow {
+  id: string;
+  category_id: string | null;
+  kind: string;
+  label: string;
+  url: string;
+  sort_order: number;
+}
+
+export interface OfferRow {
+  id: string;
+  category_id: string | null;
+  label: string;
+  audience: string;
+  discount_type: string;
+  discount_value: number;
+  min_qty: number;
+  valid_from: string | null;
+  valid_until: string | null;
+  terms: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
+export interface ItineraryRow {
+  id: string;
+  day_no: number;
+  title: string;
+  description: string | null;
+  distance_km: number | null;
+  duration_text: string | null;
+  start_altitude_m: number | null;
+  end_altitude_m: number | null;
+  meals: string[];
+  stay: string | null;
+  sort_order: number;
 }
 
 /** Today's calendar date in India (YYYY-MM-DD), which is what tier validity dates mean. */
@@ -566,26 +675,74 @@ export class EventsService {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
 
-    const [ticketRes, mediaRes, faqRes, scheduleRes, sponsorRes] =
-      await Promise.all([
+    const [
+      ticketRes,
+      mediaRes,
+      faqRes,
+      scheduleRes,
+      sponsorRes,
+      awardsRows,
+      checkpointsRows,
+      resourcesRows,
+      offersRows,
+      itineraryRows,
+    ] = await Promise.all([
+      client
+        .from('event_categories')
+        .select(TICKET_TYPE_SELECT)
+        .eq('event_id', id)
+        // Hidden ticket types are sold only through an access code (0022).
+        .eq('is_hidden', false),
+      client
+        .from('event_media')
+        .select(MEDIA_SELECT)
+        .eq('event_id', id)
+        .eq('status', 'published'),
+      client.from('event_faqs').select(FAQ_SELECT).eq('event_id', id),
+      client
+        .from('event_schedule_items')
+        .select(SCHEDULE_SELECT)
+        .eq('event_id', id),
+      client.from('event_sponsors').select(SPONSOR_SELECT).eq('event_id', id),
+      // GA-050 child tables added by migration 0026. Each is isolated: one failing
+      // fetch returns [] for that section only (see safeChildRows).
+      this.safeChildRows<AwardRow>('findDetails:event_awards', () =>
         client
-          .from('event_categories')
-          .select(TICKET_TYPE_SELECT)
+          .from('event_awards')
+          .select(AWARD_SELECT)
           .eq('event_id', id)
-          // Hidden ticket types are sold only through an access code (0022).
-          .eq('is_hidden', false),
+          .order('sort_order', { ascending: true, nullsFirst: false }),
+      ),
+      this.safeChildRows<CheckpointRow>('findDetails:event_checkpoints', () =>
         client
-          .from('event_media')
-          .select(MEDIA_SELECT)
+          .from('event_checkpoints')
+          .select(CHECKPOINT_SELECT)
           .eq('event_id', id)
-          .eq('status', 'published'),
-        client.from('event_faqs').select(FAQ_SELECT).eq('event_id', id),
+          .order('seq', { ascending: true, nullsFirst: false }),
+      ),
+      this.safeChildRows<ResourceRow>('findDetails:event_resources', () =>
         client
-          .from('event_schedule_items')
-          .select(SCHEDULE_SELECT)
-          .eq('event_id', id),
-        client.from('event_sponsors').select(SPONSOR_SELECT).eq('event_id', id),
-      ]);
+          .from('event_resources')
+          .select(RESOURCE_SELECT)
+          .eq('event_id', id)
+          .order('sort_order', { ascending: true, nullsFirst: false }),
+      ),
+      this.safeChildRows<OfferRow>('findDetails:event_offers', () =>
+        client
+          .from('event_offers')
+          .select(OFFER_SELECT)
+          .eq('event_id', id)
+          .order('sort_order', { ascending: true, nullsFirst: false }),
+      ),
+      this.safeChildRows<ItineraryRow>('findDetails:event_itinerary_days', () =>
+        client
+          .from('event_itinerary_days')
+          .select(ITINERARY_SELECT)
+          .eq('event_id', id)
+          .order('sort_order', { ascending: true, nullsFirst: false })
+          .order('day_no', { ascending: true, nullsFirst: false }),
+      ),
+    ]);
 
     const ticketRows = this.rowsOrThrow<TicketTypeRow>(
       'findDetails:event_categories',
@@ -643,8 +800,37 @@ export class EventsService {
             notes,
           })),
         sponsors: shapeSponsors(sponsorRows),
+        awards: awardsRows,
+        checkpoints: checkpointsRows,
+        resources: resourcesRows,
+        offers: offersRows,
+        itinerary_days: itineraryRows,
       },
     };
+  }
+
+  /**
+   * Fetch a 0026 child-table row set that must never 500 the whole details response.
+   * Any error — a transport failure, a Supabase/PostgREST error row, an exception from the
+   * builder itself — is logged and swallowed, and `[]` is returned. The parent event has
+   * already been resolved against RLS-equivalent filters above, so an empty section is a
+   * safe fallback for the frontend (every GA-050 field is treated as optional).
+   */
+  private async safeChildRows<T>(
+    context: string,
+    build: () => PromiseLike<{ data: unknown; error: unknown }>,
+  ): Promise<T[]> {
+    try {
+      const { data, error } = await build();
+      if (error) {
+        this.logSupabaseError(context, error);
+        return [];
+      }
+      return (data ?? []) as T[];
+    } catch (e) {
+      this.logSupabaseError(context, e);
+      return [];
+    }
   }
 
   /** Unwrap a child-table result: [] for no rows, 500 on error (or [] for an absent table). */

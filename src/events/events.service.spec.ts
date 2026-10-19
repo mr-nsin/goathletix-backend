@@ -331,6 +331,12 @@ describe('EventsService.findDetails', () => {
     expect(data.faqs).toEqual([]);
     expect(data.schedule).toEqual([]);
     expect(data.sponsors).toEqual([]);
+    // GA-050 (migration 0026) child tables default to [] when no rows exist.
+    expect(data.awards).toEqual([]);
+    expect(data.checkpoints).toEqual([]);
+    expect(data.resources).toEqual([]);
+    expect(data.offers).toEqual([]);
+    expect(data.itinerary_days).toEqual([]);
     expect(data.organizer).toEqual(EVENT_ROW.organizer);
     expect(data.event).toEqual({
       id: EVENT_ID,
@@ -710,6 +716,202 @@ describe('EventsService.findDetails', () => {
     await expect(broken.service.findDetails(EVENT_ID)).rejects.toBeInstanceOf(
       InternalServerErrorException,
     );
+  });
+
+  it('selects the GA-050 (migration 0026) event, organiser-social and ticket-type columns', async () => {
+    const { service, builders } = makeDetailsService(EVENT_ROW);
+
+    await service.findDetails(EVENT_ID);
+
+    const eventSelect = selectOf(builders.get('events'));
+    const eventColumns = topLevelColumns(eventSelect);
+    expect(eventColumns).toEqual(
+      expect.arrayContaining([
+        // 0026 event-page fields
+        'sport_details',
+        'mandatory_gear',
+        'recommended_gear',
+        'fitness_requirement',
+        'changes_allowed_until',
+        'kit_collection_mandatory',
+        'race_day_collection',
+        'gpx_url',
+        'elevation_gain_m',
+        'sanction_reference',
+        'edition_number',
+        'women_safety',
+        'sponsorship_contact',
+        'closes_when_sold_out',
+        // 0026 event social links
+        'instagram_url',
+        'facebook_url',
+        'youtube_url',
+        'x_url',
+        'linkedin_url',
+        'strava_url',
+        'hashtag',
+      ]),
+    );
+    expect(new Set(eventColumns).size).toBe(eventColumns.length);
+
+    // Organiser join carries the 0026 social links.
+    for (const col of [
+      'facebook_url',
+      'youtube_url',
+      'x_url',
+      'linkedin_url',
+      'strava_url',
+      'whatsapp_url',
+    ]) {
+      expect(eventSelect).toContain(col);
+    }
+
+    const ticketColumns = topLevelColumns(
+      selectOf(builders.get('event_categories')),
+    );
+    expect(ticketColumns).toEqual(
+      expect.arrayContaining([
+        'sport_details',
+        'is_timed',
+        'compare_at_price_inr',
+        'excludes',
+        'team_composition',
+        'ticket_kind',
+        'session_starts_on',
+        'session_ends_on',
+        'deposit_inr',
+        'balance_due_days',
+        'course_map_url',
+      ]),
+    );
+    expect(new Set(ticketColumns).size).toBe(ticketColumns.length);
+  });
+
+  it('passes the GA-050 child-table rows through unchanged (snake_case)', async () => {
+    const award = {
+      id: 'a1',
+      category_id: null,
+      scope: 'overall',
+      age_band: null,
+      gender: 'open',
+      position_from: 1,
+      position_to: 3,
+      cash_inr: 10000,
+      prize_text: 'Medal + trophy',
+      min_entries_female: null,
+      min_entries_male: null,
+      sort_order: 0,
+    };
+    const checkpoint = {
+      id: 'cp1',
+      category_id: null,
+      seq: 2,
+      name: 'CP2',
+      km: 42.5,
+      location: 'Water point',
+      cutoff_at: null,
+      cutoff_after_minutes: 180,
+      services: ['water', 'medical'],
+      notes: null,
+    };
+    const resource = {
+      id: 'r1',
+      category_id: null,
+      kind: 'gpx',
+      label: 'Course GPX',
+      url: 'https://x/c.gpx',
+      sort_order: 1,
+    };
+    const offer = {
+      id: 'o1',
+      category_id: null,
+      label: 'Women 50% off',
+      audience: 'women',
+      discount_type: 'percent',
+      discount_value: 50,
+      min_qty: 1,
+      valid_from: null,
+      valid_until: '2026-12-31T00:00:00Z',
+      terms: null,
+      is_active: true,
+      sort_order: 0,
+    };
+    const day = {
+      id: 'd1',
+      day_no: 1,
+      title: 'Sankri to Juda ka Talab',
+      description: null,
+      distance_km: 4.5,
+      duration_text: '4-5 h',
+      start_altitude_m: 1950,
+      end_altitude_m: 2800,
+      meals: ['breakfast', 'lunch', 'dinner'],
+      stay: 'Tents, 3 sharing',
+      sort_order: 0,
+    };
+
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_awards: { data: [award], error: null },
+      event_checkpoints: { data: [checkpoint], error: null },
+      event_resources: { data: [resource], error: null },
+      event_offers: { data: [offer], error: null },
+      event_itinerary_days: { data: [day], error: null },
+    });
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.awards).toEqual([award]);
+    expect(data.checkpoints).toEqual([checkpoint]);
+    expect(data.resources).toEqual([resource]);
+    expect(data.offers).toEqual([offer]);
+    expect(data.itinerary_days).toEqual([day]);
+  });
+
+  it('isolates a failing GA-050 child table: returns [] for that section only', async () => {
+    const { service } = makeDetailsService(EVENT_ROW, {
+      event_awards: {
+        data: null,
+        error: { code: '42P01', message: 'relation missing' },
+      },
+      event_checkpoints: {
+        data: null,
+        error: { code: '500', message: 'boom' },
+      },
+      event_offers: {
+        data: [
+          {
+            id: 'o1',
+            category_id: null,
+            label: 'Group of 10',
+            audience: 'group',
+            discount_type: 'flat',
+            discount_value: 500,
+            min_qty: 10,
+            valid_from: null,
+            valid_until: null,
+            terms: null,
+            is_active: true,
+            sort_order: 0,
+          },
+        ],
+        error: null,
+      },
+    });
+    // Silence the logger — these errors are expected.
+    jest
+      .spyOn(
+        (service as unknown as { logger: { error: () => void } }).logger,
+        'error',
+      )
+      .mockImplementation(() => undefined);
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.awards).toEqual([]);
+    expect(data.checkpoints).toEqual([]);
+    expect(data.offers).toHaveLength(1);
+    expect(data.resources).toEqual([]);
+    expect(data.itinerary_days).toEqual([]);
   });
 
   it('treats an absent faq table as [] but fails on a ticket query error', async () => {
