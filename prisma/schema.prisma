@@ -116,6 +116,13 @@ model Organizer {
   ratingAvg     Decimal?             @map("rating_avg") @db.Decimal(2, 1)
   ratingCount   Int                  @default(0) @map("rating_count")
   updatedAt     DateTime             @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0026: social links (website_url and instagram_url already exist).
+  facebookUrl   String?              @map("facebook_url")
+  youtubeUrl    String?              @map("youtube_url")
+  xUrl          String?              @map("x_url")
+  linkedinUrl   String?              @map("linkedin_url")
+  stravaUrl     String?              @map("strava_url")
+  whatsappUrl   String?              @map("whatsapp_url")
   events        Event[]
   follows       Follow[]
   members       OrganizerMember[]
@@ -257,10 +264,45 @@ model Event {
   cancellationReason String?   @map("cancellation_reason")
   setupProgress      Json      @default("{}") @map("setup_progress")
 
+  // Migration 0026: event-page fields (GA-046/GA-047, ADR-009). CHECKs:
+  //   sportDetails    jsonb object (events_sport_details_object); shape per sport_type in the SQL COMMENT and ADR-009
+  //   elevationGainM  BETWEEN 0 AND 20000 (backfilled from text elevation_gain where it is a plain metre figure)
+  //   editionNumber   BETWEEN 1 AND 1000
+  //   womenSafety     each in: female_medics, female_marshals, female_volunteers, women_only_wave, women_only_category,
+  //                   same_gender_tents, separate_changing, women_helpline, well_lit_route, safe_transport
+  //   hashtag         NULL or ^[A-Za-z0-9_]{1,100}$ (stored without the leading #)
+  // kitCollectionMandatory, raceDayCollection, closesWhenSoldOut: NULL = the organiser has not said.
+  sportDetails           Json      @default("{}") @map("sport_details")
+  mandatoryGear          String[]  @default([]) @map("mandatory_gear")
+  recommendedGear        String[]  @default([]) @map("recommended_gear")
+  fitnessRequirement     String?   @map("fitness_requirement")
+  changesAllowedUntil    DateTime? @map("changes_allowed_until") @db.Timestamptz(6)
+  kitCollectionMandatory Boolean?  @map("kit_collection_mandatory")
+  raceDayCollection      Boolean?  @map("race_day_collection")
+  gpxUrl                 String?   @map("gpx_url")
+  elevationGainM         Int?      @map("elevation_gain_m")
+  sanctionReference      String?   @map("sanction_reference")
+  editionNumber          Int?      @map("edition_number") @db.SmallInt
+  womenSafety            String[]  @default([]) @map("women_safety")
+  sponsorshipContact     String?   @map("sponsorship_contact")
+  closesWhenSoldOut      Boolean?  @map("closes_when_sold_out")
+  instagramUrl           String?   @map("instagram_url")
+  facebookUrl            String?   @map("facebook_url")
+  youtubeUrl             String?   @map("youtube_url")
+  xUrl                   String?   @map("x_url")
+  linkedinUrl            String?   @map("linkedin_url")
+  stravaUrl              String?   @map("strava_url")
+  hashtag                String?
+
   scheduleItems       EventScheduleItem[]
   sponsors            EventSponsor[]
   faqs                EventFaq[]
   complianceDocuments EventDocument[]
+  awards              EventAward[]
+  checkpoints         EventCheckpoint[]
+  resources           EventResource[]
+  offers              EventOffer[]
+  itineraryDays       EventItineraryDay[]
 
   follows            Follow[]
   userCalendars      UserCalendar[]
@@ -290,7 +332,8 @@ model Event {
 
   // Indexes that exist in SQL but cannot be expressed here: idx_events_featured (partial, 0014),
   // idx_events_certified (partial, 0014), idx_events_results_published (partial, 0016),
-  // idx_events_discoverable (partial, 0022), idx_events_price_min (plain btree, 0014).
+  // idx_events_discoverable (partial, 0022), idx_events_price_min (plain btree, 0014),
+  // idx_events_elevation_gain_m (partial, 0026).
   @@map("events")
 }
 
@@ -366,6 +409,9 @@ model Profile {
   broadcastsCreated        OrganizerBroadcast[]
   reviewedEventDocuments   EventDocument[]          @relation("EventDocumentReviewer")
   uploadedEventDocuments   EventDocument[]          @relation("EventDocumentUploader")
+  centerCoachProfiles      CenterCoach[]
+  uploadedCenterMedia      CenterMedia[]
+  centerReviews            CenterReview[]
 
   @@map("profiles")
 }
@@ -702,6 +748,7 @@ model Discipline {
   displayOrder    Int             @default(100) @map("display_order")
   isFeatured      Boolean         @default(false) @map("is_featured")
   eventCategories EventCategory[]
+  centerBatches   CenterBatch[]
 
   @@map("disciplines")
 }
@@ -726,33 +773,75 @@ model EventSeries {
 }
 
 model Club {
-  id                String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String
-  slug              String                                 @unique
-  description       String?
-  sportTypes        SportCategory[]                        @map("sport_types")
-  disciplineSlugs   String[]                               @map("discipline_slugs")
-  ageCategories     AgeCategory[]                          @map("age_categories")
-  city              String
-  state             String
-  meetingPoint      String?                                @map("meeting_point")
-  geoLocation       Unsupported("geography(Point, 4326)")? @map("geo_location")
-  logoUrl           String?                                @map("logo_url")
-  coverUrl          String?                                @map("cover_url")
-  websiteUrl        String?                                @map("website_url")
-  instagramUrl      String?                                @map("instagram_url")
-  whatsappInviteUrl String?                                @map("whatsapp_invite_url")
-  contactEmail      String?                                @map("contact_email")
-  ownerId           String?                                @map("owner_id") @db.Uuid
-  owner             Profile?                               @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  isVerified        Boolean                                @default(false) @map("is_verified")
-  isActive          Boolean                                @default(true) @map("is_active")
-  memberCount       Int                                    @default(0) @map("member_count")
-  createdAt         DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
-  members           ClubMember[]
-  events            Event[]
-  series            EventSeries[]
+  id                    String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String
+  slug                  String                                 @unique
+  description           String?
+  sportTypes            SportCategory[]                        @map("sport_types")
+  disciplineSlugs       String[]                               @map("discipline_slugs")
+  ageCategories         AgeCategory[]                          @map("age_categories")
+  city                  String
+  state                 String
+  meetingPoint          String?                                @map("meeting_point")
+  geoLocation           Unsupported("geography(Point, 4326)")? @map("geo_location")
+  logoUrl               String?                                @map("logo_url")
+  coverUrl              String?                                @map("cover_url")
+  websiteUrl            String?                                @map("website_url")
+  instagramUrl          String?                                @map("instagram_url")
+  whatsappInviteUrl     String?                                @map("whatsapp_invite_url")
+  contactEmail          String?                                @map("contact_email")
+  ownerId               String?                                @map("owner_id") @db.Uuid
+  owner                 Profile?                               @relation("ClubOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  isVerified            Boolean                                @default(false) @map("is_verified")
+  isActive              Boolean                                @default(true) @map("is_active")
+  memberCount           Int                                    @default(0) @map("member_count")
+  createdAt             DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0026 (GA-032, ADR-009). CHECK vocabularies:
+  //   levels              beginner, intermediate, advanced, elite
+  //   feeUnit             per_session, per_month, per_quarter, per_year, per_pack, per_programme (NULL fee = "Ask for fees")
+  //   facilities          parking, changing_rooms, showers, toilets, drinking_water, lockers, first_aid, cafe, floodlights,
+  //                       indoor, outdoor, synthetic_track, turf, rink, pool, gym, wheelchair_access, waiting_area,
+  //                       equipment_rental
+  //   verificationChecks  phone, email, govt_id, address, affiliation, coach_credentials, site_visit, police_verification
+  //   safeguardingStatus  not_declared, declared, verified, expired (do not display until the ADR-008 legal decision)
+  //   pincode             NULL or ^[1-9][0-9]{5}$
+  // Staff-only (forced by a guard trigger for non-staff sessions): isVerified, memberCount, verifiedAt, verificationChecks,
+  // safeguardingStatus, safeguardingCheckedAt, affiliationVerified, ratingAvg, ratingCount.
+  locality              String?
+  address               String?
+  pincode               String?
+  contactPhone          String?                                @map("contact_phone")
+  facebookUrl           String?                                @map("facebook_url")
+  youtubeUrl            String?                                @map("youtube_url")
+  xUrl                  String?                                @map("x_url")
+  linkedinUrl           String?                                @map("linkedin_url")
+  stravaUrl             String?                                @map("strava_url")
+  levels                String[]                               @default([])
+  languages             String[]                               @default([])
+  establishedYear       Int?                                   @map("established_year") @db.SmallInt
+  feeFromInr            Int?                                   @map("fee_from_inr")
+  feeUnit               String?                                @map("fee_unit")
+  trialAvailable        Boolean                                @default(false) @map("trial_available")
+  trialFeeInr           Int?                                   @map("trial_fee_inr")
+  trialNotes            String?                                @map("trial_notes")
+  facilities            String[]                               @default([])
+  affiliationBody       String?                                @map("affiliation_body")
+  affiliationNumber     String?                                @map("affiliation_number")
+  affiliationVerified   Boolean                                @default(false) @map("affiliation_verified")
+  verifiedAt            DateTime?                              @map("verified_at") @db.Timestamptz(6)
+  verificationChecks    String[]                               @default([]) @map("verification_checks")
+  safeguardingStatus    String                                 @default("not_declared") @map("safeguarding_status")
+  safeguardingCheckedAt DateTime?                              @map("safeguarding_checked_at") @db.Timestamptz(6)
+  ratingAvg             Decimal?                               @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount           Int                                    @default(0) @map("rating_count")
+  members               ClubMember[]
+  events                Event[]
+  series                EventSeries[]
+  batches               CenterBatch[]
+  coaches               CenterCoach[]
+  media                 CenterMedia[]
+  reviews               CenterReview[]
 
   @@map("clubs")
 }
@@ -843,29 +932,80 @@ model SharedCalendar {
 }
 
 model TrainingCenter {
-  id              String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String
-  slug            String                                 @unique
-  description     String?
-  sportTypes      SportCategory[]                        @map("sport_types")
-  disciplineSlugs String[]                               @map("discipline_slugs")
-  ageCategories   AgeCategory[]                          @map("age_categories")
-  city            String
-  state           String
-  address         String?
-  geoLocation     Unsupported("geography(Point, 4326)")? @map("geo_location")
-  contactPhone    String?                                @map("contact_phone")
-  contactEmail    String?                                @map("contact_email")
-  websiteUrl      String?                                @map("website_url")
-  logoUrl         String?                                @map("logo_url")
-  coverUrl        String?                                @map("cover_url")
-  isCertified     Boolean                                @default(false) @map("is_certified")
-  isVerified      Boolean                                @default(false) @map("is_verified")
-  isActive        Boolean                                @default(true) @map("is_active")
-  ownerId         String?                                @map("owner_id") @db.Uuid
-  owner           Profile?                               @relation("CenterOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  createdAt       DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  id                    String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                  String
+  slug                  String                                 @unique
+  description           String?
+  sportTypes            SportCategory[]                        @map("sport_types")
+  disciplineSlugs       String[]                               @map("discipline_slugs")
+  ageCategories         AgeCategory[]                          @map("age_categories")
+  city                  String
+  state                 String
+  address               String?
+  geoLocation           Unsupported("geography(Point, 4326)")? @map("geo_location")
+  contactPhone          String?                                @map("contact_phone")
+  contactEmail          String?                                @map("contact_email")
+  websiteUrl            String?                                @map("website_url")
+  logoUrl               String?                                @map("logo_url")
+  coverUrl              String?                                @map("cover_url")
+  isCertified           Boolean                                @default(false) @map("is_certified")
+  isVerified            Boolean                                @default(false) @map("is_verified")
+  isActive              Boolean                                @default(true) @map("is_active")
+  ownerId               String?                                @map("owner_id") @db.Uuid
+  owner                 Profile?                               @relation("CenterOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt             DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  // Migration 0026 (GA-032, ADR-009). CHECK vocabularies:
+  //   levels              beginner, intermediate, advanced, elite
+  //   feeUnit             per_session, per_month, per_quarter, per_year, per_pack, per_programme (NULL fee = "Ask for fees")
+  //   facilities          parking, changing_rooms, showers, toilets, drinking_water, lockers, first_aid, cafe, floodlights,
+  //                       indoor, outdoor, synthetic_track, turf, rink, pool, gym, wheelchair_access, waiting_area,
+  //                       equipment_rental
+  //   verificationChecks  phone, email, govt_id, address, affiliation, coach_credentials, site_visit, police_verification
+  //   safeguardingStatus  not_declared, declared, verified, expired (do not display until the ADR-008 legal decision)
+  //   pincode             NULL or ^[1-9][0-9]{5}$
+  // Staff-only (forced by a guard trigger for non-staff sessions): isVerified, isCertified, verifiedAt, verificationChecks,
+  // safeguardingStatus, safeguardingCheckedAt, affiliationVerified, ratingAvg, ratingCount.
+  //   centerType          academy, coach, club, rink, dojo, studio, pool, venue, other
+  //   deliveryModes       in_person, online, at_home
+  centerType            String                                 @default("academy") @map("center_type")
+  locality              String?
+  pincode               String?
+  venueNotes            String?                                @map("venue_notes")
+  whatsappUrl           String?                                @map("whatsapp_url")
+  instagramUrl          String?                                @map("instagram_url")
+  facebookUrl           String?                                @map("facebook_url")
+  youtubeUrl            String?                                @map("youtube_url")
+  xUrl                  String?                                @map("x_url")
+  linkedinUrl           String?                                @map("linkedin_url")
+  stravaUrl             String?                                @map("strava_url")
+  levels                String[]                               @default([])
+  languages             String[]                               @default([])
+  deliveryModes         String[]                               @default([]) @map("delivery_modes")
+  establishedYear       Int?                                   @map("established_year") @db.SmallInt
+  feeFromInr            Int?                                   @map("fee_from_inr")
+  feeUnit               String?                                @map("fee_unit")
+  trialAvailable        Boolean                                @default(false) @map("trial_available")
+  trialFeeInr           Int?                                   @map("trial_fee_inr")
+  trialNotes            String?                                @map("trial_notes")
+  facilities            String[]                               @default([])
+  makeupPolicy          String?                                @map("makeup_policy")
+  cancellationPolicy    String?                                @map("cancellation_policy")
+  refundPolicy          String?                                @map("refund_policy")
+  affiliationBody       String?                                @map("affiliation_body")
+  affiliationNumber     String?                                @map("affiliation_number")
+  affiliationVerified   Boolean                                @default(false) @map("affiliation_verified")
+  verifiedAt            DateTime?                              @map("verified_at") @db.Timestamptz(6)
+  verificationChecks    String[]                               @default([]) @map("verification_checks")
+  safeguardingStatus    String                                 @default("not_declared") @map("safeguarding_status")
+  safeguardingCheckedAt DateTime?                              @map("safeguarding_checked_at") @db.Timestamptz(6)
+  ratingAvg             Decimal?                               @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount           Int                                    @default(0) @map("rating_count")
+
+  batches CenterBatch[]
+  coaches CenterCoach[]
+  media   CenterMedia[]
+  reviews CenterReview[]
 
   @@map("training_centers")
 }
@@ -973,6 +1113,20 @@ model EventCategory {
   teamSizeMin        Int?          @map("team_size_min") @db.SmallInt
   teamSizeMax        Int?          @map("team_size_max") @db.SmallInt
   eligibilityNotes   String?       @map("eligibility_notes")
+  // Migration 0026. CHECKs: ticket_kind IN ('participant','team','spectator','add_on');
+  // compare_at_price_inr >= 0 and > price_inr; session_ends_on >= session_starts_on; deposit_inr >= 0 and <= price_inr;
+  // balance_due_days BETWEEN 0 AND 365; sport_details is a jsonb object. isTimed NULL = inherit events.is_chip_timed.
+  sportDetails       Json          @default("{}") @map("sport_details")
+  isTimed            Boolean?      @map("is_timed")
+  compareAtPriceInr  Int?          @map("compare_at_price_inr")
+  excludes           String[]      @default([])
+  teamComposition    String?       @map("team_composition")
+  ticketKind         String        @default("participant") @map("ticket_kind")
+  sessionStartsOn    DateTime?     @map("session_starts_on") @db.Date
+  sessionEndsOn      DateTime?     @map("session_ends_on") @db.Date
+  depositInr         Int?          @map("deposit_inr")
+  balanceDueDays     Int?          @map("balance_due_days") @db.SmallInt
+  courseMapUrl       String?       @map("course_map_url")
 
   scheduleItems     EventScheduleItem[]
   priceTiers        EventPriceTier[]
@@ -981,6 +1135,10 @@ model EventCategory {
   tickets           Ticket[]
   resultEntries     EventResultEntry[]
   unlockedByCoupons Coupon[]
+  awards            EventAward[]
+  checkpoints       EventCheckpoint[]
+  resources         EventResource[]
+  offers            EventOffer[]
 
   @@unique([eventId, label])
   @@map("event_categories")
@@ -1489,39 +1647,60 @@ model Seller {
 /// external_url). Indexes in SQL only (GIN / partial): idx_products_sports, idx_products_disciplines,
 /// idx_products_category, idx_products_review_queue. review_* columns are forced by guard_product_review.
 model Product {
-  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sellerId        String          @map("seller_id") @db.Uuid
-  seller          Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
-  slug            String
-  title           String
-  description     String?
-  brand           String?
-  category        String
-  sportTypes      SportCategory[] @default([]) @map("sport_types")
-  disciplineSlugs String[]        @default([]) @map("discipline_slugs")
-  ageCategories   AgeCategory[]   @default([]) @map("age_categories")
-  priceInr        Int             @map("price_inr")
-  mrpInr          Int?            @map("mrp_inr")
-  imageUrls       String[]        @default([]) @map("image_urls")
+  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sellerId            String          @map("seller_id") @db.Uuid
+  seller              Seller          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  slug                String
+  title               String
+  description         String?
+  brand               String?
+  category            String
+  sportTypes          SportCategory[] @default([]) @map("sport_types")
+  disciplineSlugs     String[]        @default([]) @map("discipline_slugs")
+  ageCategories       AgeCategory[]   @default([]) @map("age_categories")
+  priceInr            Int             @map("price_inr")
+  mrpInr              Int?            @map("mrp_inr")
+  imageUrls           String[]        @default([]) @map("image_urls")
   // Nullable since 0021: checkout-mode products have no external page.
-  externalUrl     String?         @map("external_url")
-  stockStatus     String          @default("in_stock") @map("stock_status")
-  isActive        Boolean         @default(true) @map("is_active")
-  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+  externalUrl         String?         @map("external_url")
+  stockStatus         String          @default("in_stock") @map("stock_status")
+  isActive            Boolean         @default(true) @map("is_active")
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
   // Migration 0021.
-  purchaseMode    String          @default("external_link") @map("purchase_mode")
-  hsnCode         String?         @map("hsn_code")
-  gstRate         Decimal?        @map("gst_rate") @db.Decimal(4, 2)
-  weightGrams     Int?            @map("weight_grams")
-  ratingAvg       Decimal?        @map("rating_avg") @db.Decimal(2, 1)
-  ratingCount     Int             @default(0) @map("rating_count")
-  reviewStatus    String          @default("draft") @map("review_status")
-  submittedAt     DateTime?       @map("submitted_at") @db.Timestamptz(6)
-  reviewedAt      DateTime?       @map("reviewed_at") @db.Timestamptz(6)
-  reviewedBy      String?         @map("reviewed_by") @db.Uuid
-  reviewer        Profile?        @relation("ProductReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
-  reviewNotes     String?         @map("review_notes")
+  purchaseMode        String          @default("external_link") @map("purchase_mode")
+  hsnCode             String?         @map("hsn_code")
+  gstRate             Decimal?        @map("gst_rate") @db.Decimal(4, 2)
+  weightGrams         Int?            @map("weight_grams")
+  ratingAvg           Decimal?        @map("rating_avg") @db.Decimal(2, 1)
+  ratingCount         Int             @default(0) @map("rating_count")
+  reviewStatus        String          @default("draft") @map("review_status")
+  submittedAt         DateTime?       @map("submitted_at") @db.Timestamptz(6)
+  reviewedAt          DateTime?       @map("reviewed_at") @db.Timestamptz(6)
+  reviewedBy          String?         @map("reviewed_by") @db.Uuid
+  reviewer            Profile?        @relation("ProductReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewNotes         String?         @map("review_notes")
+  // Migration 0026: product detail page. CHECKs: specs is a jsonb object; size_chart NULL or object;
+  // gender IN ('men','women','unisex','boys','girls','kids'); suited_distance_max_km >= suited_distance_min_km;
+  // suited_terrains each in road, trail, track, treadmill, mixed, gym, court, pool, open_water, snow, rink;
+  // return_window_days 0..365; warranty_months 0..240. Shapes of specs / size_chart: SQL COMMENT and ADR-009.
+  // guard_product_review_zz_detail_trg sends an approved product back to review when these fields change.
+  specs               Json            @default("{}")
+  sizeChart           Json?           @map("size_chart")
+  highlights          String[]        @default([])
+  videoUrls           String[]        @default([]) @map("video_urls")
+  gender              String?
+  suitedDistanceMinKm Decimal?        @map("suited_distance_min_km") @db.Decimal(7, 3)
+  suitedDistanceMaxKm Decimal?        @map("suited_distance_max_km") @db.Decimal(7, 3)
+  suitedTerrains      String[]        @default([]) @map("suited_terrains")
+  deliveryInfo        String?         @map("delivery_info")
+  isReturnable        Boolean?        @map("is_returnable")
+  returnWindowDays    Int?            @map("return_window_days") @db.SmallInt
+  returnsInfo         String?         @map("returns_info")
+  warrantyMonths      Int?            @map("warranty_months") @db.SmallInt
+  warrantyInfo        String?         @map("warranty_info")
+  countryOfOrigin     String?         @map("country_of_origin")
+  manufacturerInfo    String?         @map("manufacturer_info")
 
   dailyStats         ProductDailyStat[]
   moderationLog      ProductModerationLog[]
@@ -2302,4 +2481,237 @@ model OrganizerBroadcast {
   updatedAt      DateTime            @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("organizer_broadcasts")
+}
+
+// ---------------------------------------------------------------------------
+// Event-page child tables, clubs and academies detail tables — migration 0026 (GA-047, ADR-009).
+// RLS (SQL only): event_* tables follow the parent event's visibility and are managed by the organiser team;
+// center_* tables are readable when the parent club / training centre is active and managed through
+// can_manage_listing(). A center_* row belongs to exactly one parent: CHECK num_nonnulls(training_center_id, club_id) = 1.
+// ---------------------------------------------------------------------------
+
+/// CHECKs: scope IN ('overall','age_band','team','special'); gender NULL or IN ('open','female','male','mixed');
+/// position_from/position_to BETWEEN 1 AND 100 and position_to >= position_from; cash_inr >= 0;
+/// min_entries_* >= 0. categoryId NULL = all categories. SQL index idx_event_awards on (event_id, sort_order).
+model EventAward {
+  id               String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId          String         @map("event_id") @db.Uuid
+  event            Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId       String?        @map("category_id") @db.Uuid
+  category         EventCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  scope            String         @default("overall")
+  ageBand          String?        @map("age_band")
+  gender           String?
+  positionFrom     Int            @default(1) @map("position_from") @db.SmallInt
+  positionTo       Int            @default(1) @map("position_to") @db.SmallInt
+  cashInr          Int?           @map("cash_inr")
+  prizeText        String?        @map("prize_text")
+  minEntriesFemale Int?           @map("min_entries_female") @db.SmallInt
+  minEntriesMale   Int?           @map("min_entries_male") @db.SmallInt
+  sortOrder        Int            @default(0) @map("sort_order")
+  createdAt        DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([eventId, sortOrder], map: "idx_event_awards")
+  @@map("event_awards")
+}
+
+/// CHECKs: seq >= 0; km >= 0; cutoff_after_minutes > 0; cutoff_at and cutoff_after_minutes not both set;
+/// services each in water, electrolyte, food, medical, crew_access, timing_mat, toilets, drop_bag, mechanical, shelter.
+model EventCheckpoint {
+  id                 String                                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId            String                                 @map("event_id") @db.Uuid
+  event              Event                                  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId         String?                                @map("category_id") @db.Uuid
+  category           EventCategory?                         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  seq                Int                                    @default(1) @db.SmallInt
+  name               String
+  km                 Decimal?                               @db.Decimal(7, 3)
+  location           String?
+  geoLocation        Unsupported("geography(Point, 4326)")? @map("geo_location")
+  cutoffAt           DateTime?                              @map("cutoff_at") @db.Timestamptz(6)
+  cutoffAfterMinutes Int?                                   @map("cutoff_after_minutes")
+  services           String[]                               @default([])
+  notes              String?
+  createdAt          DateTime                               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime                               @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([eventId, seq], map: "idx_event_checkpoints")
+  @@map("event_checkpoints")
+}
+
+/// Public documents and links. CHECKs: kind IN ('rules','athlete_guide','circular','waiver_pdf','gpx','route_map',
+/// 'prospectus','results','other'); char_length(label) <= 200. Private compliance paperwork stays in EventDocument.
+model EventResource {
+  id         String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId    String         @map("event_id") @db.Uuid
+  event      Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId String?        @map("category_id") @db.Uuid
+  category   EventCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  kind       String         @default("other")
+  label      String
+  url        String
+  sortOrder  Int            @default(0) @map("sort_order")
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([eventId, sortOrder], map: "idx_event_resources")
+  @@map("event_resources")
+}
+
+/// Public audience offers (display data; private promo codes stay in Coupon). CHECKs: audience IN ('everyone',
+/// 'women','senior','group','corporate','student','club','defence','kids'); discount_type IN ('percent','flat');
+/// discount_value > 0 and <= 100 when percent; min_qty >= 1; valid_until >= valid_from; char_length(label) <= 200.
+/// Public read only when is_active.
+model EventOffer {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId       String         @map("event_id") @db.Uuid
+  event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  categoryId    String?        @map("category_id") @db.Uuid
+  category      EventCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  label         String
+  audience      String         @default("everyone")
+  discountType  String         @map("discount_type")
+  discountValue Int            @map("discount_value")
+  minQty        Int            @default(1) @map("min_qty") @db.SmallInt
+  validFrom     DateTime?      @map("valid_from") @db.Timestamptz(6)
+  validUntil    DateTime?      @map("valid_until") @db.Timestamptz(6)
+  terms         String?
+  isActive      Boolean        @default(true) @map("is_active")
+  sortOrder     Int            @default(0) @map("sort_order")
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@index([eventId, sortOrder], map: "idx_event_offers")
+  @@map("event_offers")
+}
+
+/// Day-by-day plan (treks, multi-day rides, stage races). CHECKs: day_no BETWEEN 1 AND 60; distance_km >= 0;
+/// start/end_altitude_m BETWEEN -500 AND 9000; meals each in breakfast, lunch, dinner, snacks, packed_lunch.
+model EventItineraryDay {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId        String   @map("event_id") @db.Uuid
+  event          Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  dayNo          Int      @map("day_no") @db.SmallInt
+  title          String
+  description    String?
+  distanceKm     Decimal? @map("distance_km") @db.Decimal(6, 2)
+  durationText   String?  @map("duration_text")
+  startAltitudeM Int?     @map("start_altitude_m")
+  endAltitudeM   Int?     @map("end_altitude_m")
+  meals          String[] @default([])
+  stay           String?
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([eventId, dayNo])
+  @@index([eventId, sortOrder], map: "idx_event_itinerary_days")
+  @@map("event_itinerary_days")
+}
+
+/// Batches and timings for a club or training centre (Phase 1 directory, ADR-008; not bookable).
+/// CHECKs: level NULL or IN ('beginner','intermediate','advanced','elite'); gender IN ('open','female','male','mixed');
+/// days_of_week each 1..7 (ISO, 1 = Monday); min_age/max_age 0..120 and max >= min; fee_inr >= 0 (NULL = ask for fees);
+/// fee_unit NULL or IN ('per_session','per_month','per_quarter','per_year','per_pack','per_programme'); capacity > 0.
+/// SQL indexes idx_center_batches_center / idx_center_batches_club are partial.
+model CenterBatch {
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainingCenterId String?         @map("training_center_id") @db.Uuid
+  trainingCenter   TrainingCenter? @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  clubId           String?         @map("club_id") @db.Uuid
+  club             Club?           @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  title            String
+  disciplineSlug   String?         @map("discipline_slug")
+  discipline       Discipline?     @relation(fields: [disciplineSlug], references: [slug], onDelete: SetNull)
+  level            String?
+  ageCategories    AgeCategory[]   @default([]) @map("age_categories")
+  minAge           Int?            @map("min_age") @db.SmallInt
+  maxAge           Int?            @map("max_age") @db.SmallInt
+  gender           String          @default("open")
+  daysOfWeek       Int[]           @default([]) @map("days_of_week") @db.SmallInt
+  startTime        DateTime?       @map("start_time") @db.Time(6)
+  endTime          DateTime?       @map("end_time") @db.Time(6)
+  venue            String?
+  feeInr           Int?            @map("fee_inr")
+  feeUnit          String?         @map("fee_unit")
+  capacity         Int?
+  trialAvailable   Boolean         @default(false) @map("trial_available")
+  isActive         Boolean         @default(true) @map("is_active")
+  sortOrder        Int             @default(0) @map("sort_order")
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("center_batches")
+}
+
+/// Coaches of a club or training centre. CHECKs: char_length(bio) <= 2000; years_experience 0..80.
+/// credentialVerified is staff-only (guard_center_coach_verification_trg).
+model CenterCoach {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainingCenterId   String?         @map("training_center_id") @db.Uuid
+  trainingCenter     TrainingCenter? @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  clubId             String?         @map("club_id") @db.Uuid
+  club               Club?           @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  profileId          String?         @map("profile_id") @db.Uuid
+  profile            Profile?        @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  name               String
+  roleTitle          String?         @map("role_title")
+  bio                String?
+  photoUrl           String?         @map("photo_url")
+  credential         String?
+  certifyingBody     String?         @map("certifying_body")
+  credentialVerified Boolean         @default(false) @map("credential_verified")
+  yearsExperience    Int?            @map("years_experience") @db.SmallInt
+  languages          String[]        @default([])
+  sortOrder          Int             @default(0) @map("sort_order")
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime        @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("center_coaches")
+}
+
+/// Pre-moderated gallery, like EventMedia. CHECKs: kind IN ('photo','video'); char_length(caption) <= 300.
+/// `status` is forced to 'pending' for non-staff sessions by guard_center_media_status.
+model CenterMedia {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainingCenterId String?          @map("training_center_id") @db.Uuid
+  trainingCenter   TrainingCenter?  @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  clubId           String?          @map("club_id") @db.Uuid
+  club             Club?            @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  uploadedBy       String?          @map("uploaded_by") @db.Uuid
+  uploader         Profile?         @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+  url              String
+  kind             String           @default("photo")
+  caption          String?
+  credit           String?
+  isCover          Boolean          @default(false) @map("is_cover")
+  status           ModerationStatus @default(pending)
+  sortOrder        Int              @default(0) @map("sort_order")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("center_media")
+}
+
+/// Post-moderated reviews, like EventReview. CHECKs: rating BETWEEN 1 AND 5; char_length(title) <= 120;
+/// char_length(body) <= 4000. refresh_center_rating_trg maintains rating_avg / rating_count on the parent.
+model CenterReview {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainingCenterId String?          @map("training_center_id") @db.Uuid
+  trainingCenter   TrainingCenter?  @relation(fields: [trainingCenterId], references: [id], onDelete: Cascade)
+  clubId           String?          @map("club_id") @db.Uuid
+  club             Club?            @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  userId           String           @map("user_id") @db.Uuid
+  user             Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating           Int              @db.SmallInt
+  title            String?
+  body             String?
+  status           ModerationStatus @default(published)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([trainingCenterId, userId], map: "center_reviews_center_user_key")
+  @@unique([clubId, userId], map: "center_reviews_club_user_key")
+  @@map("center_reviews")
 }
