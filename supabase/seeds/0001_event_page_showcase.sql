@@ -323,7 +323,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 5),
   min_age = COALESCE(min_age, 12), max_age = COALESCE(max_age, 75),
   age_as_on_date = COALESCE(age_as_on_date, '2026-11-27'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Signed parental consent if under 18']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','parental_consent']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Open to all; strollers and dogs not permitted on course.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/ultra-goa-2026-10k.pdf')
 WHERE id = md5('ga-051-cat:fe2f7043-1889-4b31-b7bb-07bc9c26685d:10K')::uuid;
@@ -334,7 +334,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 5),
   min_age = COALESCE(min_age, 16), max_age = COALESCE(max_age, 75),
   age_as_on_date = COALESCE(age_as_on_date, '2026-11-27'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Signed parental consent if under 18']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','parental_consent']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Minimum sub-2h45 recent 21K finish recommended but not required.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/ultra-goa-2026-21k.pdf')
 WHERE id = md5('ga-051-cat:fe2f7043-1889-4b31-b7bb-07bc9c26685d:21K')::uuid;
@@ -345,7 +345,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 3),
   min_age = COALESCE(min_age, 18), max_age = COALESCE(max_age, 70),
   age_as_on_date = COALESCE(age_as_on_date, '2026-11-27'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Marathon finish certificate (last 24 months)']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','qualifying_proof']::text[] ELSE required_documents END,
   qualifying_standard = COALESCE(qualifying_standard, 'Marathon sub 5h00 within last 24 months, or 50K < 7h00.'),
   eligibility_notes = COALESCE(eligibility_notes, 'Mandatory pre-race briefing on race day minus one.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/ultra-goa-2026-50k.pdf')
@@ -357,7 +357,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 2),
   min_age = COALESCE(min_age, 21), max_age = COALESCE(max_age, 70),
   age_as_on_date = COALESCE(age_as_on_date, '2026-11-27'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Marathon or 50K finish certificate','Medical fitness certificate (<6 months)']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','qualifying_proof','medical_certificate']::text[] ELSE required_documents END,
   qualifying_standard = COALESCE(qualifying_standard, 'Marathon sub 5h30 OR 50K sub 7h00 within the last 24 months.'),
   eligibility_notes = COALESCE(eligibility_notes, 'Mandatory kit check at bib collection. Non-compliance = no bib.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/ultra-goa-2026-100k.pdf')
@@ -392,7 +392,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 4),
   min_age = COALESCE(min_age, 14), max_age = COALESCE(max_age, 70),
   age_as_on_date = COALESCE(age_as_on_date, '2026-03-01'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Parental consent if under 18']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','parental_consent']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Open to all with a roadworthy MTB or hybrid.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/stargoa-gravel-2026-50k.pdf')
 WHERE id = md5('ga-051-cat:dee4ce05-e00e-46f3-9d4b-808457f8adbd:50K Fellowship')::uuid;
@@ -403,7 +403,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 3),
   min_age = COALESCE(min_age, 18), max_age = COALESCE(max_age, 65),
   age_as_on_date = COALESCE(age_as_on_date, '2026-03-01'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Signed waiver']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Participants must complete a bike check at the expo.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/stargoa-gravel-2026-100k.pdf')
 WHERE id = md5('ga-051-cat:dee4ce05-e00e-46f3-9d4b-808457f8adbd:100K Gran Fondo')::uuid;
@@ -414,7 +414,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 2),
   min_age = COALESCE(min_age, 19), max_age = COALESCE(max_age, 60),
   age_as_on_date = COALESCE(age_as_on_date, '2026-03-01'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','100K+ finish certificate (<12 months)','Medical fitness certificate (<6 months)']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','qualifying_proof','medical_certificate']::text[] ELSE required_documents END,
   qualifying_standard = COALESCE(qualifying_standard, 'Finish of any 100K cycling event within the last 12 months.'),
   eligibility_notes = COALESCE(eligibility_notes, 'Mandatory briefing on race day minus one. Riders must carry proof of qualifying ride.'),
   course_map_url = COALESCE(course_map_url, 'https://cdn.goathletix.sample/maps/stargoa-gravel-2026-150k.pdf')
@@ -450,7 +450,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 4),
   min_age = COALESCE(min_age, 15), max_age = COALESCE(max_age, 60),
   age_as_on_date = COALESCE(age_as_on_date, '2027-11-13'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Medical fitness certificate (<60 days)','Signed parental consent if under 18']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','medical_certificate','parental_consent']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Pre-trek briefing call scheduled 10 days before departure.')
 WHERE id = md5('ga-051-cat:b6951a6a-a872-45a0-9377-738549a876ea:Standard Batch')::uuid;
 
@@ -461,7 +461,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 4),
   min_age = COALESCE(min_age, 15), max_age = COALESCE(max_age, 60),
   age_as_on_date = COALESCE(age_as_on_date, '2027-11-20'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Medical fitness certificate (<60 days)']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','medical_certificate']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Open to self-identifying women. Pre-trek fitness call mandatory.')
 WHERE id = md5('ga-051-cat:b6951a6a-a872-45a0-9377-738549a876ea:Women-Only Batch')::uuid;
 
@@ -472,7 +472,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 4),
   min_age = COALESCE(min_age, 18), max_age = COALESCE(max_age, 25),
   age_as_on_date = COALESCE(age_as_on_date, '2027-11-27'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['Govt photo ID','Student ID','Medical fitness certificate (<60 days)']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['govt_id','school_id','medical_certificate']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Student status is checked at check-in; mismatched IDs forfeit the discount.')
 WHERE id = md5('ga-051-cat:b6951a6a-a872-45a0-9377-738549a876ea:Student Batch')::uuid;
 
@@ -509,7 +509,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 1),
   min_age = COALESCE(min_age, 16), max_age = COALESCE(max_age, 65),
   age_as_on_date = COALESCE(age_as_on_date, '2026-10-18'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['AITA ID or Govt photo ID','Age proof']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['federation_id','govt_id']::text[] ELSE required_documents END,
   qualifying_standard = COALESCE(qualifying_standard, 'Open to all AITA-registered or unrated players; qualifiers held one day before main draw.'),
   team_size_min = COALESCE(team_size_min, 1), team_size_max = COALESCE(team_size_max, 1)
 WHERE id = md5('ga-051-cat:4011e73d-a3df-4dde-94ea-72c58619d966:Mens Singles')::uuid;
@@ -520,7 +520,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 1),
   min_age = COALESCE(min_age, 14), max_age = COALESCE(max_age, 65),
   age_as_on_date = COALESCE(age_as_on_date, '2026-10-18'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['AITA ID or Govt photo ID','Age proof']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['federation_id','govt_id']::text[] ELSE required_documents END,
   team_size_min = COALESCE(team_size_min, 1), team_size_max = COALESCE(team_size_max, 1)
 WHERE id = md5('ga-051-cat:4011e73d-a3df-4dde-94ea-72c58619d966:Womens Singles')::uuid;
 
@@ -530,7 +530,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 1),
   min_age = COALESCE(min_age, 16), max_age = COALESCE(max_age, 70),
   age_as_on_date = COALESCE(age_as_on_date, '2026-10-18'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['AITA ID or Govt photo ID for each player','Age proof']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['federation_id','govt_id']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Both players must be registered by one entrant; partner changes allowed only before draw release.'),
   team_size_min = COALESCE(team_size_min, 2), team_size_max = COALESCE(team_size_max, 2)
 WHERE id = md5('ga-051-cat:4011e73d-a3df-4dde-94ea-72c58619d966:Mens Doubles')::uuid;
@@ -541,7 +541,7 @@ UPDATE event_categories SET
   max_per_order = COALESCE(max_per_order, 1),
   min_age = COALESCE(min_age, 16), max_age = COALESCE(max_age, 70),
   age_as_on_date = COALESCE(age_as_on_date, '2026-10-18'::date),
-  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['AITA ID or Govt photo ID for each player','Age proof']::text[] ELSE required_documents END,
+  required_documents = CASE WHEN required_documents = '{}'::text[] THEN ARRAY['federation_id','govt_id']::text[] ELSE required_documents END,
   eligibility_notes = COALESCE(eligibility_notes, 'Combined age minimum of 32 verified at check-in.'),
   team_size_min = COALESCE(team_size_min, 2), team_size_max = COALESCE(team_size_max, 2)
 WHERE id = md5('ga-051-cat:4011e73d-a3df-4dde-94ea-72c58619d966:Mixed Doubles')::uuid;
