@@ -30,3 +30,7 @@ pnpm-debug.log*
 
 # Extra backend stuff
 /generated/prisma
+
+# Claude Code: track shared agents/hooks/settings, never the local-only overrides that may hold secrets
+.claude/settings.local.json
+.claude/*.local.json

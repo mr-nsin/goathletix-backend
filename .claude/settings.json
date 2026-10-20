@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"D:/project/goathletix/.claude/hooks/record-edits.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"D:/project/goathletix/.claude/hooks/check-memory-bank.js\"",
+            "timeout": 10,
+            "statusMessage": "Checking memory bank"
+          }
+        ]
+      }
+    ]
+  }
+}

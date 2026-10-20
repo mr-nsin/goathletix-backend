@@ -1,0 +1,42 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "goathletix-backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start:dev",
+        "--prefix",
+        "goathletix-backend"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "goathletix-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "goathletix-frontend"
+      ],
+      "port": 3001,
+      "autoPort": true
+    },
+    {
+      "name": "mockup",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "3005",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "goathletix-backend/01 Product"
+      ],
+      "port": 3005
+    }
+  ]
+}
