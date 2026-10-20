@@ -79,10 +79,12 @@ accessibility-review and ux-copy)
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| tsc --noEmit | not run | - |
-| eslint src | not run | - |
-| Server/client boundary self-check | not run | - |
-| Loaded in a browser | not run | coordinator, after merge (headless Edge) |
+| tsc --noEmit | pass, exit 0 | run in the worktree after the last edit |
+| eslint src | pass: 0 errors, 6 warnings | all 6 are pre-existing, in files not touched (CategoryGrid, EventsDirectory, LiveTicker, Footer) |
+| `!important` inside a comma list | none | `grep -nE '!important\s*,' src/components/event/*.css` found nothing |
+| Server/client boundary self-check | pass | client files: MediaGallery, TicketStepper, TicketFinder, ShareButton, SectionNav, MobileTicketBar. Server files only render them or import their types (`type GalleryItem`, `type FinderFacet`). Every helper the server calls lives in a plain module (eventDetails.ts, formatRegistry.ts, vocab.tsx, EventSections.tsx). No client file imports eventDetails.ts or sampleContent.ts (ShareButton imports only BrandGlyph.tsx) |
+| Server render of the four samples, the `?mode=external` variant and a basics-only sample | pass (no browser) | rendered EventPage to static HTML with react-dom/server through jiti, with next/image and the CSS import stubbed. All 6 rendered without errors; heading order is h1, then h2, then h3, with h4 only under "Add-ons"; the section ids and nav links match each sample's data |
+| Loaded in a browser (layout, 375 px, dark mode, motion, finder and share interaction) | not run | no browser here: coordinator to check after merge (headless Edge) |
 
 ## Handoff
 
