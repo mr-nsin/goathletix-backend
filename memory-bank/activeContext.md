@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-10-12.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-10-21.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -9,222 +9,132 @@ context. Detail belongs in the linked notes, not here.
 When two sources disagree, the higher one wins and the lower one gets corrected.
 
 1. **The code** — always ground truth.
-2. `04 Delivery/Issue register.md` — all 44 open issues (6 blockers), frontend and backend.
+2. `04 Delivery/Issue register.md` — all open issues (6 blockers), frontend and backend.
 3. `04 Delivery/GA-018-product-reliability-and-ux-roadmap.md` — verified findings + phased plan.
 4. `01 Product/Feature status and gaps.md` — PRD vs reality. `01 Product/UI-UX improvement plan.md` — design specs.
 5. `04 Delivery/Task board.md` + `GA-###` notes — what is in flight and who owns it.
 6. `PROGRESS.md` (workspace root) — cross-repo rollup.
 7. This file + `progress.md` — narrative.
 
-**Do NOT trust** `techContext.md` or `projectbrief.md`. They describe FastAPI services, an OpenRouter
-LLM pipeline, Algolia, Mem0 and an agent fleet. **None of that exists.** They are marked at the top.
+**Do NOT trust** `techContext.md` or `projectbrief.md` — FastAPI/OpenRouter/Mem0/Algolia are aspirational.
 
-## Blocking now (2026-09-30)
+## What's happening right now (2026-10-21)
 
-- **Supabase restored 2026-10-05** (it was a paused free-tier project — pauses after ~7 days idle; Pro
-  never pauses). `/events` serves all 10,100 rows again. **Migrations 0012–0023 are APPLIED to the live database (verified 2026-10-06 over REST):** 84 tables exposed,
-  all 59 new tables and their columns present; 54 cities (Srinagar ×2), all 10,100 events geocoded, priced,
-  public + published; `event_counts`, `events_near` (Bengaluru 100 km → 185) and `trending_events` respond;
-  anon is blocked from `record_event_stat`. Not yet tested: the anonymous browser path (no anon key on this machine). git-bash `curl` cannot reach Supabase
-  through the proxy (its CA bundle lacks the corporate root); use Node with `tls.getCACertificates`, as `main.ts` does.
-- **All 10,100 events are synthetic** (`source_id` = `seed_…`, from `scripts/generate_10000_events.py`): names like
-  "Goa Snowboarding 2026", and every `registration_url` is a fabricated `townscript.com/e/...` link — a real
-  company's domain, so "Register" sends visitors to broken pages on Townscript's site. Launch blocker: real
-  ingestion (GA-009) or delete the seed rows before anything is public.
-- **Live data per rail (2026-10-05):** 7,553 upcoming · 5 featured (`is_popular`) · 18 this weekend ·
-  **0** athletics, skating, kids/junior, or any discipline-tagged rows. Bengaluru has only 3 in the next 30 days.
-- **ADR-007 (2026-10-05): discovery + ticketing, ticketing first;** events are public / unlisted / private; seller
-  products are reviewed before sale. Migrations 0012–0023 are **applied** (2026-10-06). The backend
-  visibility filter must ship with 0022 (service role bypasses RLS). Homepage rebuilt on `feat/implement-main-page-mockup`.
-- **Coach trainings — requirement #61 (2026-10-12).** Owner decision: coaches and academies host their own
-  trainings. Header row 2 has **Training**, the Partner menu has a "For coaches" column and the hero has a
-  "Coach or academy?" card; all inert "Soon" until pages exist. Product doc:
-  `01 Product/Organizer and seller platform features.md` §5. Model and phasing are
-  [[03 Decisions/ADR-008-coach-trainings|ADR-008]] **proposed** (own tables not `events`; Phase 1 find-a-coach with
-  no payments, Phase 2 book-and-pay). **No migration yet** (proposed 0026); `training_centers` (0010) is the only
-  existing table. Open: evidence for coaches who work with minors (legal), GST on coaching fees (CA), platform fee.
-  `docs/04` "never build coaching" now narrowed to "never author plans or employ coaches".
-- **Homepage ([[04 Delivery/GA-020-homepage-build-from-mockup|GA-020]]) — state 2026-10-08:** header is
-  Logo | Location | Search | bell · cart | Sign in | List your event | Partner with us (organisers + sellers + coaches),
-  row 2 has Training and Blog; the header search hides while the hero search is on screen, has type-ahead (sports, cities,
-  events via `search`, recent searches) and `/` / Ctrl+K. Location is a BookMyShow-style modal (search all 53
-  cities, landmark icons, radius kept). Hero: local count line, sport icon row, "Next up" strip, resume chip,
-  stats + partner band; light background (a dark navy hero was tried and **rejected by the owner**). The sticky
-  filter row is **removed from the homepage** — it moves to a future Explore page. Live activity now rotates
-  inside the announcement bar. **Event card design is frozen** by the owner; three candidate directions live
-  in the mockup's "card directions" section, undecided.
+**Event page vertical is shipped and polished.** Four showcase events render the full Luma-style
+layout with seeded sample data. The last seven GA tasks all landed; the branch is
+`feat/implement-main-page-mockup` on both repos, up to date on origin.
 
-## Where the product actually stands
+- `goathletix-backend` HEAD: `b6c7a57` or later — includes migrations 0024/0025/0026 declarations,
+  `/events/:id/details` v3 returning 90-key event + 11-key organiser + 5 child-table arrays,
+  `supabase/seeds/0001_event_page_showcase.sql` and `0002_event_page_media.sql`, and `.claude/`
+  (agents, hooks, settings) with `settings.local.json` gitignored.
+- `goathletix-frontend` HEAD: `ea6d926` — Luma event page with floating action rail, gradient
+  nav indicator, section-reveal + checkpoint timeline, savings ribbons, animated fill bars,
+  fact-strip ticket cards, course-map thumbnails, sticky Register bar.
 
-**The product now serves real data end to end** (GA-019, 2026-09-12). `GET /events` returns 200 with
-all 10,100 rows; `/locations/mumbai` renders live database events with correct dates.
+## Schema state
 
-Fixed in GA-019:
-- Backend **builds** (the `seed.ts:44` TS2322 deploy blocker is gone).
-- `GET /events` **works**. The long-standing 500 was **not** the proxy being absent — it was
-  **`UNABLE_TO_GET_ISSUER_CERT_LOCALLY`**: the corporate proxy terminates TLS with a root CA that
-  Windows trusts but Node does not. `main.ts` now feeds `tls.getCACertificates('bundled'|'system')`
-  into undici's `ProxyAgent({ requestTls: { ca } })`, and loads `.env` from `__dirname/../.env`
-  (the dev server's cwd is the workspace root, so plain `dotenv/config` looked in the wrong place).
-- `/sports/[sport]` and `/locations/[city]` return 200 (`await params`).
-- Date cutover complete: API, DTO, seed, generators and frontend all on `start_date`/`end_date`
-  with range-overlap filtering, plus new `dateFrom`/`dateTo` query params.
+**Migrations 0012–0026 are APPLIED** to the live database:
 
-Still open:
-- The mega-search bar is **not wired to the API**; 3 of its 5 fields have no backing DTO field.
-- `EventsDirectory.tsx:89-101` still falls back to `fallbackEvents.json` **silently** — no banner.
-- Of the **13 P0 features** in `docs/05-feature-inventory.md`: **0 built, 6 partial, 7 not built.**
-  Buddy Sync and the Live Activity Feed have zero implementation.
-- No multi-day rows exist yet (backfill set every `end_date = start_date`), so the multi-day
-  rendering path is implemented but unverified against real data.
+- 0012–0023 (verified 2026-10-06): 84 tables, discipline taxonomy, geocoding, ticketing scaffolding.
+- 0024/0025 (verified 2026-10-19 via `/events/:id/details` live smoke).
+- 0026 (`20261019000026_event_page_fields.sql`, applied 2026-10-19 by owner, verified over REST):
+  114 event-page columns + 10 new tables (event_awards, event_checkpoints, event_resources,
+  event_offers, event_itinerary_days, center_batches, center_coaches, center_media, center_reviews,
+  products). All constrained vocabularies (`events_amenities_known`, `events_women_safety_known`,
+  `event_categories_documents_known`, `clubs_facilities_known`, etc.) are enforced — seed values
+  must map to the controlled slugs.
 
-## Established facts — do not re-investigate these
+Seeds `0001_event_page_showcase.sql` and `0002_event_page_media.sql` fill four showcase events
+(fe2f7043 ultra marathon, dee4ce05 gravel race, b6951a6a trek, 4011e73d tennis) with rich page
+content, past-year photos and per-category course-map image URLs.
 
-- **GA-002 is resolved.** The live `events` table has `event_date` and **no** `start_date`/`end_date`
-  and **no** `slug` (21 columns). Migration 0003 was never applied, so `schema.prisma` is *ahead of*
-  the database and `events.service.ts` is correct. Anything querying `startDate` fails in production.
-  This also breaks `seed.ts` independently of the build error.
-- **Network:** raw Postgres **5432 is firewalled** here, so Prisma cannot connect at all. Supabase REST
-  over 443 works **only** through the corporate proxy (host in `~/.npmrc`; accepts unauthenticated
-  CONNECT). `main.ts:6` reads `HTTPS_PROXY` at module load, *before* `ConfigModule` loads `.env`, so
-  the proxy can never be configured from `.env`. Many external sites are blocked by Forcepoint.
-- **Browser pane does not composite frames** — `requestAnimationFrame` never fires. CSS transitions and
-  framer-motion freeze at their start values, exited elements linger at `opacity: 0`, and
-  `getComputedStyle` returns pre-transition values. Never diagnose an animation bug from that; verify
-  layout/ARIA/DOM instead and ask a human to eyeball motion.
-- **Three palettes coexist.** `chore/sync-from-monorepo` (live frontend) is indigo `#2C3D8F` / cyan
-  `#37DAC3`. `main` is orange `#f97316` / violet. `MegaSearchBar.tsx` uses Airbnb red `#FF385C`.
-  **`CLAUDE.md` §7's orange claim is stale for the live branch.** Needs an ADR.
-- **Six tables are fully modelled with RLS and have zero consuming UI:** `Profile`, `Follow`,
-  `UserCalendar`, `Reminder`, `EventRequest`, `UserFeedback`. Cheapest route to visible value.
-- **9 files in the stale tree** `goathletix-backend/backend/src/` are an unported Sprint-3 slice
-  (activity gateway, auth JWT strategy/guard/decorator, events gateway). GA-005 is port-and-harden,
-  not build. Fix the `super-secret-fallback` JWT default and `origin:'*'` CORS on the way out.
-- `crawler.py` never calls the `urllib`/`re` it imports; its "extraction" is ~15 hardcoded events
-  written to a hardcoded macOS path. GA-009 is a rewrite.
-- `.DS_Store` is still tracked in `goathletix-backend` (GA-012 open).
-- **Forcepoint intermittently blocks Supabase.** When it does, the backend logs an HTML "Access to this site
-  is blocked" page or `fetch failed` and every `/events` call 500s; it clears on its own within minutes. The
-  homepage hides it because Next caches API responses for 5 minutes — probe `curl localhost:3000/events?limit=1`
-  before suspecting code.
-- **Turbopack sometimes misses `globals.css` edits** (TSX hot-reloads, the stylesheet stays stale). Stop the
-  frontend, delete `.next`, restart. Moving the workspace-root lockfile also needed a `.next` wipe.
+## Multi-agent workflow (new 2026-10-20)
+
+- **Coordinator = Opus** (this session). Writes GA task notes, dispatches, audits diffs, merges, pushes.
+- **All seven subagents = Sonnet** (vault-scribe = Haiku) via `model:` frontmatter in
+  `.claude/agents/*.md`. Model split is committed to the backend repo.
+- Pattern established: write exhaustive task note with scope + settled facts + acceptance → dispatch
+  to Sonnet in a worktree → audit diff vs declared scope → tsc/eslint/pglast verify → merge → push.
+  First two trial runs (GA-056, GA-058, GA-059) all landed cleanly with correct judgement calls.
+- `.claude/` lives in both the workspace root (live for the current cwd) and `goathletix-backend/.claude/`
+  (committed, portable). Hook paths are relative so both work.
+
+## Event page truth (post GA-059)
+
+Layout: image + floating-right action rail → right column with icon-only quickbar on eyebrow row
+(Save/Interested/Share, no label), title, badges, date tile, **venue card** (whole card = directions
+link), host, action card (Register CTA + urgency), **At a glance** tinted grid, **Social links**
+bare row below image, sticky section nav with gradient indicator sliding between tabs, **ticket
+cards** redesigned to screenshot-5 pattern (sport eyebrow + status pill / title + category pills /
+description / bordered fact strip of Entry·When·Eligibility·Format·Cut-off / inclusions / price +
+animated capacity bar), About/Course/Format/Eligibility/Schedule/Prizes/Policies/FAQ sections with
+gray full-width underline on each heading, aside with organiser (sm icons), docs & links, sponsors.
+
+Section headings: no accent bar; gray 1px full-width underline. Nav indicator uses
+`linear-gradient(90deg, var(--accent), color-mix(cyan))`. Hover never translates — only colour +
+shadow ring, so icons don't jump.
+
+Palette on this branch: `--accent: #12B4A0` (teal), `--cta: #FF385C` (red). Dark mode: `#37DAC3`
+accent. **CLAUDE.md §7's claim of indigo/orange is stale** — needs the ADR-002 update.
+
+## Established facts — do not re-investigate
+
+- **ADR-001 DONE.** `events` has `start_date` + `end_date` (not `event_date`). `events.service.ts`
+  queries them. `reminder_type` enum value `'event_date'` is a reminder kind, not a column.
+- **ADR-003 accepted.** Phantom trading tables don't exist in the live DB; they're prisma residue.
+- **Network:** 5432 is firewalled, Supabase REST only via corporate proxy (`.npmrc` host,
+  undici `ProxyAgent` with `tls.getCACertificates`). `main.ts:6` must read `HTTPS_PROXY` before
+  bootstrap. `curl` from git-bash can't reach Supabase through the proxy; use Node.
+- **No DDL from here.** PostgREST can't `ALTER` or `CREATE TABLE` — migrations only run from the
+  Supabase dashboard SQL editor. Seeds too, if they use types that need the service-role session.
+- **Browser pane doesn't composite frames** — rAF never fires; verify ARIA/DOM, not motion.
+- **Nine files in the stale `goathletix-backend/backend/src/` tree** are the unported Sprint-3 slice
+  (Socket.IO gateway, JWT strategy with `super-secret-fallback`, open CORS). GA-005 is port-and-harden.
+- `crawler.py` imports `urllib`/`re` but never calls them; "extraction" is ~15 hardcoded events.
+  GA-009 is a rewrite.
+- `.DS_Store` is still tracked (GA-012 open).
+- **Forcepoint intermittently blocks Supabase.** Returns HTML or 500; clears within minutes.
+- **Turbopack sometimes misses `globals.css` edits.** Stop the frontend, delete `.next`, restart.
 
 ## Branch state
 
-- **Both repos are on `feat/implement-main-page-mockup`, pushed** (2026-10-08). The workspace-root
-  `package.json` / `package-lock.json` / `node_modules` (a stray `headroom-ai` install, not used by the
-  headroom MCP server) were moved out so Turbopack resolves the frontend as its root.
-- `goathletix-frontend/main` is 4 weeks stale and `chore/sync-from-monorepo` has **no merge base**
-  with it, so it cannot be merged conventionally. GA-019 branched from the sync branch, so it
-  inherits that problem — decide the reconciliation before opening a PR.
+Both repos are on `feat/implement-main-page-mockup`, pushed. `goathletix-frontend/main` is
+weeks stale and `chore/sync-from-monorepo` has no merge base with it. GA-019 branched from the sync
+branch, so it inherits that problem — decide the reconciliation before opening a PR.
 
-## Product scope — broadened 2026-09-16
+## Shipped GA tasks (recent)
 
-GoAthletix is now an **athletics-first, multi-sport, multi-age** platform, not an endurance
-aggregator. Target: any place, any age group, kids through masters. Team sports (cricket, hockey)
-come **last** and are a different record type, not a later phase of the same one.
+- GA-043 /events/:id/details endpoint
+- GA-044 Luma-style event page (desktop + phone)
+- GA-045 design skills market research
+- GA-046 event detail field model by sport
+- GA-047 migration 0026 draft
+- GA-048 details endpoint existing fields (0024/0025)
+- GA-049 event page v2 with organiser details + category finder
+- GA-050 /events/:id/details v3 with 0026 fields
+- GA-051 showcase seed (0001_event_page_showcase.sql)
+- GA-055 media seed (0002_event_page_media.sql) + course map images
+- GA-056 aid-station vocab icons (Sonnet trial 1)
+- GA-057 sticky Register bar + aid-station mini cards + CTA glow
+- GA-058 section reveals + ticket interactive + checkpoint timeline (Sonnet)
+- GA-059 ticket card redesign with fact strip (Sonnet)
 
-- `docs/21-platform-expansion-vision.md` (new): five sequenced pillars —
-  Discover -> Host -> Community+WhatsApp CRM -> Marketplace -> Services. Discovery stays the wedge.
-- `docs/17-sports-taxonomy.md`: +6 categories (athletics, skating, gymnastics, martial arts,
-  team sports, mind sports), an age-group axis, and a training-centers entity.
-- `docs/03-target-users.md`: new segments — Parents/Guardians (10-20M households), Academies,
-  Schools/Federations.
-- **These four docs were edited in `goathletix-frontend/docs/` first and have now been synced here.**
-  The vault copy under `goathletix-backend/docs/` is the authoritative one (CLAUDE.md section 0).
-  If they diverge again, the frontend copy is the fork, not the source.
+## Next, in order
 
-**Blocking fact: athletics is not in the database.** `sport_category` has 8 values and
-`athletics` is not among them — `running` is road running. The product's stated primary focus
-cannot be stored, filtered or displayed until migration 0005 is applied.
-
-**Homepage model (settled):** the main page is an *eligibility feed*, not a catalogue and not a
-fixture list — "events I can enter, near me, soon, for my age group." Three axes: WHERE / WHEN /
-WHO. Sport is a secondary filter, never the entry point. WHO does not exist yet (0006).
-
-## Decisions — see `03 Decisions/Decision log.md`
-
-- **ADR-001 DONE.** Migration applied to the live database 2026-09-12 and verified: `events` has 22
-  columns, `event_date` gone, `start_date` + `end_date` present, **0 null end_dates** across 10,100
-  rows; `event_requests` migrated too. Code cutover shipped as GA-019. Beware: `reminder_type` has an
-  enum *value* `'event_date'` — never blanket find-and-replace.
-- **Network, corrected:** the blocker was never just the proxy. Postgres 5432 is still firewalled
-  (so Prisma and `seed.ts` still cannot run here), but HTTPS through the proxy additionally fails
-  Node's TLS validation with `UNABLE_TO_GET_ISSUER_CERT_LOCALLY` unless the OS trust store is passed
-  in explicitly. `curl -k` masks this — never use `-k` to "prove" connectivity works.
-- **ADR-003 accepted:** there is **no shared database.** Verified — the trading tables (`order`,
-  `brokercredential`, `virtualtrade`, …) return 404 on the live project while `events`/`organizers`
-  return 200, and they declare no `@@schema`. They are phantom models left by a `db pull` against a
-  different database. Remove them from `schema.prisma`. **GA-010 is closed as a false premise.**
-  This removal is a prerequisite for any Prisma-managed migration.
-- **ADR-004 accepted:** stay on Supabase REST. `chore/discovery-portal-and-env-samples` is **parked,
-  not pending** — its Prisma rewrite cannot work (5432 blocked *and* it queries a non-existent
-  `startDate`). Cherry-pick its `sample.env` files only, correcting the port to 3000.
-- **ADR-002 proposed:** brand palette — indigo `#2C3D8F` (this branch), orange (`main`), or Airbnb red
-  (`MegaSearchBar`). Isolated to an `ACCENT` constant, so the swap is two lines; the real work is
-  routing hardcoded hex through `@theme`.
-- **ADR-005 proposed:** event imagery. `Event` has **no image field** (only `Organizer.logoUrl`).
-  Recommendation: sport-coded gradient placeholders now, `hero_image_url` when ingestion can populate
-  it. Gates the homepage rails and the card redesign.
-
-Homepage composition (requested 2026-09-09) is specced in
-`01 Product/UI-UX improvement plan.md` §9 — lead with a real-events rail below the search bar, and
-avoid the word "best" until there is a signal behind it.
-
-## Next steps
-
-**Phase 0 of GA-018 is done** — `seed.ts:44` typed so the backend builds; the proxy reaches the
-server *and* its TLS is fixed via `tls.getCACertificates` into `ProxyAgent({requestTls:{ca}})`;
-`seed.ts` cut over to `start_date`/`end_date`; `await params` applied to `/sports/[sport]` and
-`/locations/[city]`. Still open from that phase: `GET /health`, and the "showing cached data" banner.
-
-Shipped in GA-019 beyond the date cutover: multi-select cities **and** states (24 states / 53 cities
-generated into `goathletix-frontend/src/lib/locations.ts`), the 17 Townscript disciplines mapped onto
-the 8 backend primaries (`src/lib/sportTaxonomy.ts`, with 9 unmappable entries recorded), widened +
-sanitised `search`, and the search-bar clipping/alignment fixes.
-
-**Migrations 0005-0011 are APPLIED and verified over REST (2026-09-16).** 11 tables exposed, every
-expected column present, 14 sports, 105 disciplines (93 active), 0 events missing a slug.
-`schema.prisma` is mirrored and `prisma generate` has been run, so the API accepts `sport=athletics`.
-Shipped alongside: `GET /taxonomy/sports`, the `disciplines`/`ageCategories`/`family` filters,
-prefix full-text search over `search_vector` (which is what finally makes organiser search work),
-and the frontend's athletics-first 12-sport list with the age-group axis.
-
-**Blocking fact, now the main constraint: the new categories have no data.** `sport=athletics`
-returns 0. All 10,100 rows are from the original 8 endurance categories and every one has
-`discipline_slugs = []`. The schema, API and UI all support athletics-first, all-ages discovery;
-the catalogue behind it does not exist yet. This is an ingestion problem, not a code one.
-
-The main page design is specced in `01 Product/Main page design spec.md`, now revised against
-`01 Product/Competitor homepage research.md` (11 sites checked). **One correction the research
-forced:** WHO (age) does not belong in the search bar — no competitor surfaces age above a
-per-sport drill-down, not even Airbnb. WHERE + WHEN stay in the bar; WHO ships as the "For kids &
-juniors near you" rail plus composed chips ("U12 Skating"), which is validated precisely because
-it is unclaimed everywhere else. Price was also added back to the card (a single "From ₹X",
-never the raw range) — indiarunning shows it on every card and the user base is cost-sensitive.
-Category grid stays banned as an *entry point*, but a slim sticky sport row survives — Airbnb, the
-spec's own analogue, keeps exactly that above its pill.
-
-Applying them taught two things worth keeping: PostgREST has **no DDL surface** and 5432 is
-firewalled, so migrations only ever run from the Supabase dashboard; and `update_modified_column()`
-from migration 0000 was **missing from the live database** even though 0001 and 0002 had clearly
-run. The repo's migration files do not describe what is deployed — verify, never assume.
-
-Next, in order:
-1. Decide how GA-019 lands — the no-merge-base problem above blocks the PR.
-2. Organiser search. PostgREST **cannot** reference an embedded column inside `or()` (PGRST100), so
-   this needs a denormalized `organizer_name` column or an RPC. "Competition" has no backing column
-   at all, and the PRD's `tags` column was never built — all three are schema work.
-3. Log the five ADRs; ADR-002 (palette) and ADR-005 (imagery) gate the homepage rails.
-
-Unverified, not broken: multi-day rendering (every row currently has `end_date == start_date`, so
-the → end affordance has never been exercised) and the search-bar animations (the Browser pane does
-not composite frames).
+1. **Memory bank maintenance:** this file was 9 days stale; the update obligation needs to actually run
+   each shipping task. New sub-step for every GA task: edit `activeContext.md` in the same commit.
+2. **Decide GA-019 landing** — the no-merge-base problem blocks the PR.
+3. **GA-002 CLAUDE.md palette:** section 7 still claims orange/indigo. Live is teal `#12B4A0`.
+   Needs an ADR-002 decision commit + CLAUDE.md fix.
+4. Club detail page (new GA, uses live `clubs` 27 columns from migration 0026).
+5. Academy / training-center detail page (uses `training_centers` + child tables).
+6. Gear/product detail page (uses `products` 16 columns + specs/size_chart jsonb).
+7. **Blocking data gap** still open: `sport=athletics` returns 0; all 10,100 rows are the 8 endurance
+   categories with `discipline_slugs=[]`. Ingestion rewrite (GA-009) or a seeded athletics batch.
 
 ## Update obligation
 
-Whoever finishes a unit of work updates this file **in the same change** — the blocking facts, branch
-state, established facts, and next steps. Correct anything that has become false rather than appending;
-this file must stay short enough to read every session. Append historical narrative to `progress.md`
-instead.
+Whoever finishes a unit of work updates this file **in the same change** — blocking facts, branch
+state, established facts, next steps. Correct anything that has become false rather than appending;
+this file must stay short enough to read every session. Append historical narrative to `progress.md`.
