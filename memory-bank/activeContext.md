@@ -119,6 +119,9 @@ branch, so it inherits that problem — decide the reconciliation before opening
 - GA-057 sticky Register bar + aid-station mini cards + CTA glow
 - GA-058 section reveals + ticket interactive + checkpoint timeline (Sonnet)
 - GA-059 ticket card redesign with fact strip (Sonnet)
+- 2026-10-22 polish (post-GA-059): removed the ticket hover-disclosure (sibling cards no longer jump),
+  fact strip + What's included locked to 2 columns, Organiser aside is `position: sticky` so Documents
+  and Links stay in view while the main column scrolls.
 
 ## Next, in order
 
