@@ -127,6 +127,79 @@ const OFFER_SELECT =
 const ITINERARY_SELECT =
   'id, day_no, title, description, distance_km, duration_text, start_altitude_m, end_altitude_m, meals, stay, sort_order';
 
+// GA-060: published reviews. `author:profiles(full_name)` embeds through the single FK
+// event_reviews.user_id -> profiles.id. `user_id` and `updated_at` are deliberately NOT selected.
+const REVIEW_SELECT =
+  'id, rating, title, body, edition_year, category_label, helpful_count, created_at, author:profiles(full_name)';
+const REVIEW_LIST_LIMIT = 20;
+const REVIEW_DISTRIBUTION_CAP = 10000;
+
+interface ReviewRow {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  edition_year: number | null;
+  category_label: string | null;
+  helpful_count: number;
+  created_at: string;
+  author?:
+    { full_name?: string | null } | { full_name?: string | null }[] | null;
+}
+
+export interface RatingDistribution {
+  '1': number;
+  '2': number;
+  '3': number;
+  '4': number;
+  '5': number;
+}
+
+/** Privacy: first name + last initial ("Priya Sharma" -> "Priya S."); never the stored full name. */
+export function toAuthorName(fullName: string | null | undefined): string {
+  const words = (fullName ?? '').trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return 'Participant';
+  const name =
+    words.length === 1
+      ? words[0]
+      : `${words[0]} ${words[words.length - 1][0].toUpperCase()}.`;
+  return name.slice(0, 40);
+}
+
+export function shapeReviews(rows: ReviewRow[]) {
+  return rows.map((r) => {
+    const author = Array.isArray(r.author) ? r.author[0] : r.author;
+    return {
+      id: r.id,
+      rating: r.rating,
+      title: r.title,
+      body: r.body,
+      edition_year: r.edition_year,
+      category_label: r.category_label,
+      helpful_count: r.helpful_count,
+      created_at: r.created_at,
+      author_name: toAuthorName(author?.full_name),
+    };
+  });
+}
+
+/** Counted from rating rows; null when they do not account for `count` (never invent one). */
+export function buildDistribution(
+  ratings: { rating: number }[],
+  count: number,
+): RatingDistribution | null {
+  const dist: RatingDistribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+  let total = 0;
+  for (const { rating } of ratings) {
+    const key = String(rating) as keyof RatingDistribution;
+    if (key in dist) {
+      dist[key] += 1;
+      total += 1;
+    }
+  }
+  return total === count ? dist : null;
+}
+
 /** Display rank of `event_sponsors.tier` (CHECK constraint in 0023); unknown tiers sort last. */
 const SPONSOR_TIER_RANK: Record<string, number> = {
   title: 0,
@@ -686,6 +759,8 @@ export class EventsService {
       resourcesRows,
       offersRows,
       itineraryRows,
+      reviewRows,
+      ratingRows,
     ] = await Promise.all([
       client
         .from('event_categories')
@@ -742,6 +817,26 @@ export class EventsService {
           .order('sort_order', { ascending: true, nullsFirst: false })
           .order('day_no', { ascending: true, nullsFirst: false }),
       ),
+      // GA-060: service-role bypasses RLS, so status = 'published' is filtered here.
+      this.safeChildRows<ReviewRow>('findDetails:event_reviews', () =>
+        client
+          .from('event_reviews')
+          .select(REVIEW_SELECT)
+          .eq('event_id', id)
+          .eq('status', 'published')
+          .order('created_at', { ascending: false })
+          .limit(REVIEW_LIST_LIMIT),
+      ),
+      this.safeChildRows<{ rating: number }>(
+        'findDetails:event_reviews_ratings',
+        () =>
+          client
+            .from('event_reviews')
+            .select('rating')
+            .eq('event_id', id)
+            .eq('status', 'published')
+            .limit(REVIEW_DISTRIBUTION_CAP),
+      ),
     ]);
 
     const ticketRows = this.rowsOrThrow<TicketTypeRow>(
@@ -772,6 +867,17 @@ export class EventsService {
       unknown
     > & {
       organizer?: unknown;
+    };
+
+    const ratingCount = Number(event.rating_count ?? 0) || 0;
+    const ratingAvg = Number(event.rating_avg);
+    const ratingSummary = {
+      avg:
+        ratingCount > 0 && event.rating_avg != null && !Number.isNaN(ratingAvg)
+          ? Math.round(ratingAvg * 10) / 10
+          : null,
+      count: ratingCount,
+      distribution: buildDistribution(ratingRows, ratingCount),
     };
 
     return {
@@ -805,6 +911,8 @@ export class EventsService {
         resources: resourcesRows,
         offers: offersRows,
         itinerary_days: itineraryRows,
+        reviews: shapeReviews(reviewRows),
+        rating_summary: ratingSummary,
       },
     };
   }
