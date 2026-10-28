@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-10-21.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-10-28.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -102,6 +102,15 @@ accent. **CLAUDE.md §7's claim of indigo/orange is stale** — needs the ADR-00
 Both repos are on `feat/implement-main-page-mockup`, pushed. `goathletix-frontend/main` is
 weeks stale and `chore/sync-from-monorepo` has no merge base with it. GA-019 branched from the sync
 branch, so it inherits that problem — decide the reconciliation before opening a PR.
+
+## Event page layout (2026-10-28)
+
+Luma-style grid from 900px, three rows: `left | right` (photo + Social event links + one clubbed **Hosted by** block
+| title, action, At a glance), then the **section nav as its own full-width, centred row**, then `extras | main`
+(documents + sponsors, sticky | every section). `.ev-rcol` is gone; the nav is a direct grid child so its sticky range
+is the whole article. Phones stack: photo, title, sections, host, documents, sponsors. A commit from the owner's own
+session (`d7e6454`, `6a7293d`) added `PastGlimpses` (replaces `MediaGallery`), the venue map and larger type; the
+four seeded showcase events still show **no Glimpses** because `0002_event_page_media.sql` has not been applied.
 
 ## Shipped GA tasks (recent)
 
