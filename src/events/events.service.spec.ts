@@ -2,6 +2,7 @@ import {
   EventsService,
   PriceTier,
   pickCurrentTierId,
+  toAuthorName,
   todayInIst,
 } from './events.service';
 import {
@@ -60,6 +61,9 @@ class FakeQueryBuilder {
   order(...args: unknown[]) {
     this.record('order', args);
     return this;
+  }
+  limit(...args: unknown[]) {
+    return this.record('limit', args);
   }
   maybeSingle() {
     this.calls.push({ method: 'maybeSingle', args: [] });
@@ -934,6 +938,169 @@ describe('EventsService.findDetails', () => {
     await expect(broken.service.findDetails(EVENT_ID)).rejects.toBeInstanceOf(
       InternalServerErrorException,
     );
+  });
+});
+
+describe('toAuthorName', () => {
+  it('derives first name + last initial', () => {
+    expect(toAuthorName('Priya Sharma')).toBe('Priya S.');
+    expect(toAuthorName('  Priya   Kumari   Sharma ')).toBe('Priya S.');
+  });
+
+  it('keeps a single word, and falls back to Participant', () => {
+    expect(toAuthorName('Priya')).toBe('Priya');
+    expect(toAuthorName(null)).toBe('Participant');
+    expect(toAuthorName(undefined)).toBe('Participant');
+    expect(toAuthorName('   ')).toBe('Participant');
+  });
+
+  it('caps at 40 characters', () => {
+    expect(toAuthorName('A'.repeat(80))).toHaveLength(40);
+    expect(toAuthorName(`${'B'.repeat(60)} Sharma`).length).toBeLessThanOrEqual(
+      40,
+    );
+  });
+});
+
+describe('EventsService.findDetails reviews (GA-060)', () => {
+  const EVENT_ID = '123e4567-e89b-42d3-a456-426614174000';
+
+  function make(
+    eventExtra: Record<string, unknown>,
+    reviews: { data: unknown[] | null; error: unknown },
+  ) {
+    const builders = new Map<string, FakeQueryBuilder>();
+    const client = {
+      from: (table: string) => {
+        const builder = new FakeQueryBuilder();
+        if (table === 'events') {
+          builder.single = { id: EVENT_ID, organizer: null, ...eventExtra };
+        } else if (table === 'event_reviews') {
+          builder.result = {
+            data: reviews.data as unknown[],
+            count: 0,
+            error: reviews.error,
+          };
+        }
+        builders.set(table, builder);
+        return builder;
+      },
+    } as unknown as SupabaseService['client'];
+    return { service: new EventsService({ client }), builders };
+  }
+
+  const review = (id: string, rating: number, full_name: string | null) => ({
+    id,
+    rating,
+    title: 'Great',
+    body: 'Loved it',
+    edition_year: 2025,
+    category_label: '10K',
+    helpful_count: 2,
+    created_at: '2026-01-01T00:00:00Z',
+    author: { full_name },
+  });
+
+  it('returns shaped reviews with no user_id, full name or updated_at', async () => {
+    const { service, builders } = make(
+      { rating_avg: '4.46', rating_count: 2 },
+      {
+        data: [
+          { ...review('r1', 5, 'Priya Sharma'), user_id: 'u1' },
+          review('r2', 4, null),
+        ],
+        error: null,
+      },
+    );
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.reviews.map((r) => r.author_name)).toEqual([
+      'Priya S.',
+      'Participant',
+    ]);
+    const json = JSON.stringify(data.reviews);
+    expect(json).not.toContain('user_id');
+    expect(json).not.toContain('full_name');
+    expect(json).not.toContain('Sharma');
+    expect(json).not.toContain('updated_at');
+    expect(data.reviews[0]).not.toHaveProperty('author');
+
+    const eqs = builders
+      .get('event_reviews')
+      ?.calls.filter((c) => c.method === 'eq')
+      .map((c) => [c.args[0], c.args[1]]);
+    expect(eqs).toEqual([
+      ['event_id', EVENT_ID],
+      ['status', 'published'],
+    ]);
+  });
+
+  it('counts the distribution when rows account for rating_count', async () => {
+    const { service } = make(
+      { rating_avg: 4.5, rating_count: 2 },
+      {
+        data: [review('r1', 5, 'A B'), review('r2', 4, 'C D')],
+        error: null,
+      },
+    );
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.rating_summary).toEqual({
+      avg: 4.5,
+      count: 2,
+      distribution: { '1': 0, '2': 0, '3': 0, '4': 1, '5': 1 },
+    });
+  });
+
+  it('returns a null distribution when rows do not account for the count (seeded event)', async () => {
+    const { service } = make(
+      { rating_avg: 4.6, rating_count: 312 },
+      { data: [], error: null },
+    );
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.reviews).toEqual([]);
+    expect(data.rating_summary).toEqual({
+      avg: 4.6,
+      count: 312,
+      distribution: null,
+    });
+  });
+
+  it('returns avg null and count 0 when the event has no ratings', async () => {
+    const { service } = make(
+      { rating_avg: null, rating_count: null },
+      { data: [], error: null },
+    );
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.reviews).toEqual([]);
+    expect(data.rating_summary.avg).toBeNull();
+    expect(data.rating_summary.count).toBe(0);
+  });
+
+  it('isolates a review read error to [] without failing the response', async () => {
+    const { service } = make(
+      { rating_avg: 4, rating_count: 3 },
+      { data: null, error: { code: '500', message: 'boom' } },
+    );
+    jest
+      .spyOn(
+        (service as unknown as { logger: { error: () => void } }).logger,
+        'error',
+      )
+      .mockImplementation(() => undefined);
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.reviews).toEqual([]);
+    expect(data.rating_summary.distribution).toBeNull();
+    expect(data.rating_summary.count).toBe(3);
+    expect(data.event).toMatchObject({ id: EVENT_ID });
   });
 });
 
