@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-10-28.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-10-30.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -103,14 +103,18 @@ Both repos are on `feat/implement-main-page-mockup`, pushed. `goathletix-fronten
 weeks stale and `chore/sync-from-monorepo` has no merge base with it. GA-019 branched from the sync
 branch, so it inherits that problem — decide the reconciliation before opening a PR.
 
-## Event page layout (2026-10-28)
+## Event page layout (2026-10-30)
 
-Luma-style grid from 900px, three rows: `left | right` (photo + Social event links + one clubbed **Hosted by** block
-| title, action, At a glance), then the **section nav as its own full-width, centred row**, then `extras | main`
-(documents + sponsors, sticky | every section). `.ev-rcol` is gone; the nav is a direct grid child so its sticky range
-is the whole article. Phones stack: photo, title, sections, host, documents, sponsors. A commit from the owner's own
-session (`d7e6454`, `6a7293d`) added `PastGlimpses` (replaces `MediaGallery`), the venue map and larger type; the
-four seeded showcase events still show **no Glimpses** because `0002_event_page_media.sql` has not been applied.
+Luma-style top block from 900px: `left | right` (photo + Social event links + one clubbed **Hosted by** block | title,
+action, At a glance). Below it **one full-width column** of sections: no section nav (deleted, GA-062), no sidebar;
+Documents and Sponsors sit after the FAQ; Reviews (GA-060/061: read API, ratings badge links to `#reviews`, posting is
+honestly disabled until accounts exist) sit after Venue. Tickets are full-width **rows** with a large distance numeral,
+key facts on the row and a "Details and requirements" disclosure (GA-062). GA-063: **distance pills** above the rows
+(shown when an event has more than 3 ticket types; a long list opens on its first distance), a row **Select** button and
+one **sticky selection bar** (quantity, total, disabled "Checkout coming soon") via `TicketPicker`; `TicketStepper` is
+gone. Platform ticketing only; external stays information only. Research caveat: Awwwards and Mobbin could not be read
+from here, so tabs, bar and numeral are design judgement. The four seeded showcase events still show **no Glimpses**
+until `0002_event_page_media.sql` is applied.
 
 ## Shipped GA tasks (recent)
 
@@ -128,6 +132,7 @@ four seeded showcase events still show **no Glimpses** because `0002_event_page_
 - GA-057 sticky Register bar + aid-station mini cards + CTA glow
 - GA-058 section reveals + ticket interactive + checkpoint timeline (Sonnet)
 - GA-059 ticket card redesign with fact strip (Sonnet)
+- GA-060 event reviews API, GA-061 reviews UI, GA-062 ticket rows + one-column body, GA-063 distance tabs + sticky selection bar
 - 2026-10-22 polish (post-GA-059): removed the ticket hover-disclosure (sibling cards no longer jump),
   fact strip + What's included locked to 2 columns, Organiser aside is `position: sticky` so Documents
   and Links stay in view while the main column scrolls.
