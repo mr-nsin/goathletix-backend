@@ -1,6 +1,6 @@
 # Active Context: GoAthletix
 
-**Last reconciled: 2026-10-30.** This file is the session entry point — read it first, before reading
+**Last reconciled: 2026-11-05.** This file is the session entry point — read it first, before reading
 code. It is deliberately short. Keep it that way: it is loaded every session, so every line costs
 context. Detail belongs in the linked notes, not here.
 
@@ -103,18 +103,24 @@ Both repos are on `feat/implement-main-page-mockup`, pushed. `goathletix-fronten
 weeks stale and `chore/sync-from-monorepo` has no merge base with it. GA-019 branched from the sync
 branch, so it inherits that problem — decide the reconciliation before opening a PR.
 
-## Event page layout (2026-10-30)
+## Event page layout (2026-11-05)
 
-Luma-style top block from 900px: `left | right` (photo + Social event links + one clubbed **Hosted by** block | title,
-action, At a glance). Below it **one full-width column** of sections: no section nav (deleted, GA-062), no sidebar;
-Documents and Sponsors sit after the FAQ; Reviews (GA-060/061: read API, ratings badge links to `#reviews`, posting is
-honestly disabled until accounts exist) sit after Venue. Tickets are full-width **rows** with a large distance numeral,
-key facts on the row and a "Details and requirements" disclosure (GA-062). GA-063: **distance pills** above the rows
-(shown when an event has more than 3 ticket types; a long list opens on its first distance), a row **Select** button and
-one **sticky selection bar** (quantity, total, disabled "Checkout coming soon") via `TicketPicker`; `TicketStepper` is
-gone. Platform ticketing only; external stays information only. Research caveat: Awwwards and Mobbin could not be read
-from here, so tabs, bar and numeral are design judgement. The four seeded showcase events still show **no Glimpses**
-until `0002_event_page_media.sql` is applied.
+Luma-style top block from 900px: `left | right` (photo + Social event links | title, action, At a glance). The header
+Hosted-by line and the wide banner were removed; the venue row is borderless with the pin in a calendar-style tile and a
+plain arrow. Below it **one full-width column** of sections (no section nav, no sidebar; Reviews after Venue, Documents and
+Sponsors after the FAQ). Body text from About down is larger via `.ev`-scoped card tokens (homepage cards unchanged).
+Tickets are full-width rows with distance pills above; the Show / Sort / Your age panel is switched off
+(`FILTER_PANEL = false` in `TicketFinder.tsx`). No tints and no "places left" on rows (owner rejected both). Row **Add**
+button + sticky selection bar (`TicketPicker`) and the fixed bottom bar both open **checkout**. Primary buttons use
+`var(--grad)`. Platform ticketing only; external stays information only.
+
+## Checkout (GA-064, 2026-11-05)
+
+`/events/<id>/checkout?t=<ticketId>&q=<qty>`: Tickets → Participants (booking contact, per-seat details, age checked on
+the category's age-as-on date, T-shirt, qualifying result, emergency contact) → Review & pay (method picker, waiver and
+policy consent) → Confirmation (booking number, ticket stubs, .ics). Client-only render, draft in sessionStorage.
+**Payment is a preview**: no provider (ADR-007 open) and no accounts (`orders.user_id` / `tickets.buyer_id` NOT NULL →
+profiles), so nothing is posted. `orderDraft()` in `src/lib/checkout.ts` already uses `orders`/`tickets` column names.
 
 ## Shipped GA tasks (recent)
 
@@ -133,12 +139,15 @@ until `0002_event_page_media.sql` is applied.
 - GA-058 section reveals + ticket interactive + checkpoint timeline (Sonnet)
 - GA-059 ticket card redesign with fact strip (Sonnet)
 - GA-060 event reviews API, GA-061 reviews UI, GA-062 ticket rows + one-column body, GA-063 distance tabs + sticky selection bar
+- GA-064 checkout flow with preview payment (frontend only)
 - 2026-10-22 polish (post-GA-059): removed the ticket hover-disclosure (sibling cards no longer jump),
   fact strip + What's included locked to 2 columns, Organiser aside is `position: sticky` so Documents
   and Links stay in view while the main column scrolls.
 
 ## Next, in order
 
+0. **Real checkout backend:** choose the payment provider (ADR-007 follow-up), accounts/sign-in, then a NestJS
+   `POST /orders` that takes `orderDraft()` and holds seats via `tickets.reserved_until`.
 1. **Memory bank maintenance:** this file was 9 days stale; the update obligation needs to actually run
    each shipping task. New sub-step for every GA task: edit `activeContext.md` in the same commit.
 2. **Decide GA-019 landing** — the no-merge-base problem blocks the PR.
