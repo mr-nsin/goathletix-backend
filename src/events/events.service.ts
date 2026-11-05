@@ -166,6 +166,60 @@ export function toAuthorName(fullName: string | null | undefined): string {
   return name.slice(0, 40);
 }
 
+// GA-065: organiser-defined registration form fields. created_at is selected only to break
+// sort_order ties and is dropped from the output.
+const FORM_FIELD_SELECT =
+  'id, category_id, field_key, label, field_type, options, is_required, help_text, sort_order, created_at';
+
+export interface FormFieldRow {
+  id: string;
+  category_id: string | null;
+  field_key: string;
+  label: string;
+  field_type: string;
+  options: unknown;
+  is_required: boolean;
+  help_text: string | null;
+  sort_order: number | null;
+  created_at: string | null;
+}
+
+/** options is jsonb: accept string[] or {label|value}[]; anything else becomes null. */
+export function coerceFieldOptions(options: unknown): string[] | null {
+  if (!Array.isArray(options)) return null;
+  const out: string[] = [];
+  for (const o of options) {
+    if (typeof o === 'string') {
+      out.push(o);
+    } else if (o && typeof o === 'object') {
+      const { label, value } = o as { label?: unknown; value?: unknown };
+      const text = typeof label === 'string' ? label : value;
+      if (typeof text === 'string') out.push(text);
+    }
+  }
+  return out;
+}
+
+export function shapeFormFields(rows: FormFieldRow[]) {
+  return [...rows]
+    .sort(
+      (a, b) =>
+        (a.sort_order ?? Number.MAX_SAFE_INTEGER) -
+          (b.sort_order ?? Number.MAX_SAFE_INTEGER) ||
+        compareNullsLast(a.created_at, b.created_at),
+    )
+    .map((r) => ({
+      id: r.id,
+      category_id: r.category_id,
+      field_key: r.field_key,
+      label: r.label,
+      field_type: r.field_type,
+      options: coerceFieldOptions(r.options),
+      is_required: r.is_required,
+      help_text: r.help_text,
+    }));
+}
+
 export function shapeReviews(rows: ReviewRow[]) {
   return rows.map((r) => {
     const author = Array.isArray(r.author) ? r.author[0] : r.author;
@@ -761,6 +815,7 @@ export class EventsService {
       itineraryRows,
       reviewRows,
       ratingRows,
+      formFieldRows,
     ] = await Promise.all([
       client
         .from('event_categories')
@@ -836,6 +891,15 @@ export class EventsService {
             .eq('event_id', id)
             .eq('status', 'published')
             .limit(REVIEW_DISTRIBUTION_CAP),
+      ),
+      // GA-065: public-read registration form config (migration 0022).
+      this.safeChildRows<FormFieldRow>('findDetails:event_form_fields', () =>
+        client
+          .from('event_form_fields')
+          .select(FORM_FIELD_SELECT)
+          .eq('event_id', id)
+          .order('sort_order', { ascending: true, nullsFirst: false })
+          .order('created_at', { ascending: true }),
       ),
     ]);
 
@@ -913,6 +977,7 @@ export class EventsService {
         itinerary_days: itineraryRows,
         reviews: shapeReviews(reviewRows),
         rating_summary: ratingSummary,
+        form_fields: shapeFormFields(formFieldRows),
       },
     };
   }

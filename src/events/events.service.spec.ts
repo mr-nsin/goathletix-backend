@@ -1140,3 +1140,78 @@ describe('todayInIst', () => {
     expect(todayInIst(new Date('2026-10-31T18:30:00Z'))).toBe('2026-11-01');
   });
 });
+
+describe('EventsService.findDetails form_fields (GA-065)', () => {
+  const EVENT_ID = '123e4567-e89b-42d3-a456-426614174000';
+
+  function make(rows: unknown[] | null, error: unknown = null) {
+    const builders = new Map<string, FakeQueryBuilder>();
+    const client = {
+      from: (table: string) => {
+        const builder = new FakeQueryBuilder();
+        if (table === 'events') {
+          builder.single = { id: EVENT_ID, organizer: null };
+        } else if (table === 'event_form_fields') {
+          builder.result = { data: rows as unknown[], count: 0, error };
+        }
+        builders.set(table, builder);
+        return builder;
+      },
+    } as unknown as SupabaseService['client'];
+    return { service: new EventsService({ client }), builders };
+  }
+
+  const field = (id: string, extra: Record<string, unknown>) => ({
+    id,
+    category_id: null,
+    field_key: `k_${id}`,
+    label: `Label ${id}`,
+    field_type: 'text',
+    options: null,
+    is_required: false,
+    help_text: null,
+    sort_order: 0,
+    created_at: '2026-01-01T00:00:00Z',
+    ...extra,
+  });
+
+  it('returns sorted, shaped form_fields with coerced options', async () => {
+    const { service, builders } = make([
+      field('c', { sort_order: null }),
+      field('b', { sort_order: 2, options: ['S', 'M'], field_type: 'select' }),
+      field('a', {
+        sort_order: 1,
+        field_type: 'select',
+        options: [{ label: 'A+' }, { value: 'B+' }, 5],
+        is_required: true,
+      }),
+    ]);
+
+    const { data } = await service.findDetails(EVENT_ID);
+
+    expect(data.form_fields.map((f) => f.id)).toEqual(['a', 'b', 'c']);
+    expect(data.form_fields[0]).toEqual({
+      id: 'a',
+      category_id: null,
+      field_key: 'k_a',
+      label: 'Label a',
+      field_type: 'select',
+      options: ['A+', 'B+'],
+      is_required: true,
+      help_text: null,
+    });
+    expect(data.form_fields[1].options).toEqual(['S', 'M']);
+    expect(data.form_fields[2].options).toBeNull();
+    const eqs = builders
+      .get('event_form_fields')
+      ?.calls.filter((c) => c.method === 'eq')
+      .map((c) => [c.args[0], c.args[1]]);
+    expect(eqs).toEqual([['event_id', EVENT_ID]]);
+  });
+
+  it('returns [] when the form fields fetch fails', async () => {
+    const { service } = make(null, { message: 'boom' });
+    const { data } = await service.findDetails(EVENT_ID);
+    expect(data.form_fields).toEqual([]);
+  });
+});
