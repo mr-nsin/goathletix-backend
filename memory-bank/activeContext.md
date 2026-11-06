@@ -121,6 +121,10 @@ the category's age-as-on date, T-shirt, qualifying result, emergency contact) �
 policy consent) → Confirmation (booking number, ticket stubs, .ics). Client-only render, draft in sessionStorage.
 **Payment is a preview**: no provider (ADR-007 open) and no accounts (`orders.user_id` / `tickets.buyer_id` NOT NULL →
 profiles), so nothing is posted. `orderDraft()` in `src/lib/checkout.ts` already uses `orders`/`tickets` column names.
+GA-065: participant questions come from config: an event's `event_form_fields` rows (now returned by
+`/events/:id/details` as `form_fields`) override a **sport preset** in `src/lib/registrationFields.ts`; T-shirt,
+qualifying, doubles-partner and under-18 guardian fields are added per ticket. Catalogue and research:
+`01 Product/Registration form fields by sport.md`. No organiser builder UI yet.
 
 ## Shipped GA tasks (recent)
 
@@ -140,13 +144,15 @@ profiles), so nothing is posted. `orderDraft()` in `src/lib/checkout.ts` already
 - GA-059 ticket card redesign with fact strip (Sonnet)
 - GA-060 event reviews API, GA-061 reviews UI, GA-062 ticket rows + one-column body, GA-063 distance tabs + sticky selection bar
 - GA-064 checkout flow with preview payment (frontend only)
+- GA-065 registration form fields per sport + `form_fields` in the details endpoint
 - 2026-10-22 polish (post-GA-059): removed the ticket hover-disclosure (sibling cards no longer jump),
   fact strip + What's included locked to 2 columns, Organiser aside is `position: sticky` so Documents
   and Links stay in view while the main column scrolls.
 
 ## Next, in order
 
-0. **Real checkout backend:** choose the payment provider (ADR-007 follow-up), accounts/sign-in, then a NestJS
+0. **Organiser form builder** (starts from the sport preset, writes `event_form_fields`), after accounts exist.
+1. **Real checkout backend:** choose the payment provider (ADR-007 follow-up), accounts/sign-in, then a NestJS
    `POST /orders` that takes `orderDraft()` and holds seats via `tickets.reserved_until`.
 1. **Memory bank maintenance:** this file was 9 days stale; the update obligation needs to actually run
    each shipping task. New sub-step for every GA task: edit `activeContext.md` in the same commit.
