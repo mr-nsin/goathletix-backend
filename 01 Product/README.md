@@ -11,6 +11,10 @@ Store durable product requirements, user problems, and accepted scope. Link impl
   event, concrete row and card specs, a badge system, state copy, accessibility acceptance criteria,
   and a prioritised backlog ordered so no-new-data wins come first.
 
+- [[01 Product/Explore, community and analytics|Explore, community and analytics]] — the Explore tab, partner
+  athletes (profiles, sessions, photos, blogs, review before public) and the admin dashboard for feedback,
+  behaviour and traffic. Requirements only; DPDP privacy items and nine owner decisions listed.
+
 Related, in other folders:
 
 - [[04 Delivery/GA-018-product-reliability-and-ux-roadmap|GA-018 Product reliability and UX roadmap]] —

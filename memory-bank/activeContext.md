@@ -151,6 +151,10 @@ qualifying, doubles-partner and under-18 guardian fields are added per ticket. C
 
 ## Next, in order
 
+00. **Explore tab** (owner request 2026-11-10). Requirements in `01 Product/Explore, community and analytics.md`:
+    Explore page, partner athletes (profiles, photos, blogs, public posts reviewed first) and an admin dashboard for
+    post-ticket feedback, clicks and traffic. Nothing built. Needs the owner to confirm what Explore contains
+    (open decision 1) and the privacy items (DPDP, IP addresses). Phase 1 onwards needs sign-in, which does not exist.
 0. **Organiser form builder** (starts from the sport preset, writes `event_form_fields`), after accounts exist.
 1. **Real checkout backend:** choose the payment provider (ADR-007 follow-up), accounts/sign-in, then a NestJS
    `POST /orders` that takes `orderDraft()` and holds seats via `tickets.reserved_until`.
