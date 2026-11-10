@@ -204,3 +204,16 @@ Ordered by how directly each closes a gap in the MVP's own basic user flows, che
   document agrees but adds that `UserFeedback` (`schema.prisma:219`) is in the same position and was
   not named in GA-018's list — it backs the declared "Request a Feature & Feedback Form" (MVP Flow 8,
   Sprint 10 deliverable) and is equally unconsumed by any UI.
+
+## 7. Deferred until the organiser dashboard starts (added 2026-11-08)
+
+These are built on the participant side or as defaults today. The organiser-side screens to control them are **not**
+built yet and should be scoped together when the organiser dashboard begins.
+
+| Item | Today | Dashboard work to build | Spec |
+| --- | --- | --- | --- |
+| Registration form fields | Sport presets plus the organiser's own `event_form_fields` rows if present | Form builder: add, hide, reorder, required, per-ticket scope, option lists, live preview, export | `Registration form fields by sport.md` |
+| Ticket design (premium) | One platform default design | Template picker, colours, patterns, art upload, contrast check, plan gating | `Organizer and seller platform features.md` section 6 |
+| Wide event banner | Optional `banner_url` shown under the title (sample data only) | Banner upload with crop guidance | section 6.2 |
+| Route map and course info | Shows the organiser's `course_map_url` if it is an image, otherwise a link button | Upload route image or paste a map link; optional route notes (needs a new column) | Event page, Course section |
+| Filter options per sport | Distance pills plus "Available now", "Timed only", sort, age and gender | Per-sport filter config in the sports table, shown only when a filter has two or more values | Design notes in the 2026-11-08 session |

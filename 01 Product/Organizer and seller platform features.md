@@ -240,3 +240,52 @@ log) with RLS and the backend visibility filter; Prisma mirrors it in the same c
 | 7 | GST on coaching fees, TCS/TDS, coach agreement | CA and counsel |
 | 8 | Which sports first | Athletics, skating and running, matching the athletics-first scope |
 | 9 | Menu label | "Training" (covers batches, camps, clinics and race prep; it is what athletes search for). Alternatives: Coaching, Academies, Classes, Programmes |
+
+---
+
+## 6. Ticket design customisation (premium feature) — added 2026-11-08
+
+Status: **deferred, build with the organiser dashboard.** Today every ticket renders in one platform design.
+
+### 6.1 What exists now (the default design)
+
+Each ticket category on the event page is drawn as a ticket: a coloured panel at the left edge with the distance or
+icon, the name and facts in the middle, a dashed tear line, and the price and Add button on the right. Half-circle
+cut-outs sit at the centre of the left and right edges. The panel colours rotate through four palettes (teal-lime,
+blue, orange-red, violet) with dense ring and stripe patterns. This is the free, platform-wide default.
+
+### 6.2 What organisers will be able to do (premium)
+
+| Capability | Detail |
+| --- | --- |
+| Choose a template | A small set of ready-made ticket designs to pick from, each with a live preview |
+| Colours | Pick the panel palette per event or per category, or set brand colours; accent, text and pattern follow |
+| Pattern and art | Choose the abstract pattern (rings, stripes, waves, dots, none), or upload brand art or a logo for the panel |
+| Per-category style | Different design for the full marathon, half, 10K, and so on |
+| Banner | Upload a wide event banner (`banner_url`), already supported by the event page |
+| Preview | Dashboard preview on desktop and phone, in light and dark mode |
+
+### 6.3 Rules the designs must follow
+
+- **Contrast is checked at save time.** Text on the panel must meet WCAG AA, or the dashboard offers the nearest
+  passing colour. Organisers cannot publish an unreadable ticket.
+- **Content never moves.** Customising changes colour, pattern and art only. Price, the Add button, sold-out state and
+  the details link stay in the same place so buyers always find them.
+- **Sold-out and closed states** use the platform's neutral grey regardless of the chosen design.
+- **Fallback.** No design set, or a plan that lapses, falls back to the default design. Nothing breaks.
+- **Reduced motion and print** follow the platform rules; custom art is static.
+
+### 6.4 Plan gating and data
+
+- Entitlement key (suggested): `ticket_design`. Free plan: default design only. Paid plan: templates, colours, patterns.
+  Higher plan: custom art upload and per-category styles. Final plan names and prices are the owner's decision.
+- Storage (suggested, to confirm when built): `design_template text`, `design_palette jsonb` (two colours plus accent)
+  and `design_art_url text` on the ticket category (`ticket_types`), with an event-level default. Uploaded art goes in the
+  existing media storage; size and type limits as for posters.
+- The event page already accepts per-event data for `banner_url`; the ticket theme fields are new and need a migration.
+
+### 6.5 Open decisions for the owner
+
+1. Which plan tier unlocks which part (templates, colours, art upload).
+2. Whether organisers can customise the downloadable e-ticket PDF with the same design.
+3. Whether attendees' wallet passes (Apple/Google) follow the design.
