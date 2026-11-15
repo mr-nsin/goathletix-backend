@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { EventsModule } from './events/events.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TaxonomyModule } from './taxonomy/taxonomy.module';
     SupabaseModule,
     EventsModule,
     TaxonomyModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
