@@ -149,6 +149,14 @@ qualifying, doubles-partner and under-18 guardian fields are added per ticket. C
   fact strip + What's included locked to 2 columns, Organiser aside is `position: sticky` so Documents
   and Links stay in view while the main column scrolls.
 
+## Sign-in (GA-066, 2026-11-15)
+
+Built, **not live until the owner configures Supabase** (project URL and anon key in the frontend `.env.local`, redirect URLs,
+Email/Google/Phone providers, SMS DLT registration; steps in the GA-066 note). Mobile code is the default, with email + password
+and Google beside it; dialog plus `/signin`, `/signup`, `/auth/callback`, `/auth/reset`; backend `GET /me` behind
+`SupabaseAuthGuard`. Local branches only (not pushed). No real sign-in has been run. Next: owner setup, then checkout creates
+or links an account after the OTP (guest checkout stays), then saved events.
+
 ## Next, in order
 
 00. **Explore tab** (owner request 2026-11-10). Requirements in `01 Product/Explore, community and analytics.md`:
@@ -174,3 +182,5 @@ qualifying, doubles-partner and under-18 guardian fields are added per ticket. C
 Whoever finishes a unit of work updates this file **in the same change** — blocking facts, branch
 state, established facts, next steps. Correct anything that has become false rather than appending;
 this file must stay short enough to read every session. Append historical narrative to `progress.md`.
+
+<!-- 2026-11-15: sign-in dialog now on shadcn Dialog/Tabs/Input OTP; popup 1000x700 fixed; see GA-066 handoff update. Frontend changes uncommitted. -->
