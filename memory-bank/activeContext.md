@@ -184,3 +184,5 @@ state, established facts, next steps. Correct anything that has become false rat
 this file must stay short enough to read every session. Append historical narrative to `progress.md`.
 
 <!-- 2026-11-15: sign-in dialog now on shadcn Dialog/Tabs/Input OTP; popup 1000x700 fixed; see GA-066 handoff update. Frontend changes uncommitted. -->
+
+<!-- GA-067 (2026-11-16): demo sign-in + /become/{organiser,seller,coach} wizards + /organiser /seller /coach dashboards + /account, localStorage only (ga.demo.v1). Same-domain routes by decision; real user_roles/KYC not built. Frontend commit 39ab341, not pushed. -->
