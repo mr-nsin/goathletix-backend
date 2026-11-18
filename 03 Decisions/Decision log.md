@@ -18,3 +18,4 @@ Create one ADR from [[99 Templates/Decision record|the decision template]] for e
 | [[03 Decisions/ADR-006-sport-taxonomy-two-axis\|ADR-006]] | Two-axis sport taxonomy (family × category × discipline) | accepted | 2026-09-16 |
 | [[03 Decisions/ADR-007-discovery-plus-ticketing\|ADR-007]] | Discovery + ticketing (ticketing first); moderated seller marketplace; public / unlisted / private events | accepted | 2026-10-05 |
 | [[03 Decisions/ADR-008-coach-trainings\|ADR-008]] | Coaches and academies host trainings: own tables (not events), phased find-a-coach then book-and-pay, verified before visible | **proposed** | 2026-10-12 |
+| [[03 Decisions/ADR-010-separate-accounts-per-role\|ADR-010]] | Each role (participant, organiser, seller, coach or academy) has its own account, sign-in and onboarding; no shared login or role switcher | accepted | 2026-11-18 |

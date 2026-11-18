@@ -107,8 +107,8 @@ directly to these tables. RLS on every new table, with no public read.
 **Who.** Experienced athletes and coaches (a "partner") who want an audience on GoAthletix. This extends the
 coach and academy profile in
 [[01 Product/Organizer and seller platform features|Organizer and seller platform features §5.2]]: a coach is a
-partner who runs trainings; a partner athlete may run sessions or events, share their journey, or both. One
-login can hold several roles.
+partner who runs trainings; a partner athlete may run sessions or events, share their journey, or both. Each role has its own
+account (ADR-010), so a partner athlete who also runs sessions signs up for each separately.
 
 ### 3.1 What a partner can do
 

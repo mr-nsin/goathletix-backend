@@ -3,7 +3,10 @@
 Status: ready-for-review (local commit 39ab341 on codex/ga-067-role-dashboards, ff-merged into the frontend working branch, not pushed). Repo: frontend only. Branch `codex/ga-067-role-dashboards`.
 Decision basis: deep research 2026-11-16 (see `01 Product/Explore, community and analytics.md` for neighbouring scope).
 
-## Decision (settled)
+## Decision (superseded 2026-11-18 by ADR-010: each role has its own account)
+> Update: the product owner decided each role has its own account. The text below is what was built; the role switcher and the
+> `/account` "Become a..." cards need rework. See `03 Decisions/ADR-010-separate-accounts-per-role.md`.
+
 One account per person (one sign-in for all). Roles are additive and added **after** sign-up through "Become a..." flows, not at sign-up
 and not via separate login buttons. Portals are same-domain routes `/organiser`, `/seller`, `/coach` (not subdomains). Approval/KYC gates
 what a role can do (publish, list, payouts), not whether it can be applied for. A header role switcher shows only roles the person holds.

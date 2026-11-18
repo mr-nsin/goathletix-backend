@@ -149,8 +149,8 @@ make-up class, cancellation and refund policy; trial policy; photos.
 Individual coach or academy (rink, dojo, institute): name, bio, years coaching, certifications (federation,
 NIS, ITRA or other) with uploaded proof, achievements, the age groups and sports they coach, languages,
 the venues they train at, photos, and, later, reviews and followers (`entity_follows` already supports a
-`training_center` target). A centre has several coaches; an individual coach is a centre of one. One login can
-hold organiser, seller and coach roles (rights are per entity, not global).
+`training_center` target). A centre has several coaches; an individual coach is a centre of one. Each role has its own
+account (ADR-010, 2026-11-18): an organiser, a seller and a coach each sign up separately, and rights are per entity.
 
 ### 5.3 Athlete and parent side
 
