@@ -7,6 +7,7 @@ import { SupabaseModule } from './supabase/supabase.module';
 import { EventsModule } from './events/events.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { AuthModule } from './auth/auth.module';
+import { RegistrationsModule } from './registrations/registrations.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from './auth/auth.module';
     EventsModule,
     TaxonomyModule,
     AuthModule,
+    RegistrationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

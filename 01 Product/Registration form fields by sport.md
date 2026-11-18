@@ -112,3 +112,5 @@ dashboard work will give organisers a screen to change that. Requirements for it
 - **Export** of all answers as CSV, with one column per `field_key`.
 - **Premium hook.** Basic edits are free. Unlimited custom fields, conditional questions ("ask only if X") and file
   uploads can sit behind a plan later; keep the entitlement check in one place.
+
+Where answers are stored (2026-11-12): one row per answer in `registration_answers`, keyed by `field_key`, with the label and type as asked and a searchable text copy, linked to the ticket and the participant. See [[02 Architecture/Registrations data model]].
