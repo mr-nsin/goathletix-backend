@@ -26,3 +26,19 @@ Sites read on 2026-11-18: founderdesk.so, loom.com, wisprflow.ai, perchnotch.com
 4. Distance markers as progress through the page.
 5. Honest labels: "Sample data" on demos, "Coming soon" on features that are not built (payouts, results, certificates).
 6. Motion respects `prefers-reduced-motion`, and pauses on hover so people can read.
+
+## Added 2026-11-18: spico.io
+
+Read as text and one screenshot (the page is largely a scripted chat demo).
+
+| What it does | Idea for us |
+| --- | --- |
+| Hero is one prompt bar with mode pills (Research, Write, Fix, Track) on a warm gradient, not a screenshot. | A command bar in the console hero ("Find Meera Nair", "Who has not collected a kit?") that types itself and answers with cards. |
+| The demo is a chat with rich result cards (post cards, an AI reply, "View original", "Reply on your board"). | Show real-looking cards: a registrant card, a batch card, an order card, each with an action button. |
+| States plainly what it will NOT do: "Nothing is posted from here. Each of those has a button on the board." | Same honesty line on our demos: "Sample data. Nothing is sent from here." |
+| Trust strip with a review score and company logos. | We have no customers yet, so use true platform facts instead (already done). |
+| "Walk me through..." suggested prompts under the answer. | Suggested chips under the console: "What needs attention?", "Who is not checked in?". |
+
+## Added 2026-11-18: scroll story with a real runner
+
+The "how it works" section now has a start line at 0 km and a finish line at 42 km on a sticky track. A side-on runner (SVG limbs that swing) moves along it with scroll, the legs cycle only while the page is moving, and a bubble shows the current distance. Ideas to try next: a flag that waves at the finish, confetti on arrival, kilometre markers that light up as the runner passes, and a pace caption ("easy", "tempo") that changes along the way.

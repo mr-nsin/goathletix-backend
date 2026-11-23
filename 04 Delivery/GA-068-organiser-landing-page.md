@@ -37,3 +37,26 @@ Frontend only. Not committed yet. Applies the change list in `05 Research/report
 - Rework the GA-067 role switcher and `/account` "Become a..." cards; add seller and coach sign-in.
 - Legal review of the trust and comparison copy; check the sport copy with each sport's rules before any figures are added.
 - Visual pass on real competitor pages (the research read text only).
+
+## Update 2026-11-19: each landing page is its own world
+
+The owner asked for out-of-the-box themes and animations so the pages do not read as a generic organiser landing page.
+
+| Page | Theme | Signature motion |
+| --- | --- | --- |
+| `/organisers` | Race Control: a night stadium | Top-down track with runners lapping behind the hero, starting-gun countdown on first visit of a session (skippable, skipped for reduced motion), a start-to-finish scroll track with a running figure, a finish tape a runner breaks at the end, with confetti |
+| `/academies` | The Coach's Board: a chalkboard | Chalk-handwriting headline with a hand-drawn underline, a play diagram that redraws itself, paper-plane enquiries, a weekly timetable where sticky notes drop in, a wooden tray |
+| `/sellers` | The Expo Stall: a neon shop | Shutter that rolls up, flickering OPEN sign, swinging price tags, a delivery scooter, a shelf where clicking a product slams a SOLD stamp and updates the sales counter |
+
+Shared: `components/organiser-landing/stage.css` (themes), `partner-landing/` (template, art, Timetable, Shelf). All demos stay labelled "Sample data"; unbuilt features stay tagged.
+
+## Owner decision 2026-11-19
+
+The features in `05 Research/reports/Organiser dashboard improvements.md` will all be developed (MVP, then Next, then Later). The organiser dashboard remains organisers-only (ADR-010).
+
+## Update 2026-11-19 (later): one palette, partner menu, platform information
+
+- **One colour system.** The three pages share the brand palette (teal and lime on deep navy). The per-page accent overrides were removed; each page keeps its own theme only in its imagery and motion.
+- **Partner with us menu.** The header menu has no clickable list items. Each audience has one "Get more details" link: `/organisers`, `/sellers`, `/academies`. The mobile menu and footer link to the same landing pages.
+- **Platform information on every page.** A shared "What is on GoAthletix today" section shows real numbers from the listings (events listed, still to come, cities, sports, a dot map of upcoming events per city, sports with counts) from `lib/partnerPulse.ts`. It counts listings, not customers or sales.
+- **One creative information section per page:** organisers: a control-tower wall of live tiles; academies: a radar that finds you; sellers: a race-week parcel belt. Plus each page's earlier signature (timetable board, shelf you can sell from).
